@@ -30,7 +30,9 @@ function load<T>(name: string): T {
   return JSON.parse(readFileSync(join(DIR, name), 'utf8')) as T
 }
 
-function urlOf(input: RequestInfo | URL): string {
+type FetchInput = Parameters<typeof fetch>[0]
+
+function urlOf(input: FetchInput): string {
   if (typeof input === 'string') return input
   if (input instanceof URL) return input.href
   return input.url
@@ -46,7 +48,7 @@ export function replay(plan: Plan): () => void {
       : load<OEmbedFixture>(plan.oembed)
   const calls = plan.innertube === undefined ? null : load<InnertubeCall[]>(plan.innertube)
 
-  globalThis.fetch = async (input: RequestInfo | URL): Promise<Response> => {
+  globalThis.fetch = async (input: FetchInput): Promise<Response> => {
     const url = urlOf(input)
 
     if (url.includes('/oembed')) {

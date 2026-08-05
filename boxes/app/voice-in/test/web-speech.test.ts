@@ -29,7 +29,7 @@ describe('the web-speech provider', () => {
     expect(heard).toEqual(['still holding'])
   })
 
-  it('reports the engine's own failure and delivers an empty utterance', async () => {
+  it('delivers an empty utterance when the engine fails, with the reason', async () => {
     const { listener, heard } = recordedListener({ provider: 'web-speech' })
 
     await listener.start()

@@ -8,7 +8,7 @@
  * the gate and the diagnostic come from the listener's own capture instead.
  */
 
-import { EngineFailure } from '../errors.ts'
+import { EngineFailure, nameOf } from '../errors.ts'
 import type { Hold, HoldOptions, Provider } from './provider.ts'
 
 /** Never call start() straight out of the end handler; Chrome answers with a network storm. */
@@ -151,9 +151,8 @@ class WebSpeechHold implements Hold {
       recognition.start()
     } catch (error) {
       // Already running is the one throw here, and it means the session we want is open.
-      if ((error as Error).name !== 'InvalidStateError') {
-        this.#failure = new EngineFailure((error as Error).name)
-      }
+      const name = nameOf(error)
+      if (name !== 'InvalidStateError') this.#failure = new EngineFailure(name)
     }
   }
 

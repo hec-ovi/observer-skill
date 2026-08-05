@@ -8,7 +8,7 @@
  */
 
 import workletUrl from './pcm.worklet.ts?worker&url'
-import { EngineFailure, ListenError } from './errors.ts'
+import { EngineFailure, ListenError, messageOf, nameOf } from './errors.ts'
 import { toRate } from './resample.ts'
 
 export const TARGET_RATE = 16000
@@ -33,9 +33,9 @@ export function microphoneReachable(): boolean {
 }
 
 function fail(error: unknown): never {
-  const name = error instanceof Error ? error.name : ''
+  const name = nameOf(error)
   if (DENIALS.has(name)) throw new ListenError('MIC_DENIED', 'the microphone was refused')
-  throw new EngineFailure(name || String(error))
+  throw new EngineFailure(name || messageOf(error))
 }
 
 function peakOf(pcm: Float32Array<ArrayBuffer>): number {

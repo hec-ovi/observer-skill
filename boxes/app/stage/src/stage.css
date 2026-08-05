@@ -1,0 +1,80 @@
+/* The stage: a title, a caption when there is one, and the space the module draws in. */
+
+.stage {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  inline-size: 100%;
+  block-size: 100%;
+  background: var(--surface);
+  color: var(--text);
+  font-family: var(--font-sans);
+  opacity: 0;
+  transform: translateY(var(--motion-shift));
+  transition:
+    opacity var(--motion) var(--ease),
+    transform var(--motion) var(--ease);
+}
+
+.stage[data-phase='in'] {
+  opacity: 1;
+  transform: none;
+}
+
+.stage-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.stage-title {
+  margin: 0;
+  font-size: var(--text-lg);
+  font-weight: 600;
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+}
+
+.stage-caption {
+  margin: 0;
+  color: var(--text-dim);
+  font-size: var(--text-sm);
+  line-height: var(--leading);
+}
+
+.stage-close,
+.stage-failure button {
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius);
+  background: none;
+  color: var(--text-dim);
+  font: inherit;
+  font-size: var(--text-sm);
+  cursor: pointer;
+}
+
+.stage-close:hover,
+.stage-failure button:hover {
+  color: var(--text);
+}
+
+.stage-canvas {
+  position: relative;
+  flex: 1;
+  min-block-size: 0;
+}
+
+.stage-failure {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  margin: 0;
+  color: var(--text-dim);
+  font-size: var(--text-md);
+}
+
+.stage-failure button {
+  color: var(--accent);
+}

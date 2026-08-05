@@ -33,7 +33,20 @@ export class EngineFailure extends Error {
   }
 }
 
+/** A thrown value's fields. `NotAllowedError` and friends arrive as DOMException, which is
+ * not an Error, so neither reader can lean on `instanceof`. */
+function field(error: unknown, key: 'name' | 'message'): string {
+  if (typeof error !== 'object' || error === null) return ''
+  const value = (error as Record<string, unknown>)[key]
+  return typeof value === 'string' ? value : ''
+}
+
 /** Anything thrown, as the message a settings panel can show. */
 export function messageOf(error: unknown): string {
-  return error instanceof Error ? error.message : String(error)
+  return field(error, 'message') || field(error, 'name') || String(error)
+}
+
+/** Anything thrown, as the name a failure is classified by. */
+export function nameOf(error: unknown): string {
+  return field(error, 'name')
 }
