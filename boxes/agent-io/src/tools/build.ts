@@ -1,7 +1,6 @@
 import { join } from 'node:path'
 import * as z from 'zod/v4'
 import { ARTIFACT_KINDS } from '#artifact'
-import type { BuildError } from '#artifact'
 import { fail } from '#errors'
 import type { Session } from '#session'
 import { seconds, sessionIdInput } from '../schema.ts'
@@ -80,7 +79,6 @@ export const build = defineTool({
     const { store, artifact, host, knowledge, config } = call.runtime.deps
 
     if (session.phase === 'live') requireAnswered(session, input.afterEntryId)
-    if (session.phase === 'researching') await store.advance(session.id, 'building')
 
     // Verification runs in the user's own page. Without one there is nowhere to check the
     // module, and an unchecked module is never stored.
@@ -91,6 +89,7 @@ export const build = defineTool({
         'Ask the user to open the session page, then build again.',
       )
     }
+    if (session.phase === 'researching') await store.advance(session.id, 'building')
 
     const compiled = await artifact.build({
       sessionId: session.id,
@@ -99,7 +98,7 @@ export const build = defineTool({
       home: config.home,
     })
     if (!compiled.ok) {
-      return { ok: false, artifactId: input.id, errors: compiled.errors.map(toBuildError) }
+      return { ok: false, artifactId: input.id, errors: compiled.errors }
     }
 
     const range =
@@ -162,7 +161,3 @@ export const build = defineTool({
     }
   },
 })
-
-function toBuildError(error: BuildError): z.infer<typeof buildErrorSchema> {
-  return { ...error }
-}

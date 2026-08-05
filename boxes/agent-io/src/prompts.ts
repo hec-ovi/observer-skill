@@ -29,8 +29,8 @@ const PREPARATION: readonly string[] = ['study-plan', 'research', 'visual-plan']
  * `../prompts/` is the source layout, `./prompts/` the published one. `OBSERVER_PROMPTS`
  * overrides both, for a checkout that keeps them somewhere else.
  */
-export function promptsDir(env: NodeJS.ProcessEnv = process.env): string {
-  const declared = env['OBSERVER_PROMPTS']
+function promptsDir(): string {
+  const declared = process.env['OBSERVER_PROMPTS']
   if (declared !== undefined && declared.length > 0) return declared
 
   const candidates = ['../prompts/', './prompts/'].map((relative) =>
@@ -59,7 +59,8 @@ function headingOf(text: string): string {
   return first.replace(/^#+\s*/, '').trim()
 }
 
-export function loadPrompts(dir = promptsDir()): PromptFile[] {
+export function loadPrompts(): PromptFile[] {
+  const dir = promptsDir()
   return PROMPT_NAMES.map((name) => {
     const file = join(dir, `${name}.md`)
     if (!existsSync(file)) {

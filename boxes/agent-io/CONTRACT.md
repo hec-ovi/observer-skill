@@ -12,6 +12,10 @@ createAgentIo({ store, ingest, transcript, knowledge, artifact, host, config }):
 agentIo.serve(): Promise<void>   // speaks MCP on stdin/stdout until the stream closes
 ```
 
+`config` is `{ home, transcript, openBrowser, version? }`: where sessions live, which
+transcript provider to ask for, whether to put the page in front of the user, and what to
+report as the server version.
+
 The CLI spawns `observer mcp`, which builds the boxes, calls `serve`, and starts the HTTP
 listener lazily the first time a session is opened. Nothing else in the system calls in
 here.
@@ -63,14 +67,19 @@ recorded; the session prompt surfaces those as a one-line update after an answer
 
 ### `build`
 
-`{ sessionId?, id, title, kind, source, caption?, conceptId?, startsAt?, endsAt?, afterEntryId? }` →
+`{ sessionId?, id, title, kind, source, conceptId?, startsAt?, endsAt?, afterEntryId? }` →
 `{ ok, artifactId, size?, snapshotPath?, errors? }` plus the snapshot itself as an image in
 the result when the build succeeded, so the agent looks at what it made without a second
 call.
 
-Compiles, verifies in the open page, stores. On failure nothing is stored and the errors
-are line-accurate with a suggested fix. `afterEntryId` is required in `live` and must name
-an answer already sent.
+Compiles, verifies in the open page, stores. Nothing usable is stored on failure: a module
+that does not compile never reaches the record, and one the page rejects is kept as failed
+with the reason, never as a visual that can be shown. Errors are line-accurate with a
+suggested fix. `conceptId` links it in the same call, with `startsAt`/`endsAt` as the link's
+range. `afterEntryId` is required in `live` and must name an answer already sent.
+
+The first `build` of a session opens the visual pass, the way the first `wait` starts the
+session: nothing else moves a session out of the reading pass.
 
 ### `link`
 
@@ -83,14 +92,17 @@ artifact linked to nothing is never shown.
 
 `{ sessionId? }` → `{ phase, counts, pageUrl }`
 
-Closes preparation and unlocks the player. Legal from `transcribing`, `researching`, and
-`building`, so preparation can be cut short.
+Closes preparation and unlocks the player. Legal from `researching` and `building`, so
+preparation can be cut short at either pass.
 
 ### `wait`
 
 `{ sessionId?, after?, timeoutMs? }` → `{ events, cursor, idle, next }`
 
-Blocks until the user does something or the timeout elapses. Each event arrives with its
+The first `wait` is what starts the session: called in `ready`, it moves the session to
+`live` and then blocks. Blocks until the user does something or the timeout elapses. The
+default block is 45 seconds and the ceiling is 60, both under the ninety-second presence
+window, so a blocked agent never reads as a detached one. Each event arrives with its
 context already assembled: for an `ask`, the question, the second it was asked at, the
 transcript window around that second, and the concepts covering it with their notes and
 artifact ids. `idle: true` means nothing happened. `next` names the call to make now, so a
@@ -123,14 +135,19 @@ Moves the stage without saying anything.
 |---|---|
 | `feed` | `open`, `status` |
 | `transcribing` | `status` |
-| `researching` | `status`, `transcript`, `concepts`, `note`, `ready` |
-| `building` | the above, plus `build`, `link` |
-| `ready` | everything in `building` |
+| `researching` | `status`, `transcript`, `concepts`, `note`, `build`, `ready` |
+| `building` | the above, plus `link` |
+| `ready` | everything in `building` except `ready`, plus `wait` |
 | `live` | `wait`, `where`, `say`, `show`, `hide`, `transcript`, `status`, `concepts`, `note`, `link`, and `build` with `afterEntryId` |
+
+The table is generated from what the tools declare, so it cannot drift from them.
 
 A tool called outside its phase returns `WRONG_PHASE` with the phase, the reason, and the
 call to make instead. Tools are always listed; the gate is the enforcement, because the
 protocol's tool list does not vary per connection.
+
+`open` is the one call the gate does not apply to: it acts on the session it creates, which
+is in `feed` by construction, so a second video is always openable.
 
 ## Prompts
 
@@ -138,6 +155,10 @@ Exposed as MCP prompts and shipped as skill references, one file each in `prompt
 `study-plan`, `research`, `visual-plan`, `artifact-authoring`, `session-answer`, `ads`.
 `ads` is appended to the preparation prompts by the server when `source.hasAds` is set, so
 the agent does not have to remember to ask for it.
+
+The directory is `../prompts/` beside the module in the source layout and `./prompts/` in
+the published one, first that exists, overridden by `OBSERVER_PROMPTS`. They are read once
+at startup, so a broken install says so before the first tool call.
 
 No prompt text lives in code. Tool descriptions are the only words in this box: one or two
 lines each, saying what the tool does and when to reach for it.
@@ -168,7 +189,14 @@ can read it and recover in the same turn.
 ## How to modify this box safely
 
 Tools are one file each, exporting `{ name, description, phases, input, output, run }`, and
-the registry is a list of those files. The phase table is generated from the tools, so a
-tool that forgets to declare its phases fails a test. Every tool has one happy-path test and
-one wrong-phase test, driven through a real in-process MCP client rather than by calling
+`src/tools/registry.ts` is the list of them. The phase table is generated from the tools, so
+a tool that forgets to declare its phases fails a test. Every tool has one happy-path test
+and one wrong-phase test, driven through a real in-process MCP client rather than by calling
 `run` directly.
+
+Nothing in this box writes to stdout: stdout is the protocol, and every diagnostic goes
+through `src/report.ts` to stderr.
+
+Tests live in `test/` and share `fixtures.ts` at the box root, which sits outside `test/`
+because the node runner counts every file under a `test/` directory as a test. Run them with
+`node --test "boxes/agent-io/test/*.test.ts"`.

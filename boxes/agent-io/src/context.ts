@@ -16,7 +16,7 @@ const noteView = z.object({
   source: z.string().nullable(),
 })
 
-export const conceptView = z.object({
+const conceptView = z.object({
   id: z.string(),
   label: z.string(),
   kind: z.enum(CONCEPT_KINDS),
@@ -27,7 +27,7 @@ export const conceptView = z.object({
   artifactIds: z.array(z.string()),
 })
 
-export const artifactView = z.object({
+const artifactView = z.object({
   id: z.string(),
   title: z.string(),
   kind: z.string(),
