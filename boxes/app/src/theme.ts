@@ -21,6 +21,9 @@ export interface ThemeTokens {
   accent: string
   /** The categorical ramp, in order, for series colouring. */
   series: string[]
+  /** Font stacks, for canvas and SVG text that cannot inherit CSS. */
+  font: string
+  fontMono: string
   /** Transition length in milliseconds; 0 under `prefers-reduced-motion`. */
   motionMs: number
 }
@@ -111,6 +114,8 @@ class ThemeController {
       border: read('--border'),
       accent: read('--accent'),
       series,
+      font: read('--font-sans'),
+      fontMono: read('--font-mono'),
       motionMs: Number.parseFloat(read('--motion')) || 0,
     }
   }

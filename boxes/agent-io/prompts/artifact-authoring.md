@@ -30,9 +30,9 @@ observer or interval outlives the artifact.
   theme: {
     mode: 'light' | 'dark',
     surface, surfaceRaised, text, textDim, border, accent,   // colour strings
-    series: string[],        // categorical ramp, at least 8, legible in both modes
-    font, fontMono,          // font stacks
-    motion: number,          // ms; 0 when the user asked for reduced motion
+    series: string[],        // categorical ramp, eight colours, legible in both modes
+    font, fontMono,          // font stacks, for canvas and SVG text
+    motionMs: number,        // 0 when the user asked for reduced motion
   },
   onTheme(cb),               // cb(theme) when the user switches light and dark
   time: number,              // the video second this was opened at
@@ -117,7 +117,7 @@ red text instead of a failed mount.
   copy of an important number.
 - Interaction only when moving the control is the insight. A slider on the parameter the
   whole argument turns on, yes; a zoom nobody needs, no.
-- Animate only to show change over time or a process running. Respect `ctx.theme.motion`
+- Animate only to show change over time or a process running. Respect `ctx.theme.motionMs`
   being `0`.
 
 ## Data

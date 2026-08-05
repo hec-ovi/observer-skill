@@ -45,6 +45,9 @@ export async function parseModule(source: SourceText): Promise<ParseOutcome> {
       sourcesContent: false,
       logLevel: 'silent',
       logLimit: 0,
+      // Without this, stripping types also drops imports the module never used, and an
+      // import nobody can resolve would slip past the allowlist unseen.
+      tsconfigRaw: { compilerOptions: { verbatimModuleSyntax: true } },
     })
   } catch (error) {
     if (!isBuildFailure(error)) throw error

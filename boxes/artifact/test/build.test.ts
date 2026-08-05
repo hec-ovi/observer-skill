@@ -83,6 +83,16 @@ test('an import outside the registry fails the check and writes nothing', async 
   await assert.rejects(stat(join(home, 'artifacts', 'session-1', 'bad-import.js')))
 })
 
+test('require() fails the check, naming the import to write instead', async () => {
+  const { source, result } = await buildFixture('commonjs-require')
+  const errors = errorsOf(result)
+  const error = errors[0]
+  assert.ok(error)
+  assert.match(error.message, /require\("d3"\) is CommonJS/)
+  assert.match(error.fix ?? '', /import \* as d3 from 'd3'/)
+  assertPointsAt(source, error, 'require')
+})
+
 test('reaching the network fails the check', async () => {
   const { source, result } = await buildFixture('network-fetch')
   const errors = errorsOf(result)

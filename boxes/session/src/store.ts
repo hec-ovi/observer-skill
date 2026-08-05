@@ -104,7 +104,7 @@ class SessionStore {
     return handle.record
   }
 
-  patch(id: string, patch: SessionPatch): Promise<Session> {
+  async patch(id: string, patch: SessionPatch): Promise<Session> {
     const owned = STORE_OWNED_KEYS.filter((key) => key in patch)
     if (owned.length > 0) {
       fail(
@@ -117,7 +117,7 @@ class SessionStore {
   }
 
   /** New concepts are appended; a concept already there is patched, keeping its notes. */
-  appendConcepts(id: string, concepts: ConceptInput[]): Promise<Session> {
+  async appendConcepts(id: string, concepts: ConceptInput[]): Promise<Session> {
     return this.#require(id).mutate((draft) => {
       for (const incoming of concepts) {
         const index = draft.concepts.findIndex((c) => c.id === incoming.id)
@@ -134,7 +134,7 @@ class SessionStore {
     })
   }
 
-  appendNotes(id: string, conceptId: string, notes: NoteInput[]): Promise<Session> {
+  async appendNotes(id: string, conceptId: string, notes: NoteInput[]): Promise<Session> {
     return this.#require(id).mutate((draft) => {
       const concept = draft.concepts.find((c) => c.id === conceptId)
       if (concept === undefined) {
@@ -153,7 +153,7 @@ class SessionStore {
   }
 
   /** Building the same artifact id twice replaces it. */
-  putArtifact(id: string, artifact: ArtifactInput): Promise<Session> {
+  async putArtifact(id: string, artifact: ArtifactInput): Promise<Session> {
     const stored = parse(
       artifactSchema,
       {
@@ -173,7 +173,7 @@ class SessionStore {
   }
 
   /** The appended entry is the last element of `log` in the returned record. */
-  appendLog(id: string, entry: LogEntryInput): Promise<Session> {
+  async appendLog(id: string, entry: LogEntryInput): Promise<Session> {
     return this.#require(id).mutate((draft) => {
       draft.log.push(
         parse(
@@ -186,7 +186,7 @@ class SessionStore {
     })
   }
 
-  advance(id: string, phase: Phase): Promise<Session> {
+  async advance(id: string, phase: Phase): Promise<Session> {
     return this.#require(id).mutate((draft) => {
       assertTransition(draft.phase, phase, draft.settings)
       draft.phase = phase
@@ -195,18 +195,18 @@ class SessionStore {
     })
   }
 
-  touchAgent(id: string): Promise<Session> {
+  async touchAgent(id: string): Promise<Session> {
     return this.#require(id).touch()
   }
 
-  progress(id: string, progress: ProgressInput): Promise<Session> {
+  async progress(id: string, progress: ProgressInput): Promise<Session> {
     return this.#require(id).mutate((draft) => {
       draft.progress = deepMerge(draft.progress, progress)
     })
   }
 
   /** Records the failure and leaves the phase alone, so it can be retried. */
-  fail(id: string, error: SessionErrorInput): Promise<Session> {
+  async fail(id: string, error: SessionErrorInput): Promise<Session> {
     return this.#require(id).mutate((draft) => {
       draft.error = parse(
         sessionErrorSchema,
@@ -229,11 +229,11 @@ class SessionStore {
     )
   }
 
-  push(id: string, event: InboxEventInput): Promise<number> {
+  async push(id: string, event: InboxEventInput): Promise<number> {
     return this.#require(id).push(event)
   }
 
-  take(id: string, options: TakeOptions = {}): Promise<TakeResult> {
+  async take(id: string, options: TakeOptions = {}): Promise<TakeResult> {
     return this.#require(id).take(options)
   }
 

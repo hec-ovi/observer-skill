@@ -1,0 +1,13 @@
+const d3 = require('d3')
+
+export const meta = {
+  title: 'Traffic flow',
+  kind: 'diagram',
+}
+
+export function mount(el, ctx) {
+  d3.select(el).append('svg')
+  return () => {
+    el.replaceChildren()
+  }
+}

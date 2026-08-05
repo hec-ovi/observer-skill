@@ -3,6 +3,7 @@
  * runtime, so it is refused here where the agent can still read a line number.
  */
 
+import * as walk from 'acorn-walk'
 import { REGISTRY_LIST, isRegistryName, registrySubpathRoot } from '../registry.ts'
 import type { BuildError } from '../schema.ts'
 import { checkError, type Check } from './context.ts'
@@ -40,8 +41,34 @@ function problemFor(specifier: string): { message: string; fix: string } | null 
   }
 }
 
+/** `require` survives bundling as a shim that throws in the browser, so it is refused here. */
+function requireProblem(specifier: string | null): { message: string; fix: string } {
+  const named = specifier ? `require("${specifier}")` : 'require()'
+  if (specifier && isRegistryName(specifier)) {
+    return {
+      message: `${named} is CommonJS, and an artifact is an ES module.`,
+      fix: `Write "import * as ${specifier} from '${specifier}'" at the top of the module.`,
+    }
+  }
+  return {
+    message: `${named} is CommonJS, and an artifact is an ES module.`,
+    fix: `Import ${REGISTRY_LIST} at the top of the module; nothing else can be loaded.`,
+  }
+}
+
 export const checkImports: Check = (context) => {
   const errors: BuildError[] = []
+
+  walk.simple(context.ast, {
+    CallExpression(node) {
+      if (node.callee.type !== 'Identifier' || node.callee.name !== 'require') return
+      const argument = node.arguments[0]
+      const specifier =
+        argument?.type === 'Literal' && typeof argument.value === 'string' ? argument.value : null
+      errors.push(checkError(context, { node, needle: 'require', ...requireProblem(specifier) }))
+    },
+  })
+
   for (const statement of context.ast.body) {
     if (
       statement.type !== 'ImportDeclaration' &&

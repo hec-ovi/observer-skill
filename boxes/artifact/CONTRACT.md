@@ -7,7 +7,7 @@ screen, or into an error message precise enough to fix in one pass.
 
 ## Inputs
 
-Schema: [`schema/artifact.ts`](schema/artifact.ts)
+Schema: [`src/schema.ts`](src/schema.ts)
 
 ```ts
 build({ sessionId, id, source, home }): Promise<BuildResult>
@@ -15,6 +15,7 @@ build({ sessionId, id, source, home }): Promise<BuildResult>
 
 - `source`: one ES module, TypeScript or JavaScript, as a string.
 - `id`: stable across rebuilds, so fixing an artifact replaces it rather than piling up.
+- `sessionId` and `id` become path segments: letters, digits, dot, dash, underscore.
 
 ## The module the source must be
 
@@ -53,6 +54,12 @@ BuildError = { stage: 'check'|'bundle', message, line?, column?, snippet?, fix? 
 
 `fix` is a sentence naming what to do, because the reader is an agent under time pressure
 and a raw compiler message costs it a round trip.
+
+The bundle is written to `<home>/artifacts/<sessionId>/<id>.js`: ESM, browser targeted,
+source map inline, with `echarts`, `d3` and `katex` left as bare imports for the stage to
+resolve.
+
+Also exported: `ARTIFACT_KINDS`, `ARTIFACT_REGISTRY`, and the types above.
 
 ## Checks, before bundling
 
