@@ -18,8 +18,8 @@ transcript provider to ask for, whether to put the page in front of the user, an
 report as the server version.
 
 The CLI spawns `observer mcp`, which builds the boxes, calls `serve`, and starts the HTTP
-listener lazily the first time a session is opened. Nothing else in the system calls in
-here.
+listener lazily the first time a session is opened. The one other call in is `openSession`,
+which the CLI hands to `web-host` so the page can open a video by itself.
 
 ### `openSession`
 
@@ -37,8 +37,9 @@ Both ways in run the same code, so a session opened from the page is the session
 would have made: same phase, same transcription run behind it, and `status` with no
 `sessionId` finds it, because it is the newest session in the process.
 
-Wiring it is a closure, not a value: `web-host` is built before `agent-io` and
-`agent-io` holds the host, so the CLI passes `createSession: (input) => agentIo.openSession(input)`.
+Wiring it is a closure, not a value: `web-host` is built before `agent-io` and `agent-io`
+holds the host, so the CLI passes
+`createSession: (input) => agentIo.openSession({ ...input, openBrowser: false })`.
 
 ## Tools
 

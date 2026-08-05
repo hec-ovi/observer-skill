@@ -35,10 +35,7 @@ describe('openSession', () => {
       userPrompt: 'the training setup',
       settings: { extraKnowledge: false },
     })
-    await until(
-      () => fromPage.store.get(opened.id).phase !== 'transcribing',
-      'the transcript',
-    )
+    await until(() => fromPage.store.get(opened.id).phase !== 'transcribing', 'the transcript')
 
     assert.equal(opened.phase, 'transcribing')
     assert.deepEqual(shapeOf(fromPage.store.get(opened.id)), shapeOf(byTool))

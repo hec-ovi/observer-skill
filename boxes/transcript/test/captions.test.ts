@@ -9,6 +9,7 @@
 
 import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
+import { join } from 'node:path'
 import { after, before, describe, test } from 'node:test'
 
 import type { TranscriptRef } from '#transcript'
@@ -54,6 +55,33 @@ describe('captions', () => {
     delete process.env['FAKE_YTDLP_MANUAL']
     delete process.env['FAKE_YTDLP_AUTO']
     await boxes.done()
+  })
+
+  test('the language asked for is the language the fetcher is sent after', async () => {
+    const box = await boxes.open('language')
+    const log = join(box.home, 'argv.txt')
+    process.env['FAKE_YTDLP_ARGV'] = log
+    process.env['FAKE_YTDLP_LANG'] = 'de'
+    process.env['FAKE_YTDLP_MANUAL'] = fixture('human.json3')
+    process.env['FAKE_YTDLP_AUTO'] = ''
+
+    let ref
+    try {
+      ref = await fetchTranscript(source(), {
+        home: box.home,
+        sessionId: box.sessionId,
+        provider: 'captions',
+        language: 'de-DE',
+        onProgress: box.onProgress,
+      })
+    } finally {
+      delete process.env['FAKE_YTDLP_ARGV']
+      delete process.env['FAKE_YTDLP_LANG']
+    }
+
+    const args = (await readFile(log, 'utf8')).trim().split('\n')[0]?.split(' ') ?? []
+    assert.equal(args[args.indexOf('--sub-langs') + 1], 'de.*,-live_chat')
+    assert.equal(ref.language, 'de')
   })
 
   test('a track a human wrote becomes one segment per sentence, and is not marked generated', async () => {

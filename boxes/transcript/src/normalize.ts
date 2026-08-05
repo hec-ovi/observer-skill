@@ -92,20 +92,24 @@ function keys(words: string[]): string[] {
 }
 
 /** True when the per-word list is the cue's own text, word for word. */
-function spellsOut(words: Word[], text: string): boolean {
+function spellsOut(words: Word[], said: string[]): boolean {
   const given = keys(words.map((word) => word.w))
-  const said = keys(text.split(/\s+/))
-  return given.length === said.length && given.every((key, i) => key === said[i])
+  const wanted = keys(said)
+  return given.length === wanted.length && given.every((key, i) => key === wanted[i])
+}
+
+/** Spread over the cue's own span, for a cue with no per-word times worth trusting. */
+function spread(cue: Cue, end: number, said: string[]): Word[] {
+  return said.map((w, i) => ({
+    t: cue.start + ((end - cue.start) * i) / Math.max(1, said.length),
+    w,
+  }))
 }
 
 function cueWords(cue: Cue): Timed[] {
   const end = cue.end ?? cue.start
-  const raw: Word[] = spellsOut(cue.words, cue.text)
-    ? cue.words
-    : cue.text.split(/\s+/).map((w, i, all) => ({
-        t: cue.start + ((end - cue.start) * i) / Math.max(1, all.length),
-        w,
-      }))
+  const said = cue.text.split(/\s+/)
+  const raw: Word[] = spellsOut(cue.words, said) ? cue.words : spread(cue, end, said)
   return raw
     .map((word) => ({ ...word, key: wordKey(word.w), end, cueEnd: end }))
     .filter((word) => word.key.length > 0)

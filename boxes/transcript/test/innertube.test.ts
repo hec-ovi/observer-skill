@@ -1,6 +1,7 @@
 /**
  * The transcript panel route, with the platform's own JSON recorded and served from disk.
- * Panel windows are caption sized, so the proof here is that they come out as sentences.
+ * Panel windows are caption sized, so the proof here is that they come out as sentences,
+ * labelled with the track the panel served rather than the one the caller asked for.
  */
 
 import assert from 'node:assert/strict'
@@ -10,9 +11,13 @@ import { after, before, describe, test } from 'node:test'
 
 import { fetch as fetchTranscript, read } from '#transcript'
 
-import { FAKE_YTDLP, FIXTURES, pool, source, stubFetch } from '../fixtures.ts'
+import { FAKE_YTDLP, FIXTURES, fixture, pool, source, stubFetch } from '../fixtures.ts'
 
 const panel = (name: string): string => readFileSync(join(FIXTURES, 'innertube', name), 'utf8')
+
+/** The same recording, with the panel saying it answered from the machine track. */
+const autoMenu = (): string =>
+  panel('get_transcript.json').replace('"title": "English"', '"title": "English (auto-generated)"')
 
 /** The three calls the panel route makes, answered from the recording unless overridden. */
 function serve(over: { player?: string; next?: string; transcript?: string } = {}): () => void {
@@ -89,6 +94,55 @@ describe('innertube', () => {
         onProgress: box.onProgress,
       })
       assert.equal(ref.provider, 'innertube')
+    } finally {
+      restore()
+    }
+  })
+
+  test('the track the panel served says the language and who wrote it', async () => {
+    const human = await boxes.open('panel-human')
+    let restore = serve({ player: panel('player-tracks.json') })
+    try {
+      const ref = await fetchTranscript(source(), {
+        home: human.home,
+        sessionId: human.sessionId,
+        provider: 'innertube',
+        language: 'de',
+        onProgress: human.onProgress,
+      })
+      assert.equal(ref.generated, false)
+      assert.equal(ref.language, 'en')
+    } finally {
+      restore()
+    }
+
+    const machine = await boxes.open('panel-machine')
+    restore = serve({ player: panel('player-tracks.json'), transcript: autoMenu() })
+    try {
+      const ref = await fetchTranscript(source(), {
+        home: machine.home,
+        sessionId: machine.sessionId,
+        provider: 'innertube',
+        onProgress: machine.onProgress,
+      })
+      assert.equal(ref.generated, true)
+      assert.equal(ref.language, 'en')
+    } finally {
+      restore()
+    }
+  })
+
+  test('a panel shape the platform changed does not end the walk', async () => {
+    const box = await boxes.open('panel-shape')
+    const restore = serve({ transcript: panel('get_transcript-no-node.json') })
+    try {
+      const ref = await fetchTranscript(source(), {
+        home: box.home,
+        sessionId: box.sessionId,
+        file: fixture('talk.srt'),
+        onProgress: box.onProgress,
+      })
+      assert.equal(ref.provider, 'file')
     } finally {
       restore()
     }

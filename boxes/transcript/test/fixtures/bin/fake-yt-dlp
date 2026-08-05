@@ -8,9 +8,10 @@
  *   FAKE_YTDLP_LANG    language tag in the written file name, default "en"
  *   FAKE_YTDLP_FAIL    message to print on stderr before exiting non-zero
  *   FAKE_YTDLP_AUDIO   bytes to write as the downloaded audio file
+ *   FAKE_YTDLP_ARGV    path to a file each call appends its arguments to, one line per call
  */
 
-import { copyFileSync, mkdirSync, writeFileSync } from 'node:fs'
+import { appendFileSync, copyFileSync, mkdirSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 const argv = process.argv.slice(2)
@@ -19,6 +20,9 @@ if (argv.includes('--version')) {
   process.stdout.write('2026.07.04\n')
   process.exit(0)
 }
+
+const record = process.env.FAKE_YTDLP_ARGV
+if (record) appendFileSync(record, `${argv.join(' ')}\n`)
 
 const fail = process.env.FAKE_YTDLP_FAIL
 if (fail) {

@@ -18,7 +18,6 @@ export interface Chunk {
   path: string
   /** Where this chunk starts in the video, in seconds. */
   offset: number
-  end: number
 }
 
 export function ffmpegBin(): string {
@@ -87,15 +86,15 @@ export async function downloadAudio(
   return path
 }
 
+/** `<file>,<start>,<end>`. The end column is only read to know the row is a real one. */
 function parseSegmentList(csv: string): Chunk[] {
   const rows: Chunk[] = []
   for (const line of csv.split('\n')) {
     const [name, from, to] = line.trim().split(',')
     if (!name || from === undefined || to === undefined) continue
     const offset = Number(from)
-    const end = Number(to)
-    if (!Number.isFinite(offset) || !Number.isFinite(end)) continue
-    rows.push({ path: name, offset, end })
+    if (!Number.isFinite(offset) || !Number.isFinite(Number(to))) continue
+    rows.push({ path: name, offset })
   }
   return rows
 }

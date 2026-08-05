@@ -15,13 +15,17 @@ export interface Range {
  * is offered across the whole concept, so silently dropping half of one widens what the user
  * sees instead of narrowing it.
  */
-export function rangeOf(startsAt: number | undefined, endsAt: number | undefined): Range | undefined {
+export function rangeOf(
+  startsAt: number | undefined,
+  endsAt: number | undefined,
+): Range | undefined {
   if (startsAt === undefined && endsAt === undefined) return undefined
   if (startsAt === undefined || endsAt === undefined) {
+    const missing = startsAt === undefined ? '`startsAt`' : '`endsAt`'
     fail(
       'INVALID_PATCH',
       'A range needs both `startsAt` and `endsAt`.',
-      `Send the missing ${startsAt === undefined ? '`startsAt`' : '`endsAt`'}, or neither to leave the range open.`,
+      `Send ${missing} too, or neither, which leaves the visual on the concept's own range.`,
     )
   }
   return { startsAt, endsAt }
