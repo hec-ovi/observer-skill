@@ -41,5 +41,6 @@ export class Runtime {
 
   close(): void {
     this.waiters.closeAll()
+    this.transcriptions.close()
   }
 }

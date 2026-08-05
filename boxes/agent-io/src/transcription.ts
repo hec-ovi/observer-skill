@@ -15,6 +15,7 @@ export class Transcriptions {
   readonly #config: AgentIoConfig
   /** Whether the words were machine-made, which only the fetch result knows. */
   readonly #generated = new Map<string, boolean>()
+  #closed = false
 
   constructor(store: SessionStore, transcript: TranscriptPort, config: AgentIoConfig) {
     this.#store = store
@@ -25,9 +26,10 @@ export class Transcriptions {
   /** Starts the run and returns. The caller never waits for it. */
   start(session: Session): void {
     void this.#run(session).catch(async (error: unknown) => {
+      if (this.#closed) return
       report('transcript', error)
       await this.#store.fail(session.id, toErrorShape(error)).catch((failure: unknown) => {
-        report('transcript', failure)
+        if (!this.#closed) report('transcript', failure)
       })
     })
   }
@@ -37,17 +39,27 @@ export class Transcriptions {
     return this.#generated.get(sessionId) ?? true
   }
 
+  /**
+   * The process is going away. A run still in flight has nowhere to write its result, so it
+   * lands nothing and says nothing rather than reporting a store that is already gone.
+   */
+  close(): void {
+    this.#closed = true
+  }
+
   async #run(session: Session): Promise<void> {
     const ref = await this.#transcript.fetch(session.source, {
       home: this.#config.home,
       sessionId: session.id,
       provider: this.#config.transcript,
       onProgress: (progress) => {
+        if (this.#closed) return
         void this.#store.progress(session.id, progress).catch((error: unknown) => {
-          report('transcript', error)
+          if (!this.#closed) report('transcript', error)
         })
       },
     })
+    if (this.#closed) return
 
     this.#generated.set(session.id, ref.generated)
     await this.#store.patch(session.id, {
