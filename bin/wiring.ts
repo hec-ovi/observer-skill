@@ -48,8 +48,9 @@ export async function wire(config: Config): Promise<Wiring> {
     version: VERSION,
     readTranscript: async (sessionId, range) => read(sessionId, range),
     // The page's feed screen opens videos itself, through the one open path `agent-io` owns,
-    // so a session pasted into the browser is the session the `open` tool would have made.
-    // The browser is left alone: the user is already looking at the page that asked.
+    // so a link pasted in the browser starts the session the `open` tool would have started.
+    // A closure, because `agent-io` is built on this host and exists by the time a request
+    // arrives. No browser is opened: the user is already looking at the page that asked.
     createSession: (input) => agentIo.openSession({ ...input, openBrowser: false }),
   })
 

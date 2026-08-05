@@ -40,7 +40,7 @@ function flag(value: string | undefined, fallback: boolean): boolean {
 }
 
 /** An empty variable is an unset one: `VAR=` in a shell must not name the empty path. */
-function path(value: string | undefined): string | null {
+function given(value: string | undefined): string | null {
   return value === undefined || value.length === 0 ? null : value
 }
 
@@ -65,7 +65,7 @@ export function readConfig(env: NodeJS.ProcessEnv = process.env): Config {
     asrKey: env['OBSERVER_ASR_KEY'] ?? null,
     asrModel: env['OBSERVER_ASR_MODEL'] ?? 'whisper-1',
     openBrowser: flag(env['OBSERVER_OPEN'], true),
-    prompts: path(env['OBSERVER_PROMPTS']),
+    prompts: given(env['OBSERVER_PROMPTS']),
     ytdlpBin: env['YTDLP_BIN'] ?? 'yt-dlp',
     ffmpegBin: env['FFMPEG_BIN'] ?? 'ffmpeg',
   }
