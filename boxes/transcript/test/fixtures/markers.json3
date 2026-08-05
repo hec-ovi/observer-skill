@@ -1,0 +1,39 @@
+{
+  "wireMagic": "pb3",
+  "pens": [{}],
+  "wsWinStyles": [{}, { "mhModeHint": 2, "juJustifCode": 0, "sdScrollDir": 3 }],
+  "wpWinPositions": [{}, { "apPoint": 6, "ahHorPos": 20, "avVerPos": 100, "rcRows": 2 }],
+  "events": [
+    { "tStartMs": 0, "dDurationMs": 30000, "id": 1, "wpWinPosId": 1, "wsWinStyleId": 1 },
+    { "tStartMs": 500, "dDurationMs": 2500, "wWinId": 1, "segs": [{ "utf8": "[Music]", "acAsrConf": 255 }] },
+    { "tStartMs": 3000, "dDurationMs": 2200, "wWinId": 1, "aAppend": 1, "segs": [{ "utf8": "\n" }] },
+    { "tStartMs": 3010, "dDurationMs": 2190, "wWinId": 1, "segs": [{ "utf8": "[Music]", "acAsrConf": 255 }] },
+    {
+      "tStartMs": 5200,
+      "dDurationMs": 3300,
+      "wWinId": 1,
+      "segs": [
+        { "utf8": "welcome", "acAsrConf": 0 },
+        { "utf8": " back", "tOffsetMs": 420 },
+        { "utf8": " to", "tOffsetMs": 780 },
+        { "utf8": " the", "tOffsetMs": 980 },
+        { "utf8": " show.", "tOffsetMs": 1240 }
+      ]
+    },
+    { "tStartMs": 8500, "dDurationMs": 1800, "wWinId": 1, "segs": [{ "utf8": "[Applause]", "acAsrConf": 255 }] },
+    {
+      "tStartMs": 10300,
+      "dDurationMs": 3600,
+      "wWinId": 1,
+      "segs": [
+        { "utf8": "tonight", "acAsrConf": 0 },
+        { "utf8": " we", "tOffsetMs": 460 },
+        { "utf8": " are", "tOffsetMs": 720 },
+        { "utf8": " talking", "tOffsetMs": 1020 },
+        { "utf8": " about", "tOffsetMs": 1520 },
+        { "utf8": " heat.", "tOffsetMs": 1900 }
+      ]
+    },
+    { "tStartMs": 13900, "dDurationMs": 2000, "wWinId": 1, "segs": [{ "utf8": "[Laughter]", "acAsrConf": 255 }] }
+  ]
+}

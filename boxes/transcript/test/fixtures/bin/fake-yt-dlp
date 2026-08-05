@@ -1,0 +1,55 @@
+#!/usr/bin/env node
+/**
+ * Stands in for the caption fetcher binary at the subprocess boundary, so the provider runs
+ * its real code path with no network. Driven entirely by environment:
+ *
+ *   FAKE_YTDLP_MANUAL  path to a caption file to write on the --write-subs pass
+ *   FAKE_YTDLP_AUTO    path to a caption file to write on the --write-auto-subs pass
+ *   FAKE_YTDLP_LANG    language tag in the written file name, default "en"
+ *   FAKE_YTDLP_FAIL    message to print on stderr before exiting non-zero
+ *   FAKE_YTDLP_AUDIO   bytes to write as the downloaded audio file
+ */
+
+const { copyFileSync, mkdirSync, writeFileSync } = require('node:fs')
+const { join } = require('node:path')
+
+const argv = process.argv.slice(2)
+
+if (argv.includes('--version')) {
+  process.stdout.write('2026.07.04\n')
+  process.exit(0)
+}
+
+const fail = process.env.FAKE_YTDLP_FAIL
+if (fail) {
+  process.stderr.write(`ERROR: ${fail}\n`)
+  process.exit(1)
+}
+
+const flag = (name) => {
+  const at = argv.indexOf(name)
+  return at === -1 ? null : argv[at + 1]
+}
+
+const dir = flag('-P')
+if (!dir) {
+  process.stderr.write('ERROR: no output directory\n')
+  process.exit(1)
+}
+mkdirSync(dir, { recursive: true })
+
+if (argv.includes('--write-subs') || argv.includes('--write-auto-subs')) {
+  const automatic = argv.includes('--write-auto-subs')
+  const source = automatic ? process.env.FAKE_YTDLP_AUTO : process.env.FAKE_YTDLP_MANUAL
+  if (!source) process.exit(0)
+  const lang = process.env.FAKE_YTDLP_LANG || 'en'
+  const ext = source.endsWith('.vtt') ? 'vtt' : 'json3'
+  copyFileSync(source, join(dir, `video.${lang}.${ext}`))
+  process.exit(0)
+}
+
+const audio = join(dir, 'audio.webm')
+writeFileSync(audio, process.env.FAKE_YTDLP_AUDIO || 'fake-audio')
+process.stdout.write('observer 512 1024\n')
+process.stdout.write('observer 1024 1024\n')
+process.stdout.write(`${audio}\n`)

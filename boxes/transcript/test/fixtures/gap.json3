@@ -1,0 +1,49 @@
+{
+  "wireMagic": "pb3",
+  "pens": [{}],
+  "wsWinStyles": [{}],
+  "wpWinPositions": [{}],
+  "events": [
+    {
+      "tStartMs": 1000,
+      "dDurationMs": 3000,
+      "segs": [
+        { "utf8": "the", "acAsrConf": 0 },
+        { "utf8": " lecture", "tOffsetMs": 300 },
+        { "utf8": " starts", "tOffsetMs": 900 },
+        { "utf8": " here", "tOffsetMs": 1500 }
+      ]
+    },
+    {
+      "tStartMs": 4000,
+      "dDurationMs": 2600,
+      "segs": [
+        { "utf8": "and", "acAsrConf": 0 },
+        { "utf8": " then", "tOffsetMs": 320 },
+        { "utf8": " nobody", "tOffsetMs": 760 },
+        { "utf8": " speaks", "tOffsetMs": 1400 }
+      ]
+    },
+    {
+      "tStartMs": 906600,
+      "dDurationMs": 3200,
+      "segs": [
+        { "utf8": "fifteen", "acAsrConf": 0 },
+        { "utf8": " minutes", "tOffsetMs": 500 },
+        { "utf8": " later", "tOffsetMs": 1100 },
+        { "utf8": " we", "tOffsetMs": 1600 },
+        { "utf8": " resume", "tOffsetMs": 2000 }
+      ]
+    },
+    {
+      "tStartMs": 909800,
+      "dDurationMs": 2800,
+      "segs": [
+        { "utf8": "with", "acAsrConf": 0 },
+        { "utf8": " the", "tOffsetMs": 300 },
+        { "utf8": " second", "tOffsetMs": 700 },
+        { "utf8": " half", "tOffsetMs": 1300 }
+      ]
+    }
+  ]
+}

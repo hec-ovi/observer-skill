@@ -1,0 +1,50 @@
+{
+  "task": "transcribe",
+  "language": "english",
+  "duration": 600.016,
+  "text": "Welcome to the show. Today we are talking about heat engines and why they waste so much.",
+  "segments": [
+    {
+      "id": 0,
+      "seek": 0,
+      "start": 0.0,
+      "end": 2.8,
+      "text": " Welcome to the show.",
+      "tokens": [50364, 4027],
+      "temperature": 0.0,
+      "avg_logprob": -0.21,
+      "no_speech_prob": 0.01
+    },
+    {
+      "id": 1,
+      "seek": 0,
+      "start": 2.8,
+      "end": 8.4,
+      "text": " Today we are talking about heat engines and why they waste so much.",
+      "tokens": [50504, 2692],
+      "temperature": 0.0,
+      "avg_logprob": -0.19,
+      "no_speech_prob": 0.01
+    }
+  ],
+  "words": [
+    { "word": "Welcome", "start": 0.0, "end": 0.62 },
+    { "word": "to", "start": 0.62, "end": 0.9 },
+    { "word": "the", "start": 0.9, "end": 1.14 },
+    { "word": "show.", "start": 1.14, "end": 1.9 },
+    { "word": "Today", "start": 2.8, "end": 3.3 },
+    { "word": "we", "start": 3.3, "end": 3.55 },
+    { "word": "are", "start": 3.55, "end": 3.8 },
+    { "word": "talking", "start": 3.8, "end": 4.4 },
+    { "word": "about", "start": 4.4, "end": 4.9 },
+    { "word": "heat", "start": 4.9, "end": 5.4 },
+    { "word": "engines", "start": 5.4, "end": 6.1 },
+    { "word": "and", "start": 6.1, "end": 6.4 },
+    { "word": "why", "start": 6.4, "end": 6.7 },
+    { "word": "they", "start": 6.7, "end": 7.0 },
+    { "word": "waste", "start": 7.0, "end": 7.5 },
+    { "word": "so", "start": 7.5, "end": 7.9 },
+    { "word": "much.", "start": 7.9, "end": 8.4 }
+  ],
+  "usage": { "type": "duration", "seconds": 600 }
+}

@@ -1,0 +1,35 @@
+#!/usr/bin/env node
+/**
+ * Stands in for ffmpeg at the subprocess boundary. Writes the two chunks and the segment
+ * list the provider reads its offsets from, with the packet-boundary drift a real cut has.
+ */
+
+const { writeFileSync } = require('node:fs')
+const { dirname, join } = require('node:path')
+
+const argv = process.argv.slice(2)
+
+if (argv.includes('-version')) {
+  process.stdout.write('ffmpeg version 8.0.1\n')
+  process.exit(0)
+}
+
+const flag = (name) => {
+  const at = argv.indexOf(name)
+  return at === -1 ? null : argv[at + 1]
+}
+
+const list = flag('-segment_list')
+const pattern = argv[argv.length - 1]
+if (!list || !pattern) {
+  process.stderr.write('no segment list requested\n')
+  process.exit(1)
+}
+
+const dir = dirname(pattern)
+const rows = [
+  ['chunk_000.wav', '0.000000', '600.016000'],
+  ['chunk_001.wav', '600.016000', '905.400000'],
+]
+for (const [name] of rows) writeFileSync(join(dir, name), 'RIFFfake')
+writeFileSync(list, `${rows.map((row) => row.join(',')).join('\n')}\n`)

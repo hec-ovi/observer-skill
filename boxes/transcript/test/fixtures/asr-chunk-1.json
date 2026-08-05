@@ -1,0 +1,50 @@
+{
+  "task": "transcribe",
+  "language": "english",
+  "duration": 305.384,
+  "text": "So the second half is about entropy. It is the reason no engine reaches a hundred percent.",
+  "segments": [
+    {
+      "id": 0,
+      "seek": 0,
+      "start": 1.2,
+      "end": 5.0,
+      "text": " So the second half is about entropy.",
+      "tokens": [50364, 407],
+      "temperature": 0.0,
+      "avg_logprob": -0.23,
+      "no_speech_prob": 0.02
+    },
+    {
+      "id": 1,
+      "seek": 0,
+      "start": 5.0,
+      "end": 10.6,
+      "text": " It is the reason no engine reaches a hundred percent.",
+      "tokens": [50554, 467],
+      "temperature": 0.0,
+      "avg_logprob": -0.2,
+      "no_speech_prob": 0.02
+    }
+  ],
+  "words": [
+    { "word": "So", "start": 1.2, "end": 1.5 },
+    { "word": "the", "start": 1.5, "end": 1.8 },
+    { "word": "second", "start": 1.8, "end": 2.4 },
+    { "word": "half", "start": 2.4, "end": 2.9 },
+    { "word": "is", "start": 2.9, "end": 3.2 },
+    { "word": "about", "start": 3.2, "end": 3.7 },
+    { "word": "entropy.", "start": 3.7, "end": 4.6 },
+    { "word": "It", "start": 5.0, "end": 5.3 },
+    { "word": "is", "start": 5.3, "end": 5.6 },
+    { "word": "the", "start": 5.6, "end": 5.9 },
+    { "word": "reason", "start": 5.9, "end": 6.5 },
+    { "word": "no", "start": 6.5, "end": 6.9 },
+    { "word": "engine", "start": 6.9, "end": 7.6 },
+    { "word": "reaches", "start": 7.6, "end": 8.3 },
+    { "word": "a", "start": 8.3, "end": 8.5 },
+    { "word": "hundred", "start": 8.5, "end": 9.3 },
+    { "word": "percent.", "start": 9.3, "end": 10.6 }
+  ],
+  "usage": { "type": "duration", "seconds": 305 }
+}

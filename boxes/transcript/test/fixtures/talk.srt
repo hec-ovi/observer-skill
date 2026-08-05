@@ -1,0 +1,18 @@
+1
+00:00:01,000 --> 00:00:04,120
+The first law says energy is never lost.
+
+2
+00:00:04,120 --> 00:00:08,400
+It only moves, and every move
+leaves a little less of it useful.
+
+3
+00:00:08,400 --> 00:00:12,900
+That leftover is what we call entropy,
+and it is the reason engines have limits.
+
+4
+00:00:13,400 --> 00:00:17,000
+Carnot worked this out before anyone
+knew what heat actually was.

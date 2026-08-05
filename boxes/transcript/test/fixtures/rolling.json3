@@ -1,0 +1,75 @@
+{
+  "wireMagic": "pb3",
+  "pens": [{}],
+  "wsWinStyles": [{}, { "mhModeHint": 2, "juJustifCode": 0, "sdScrollDir": 3 }],
+  "wpWinPositions": [{}, { "apPoint": 6, "ahHorPos": 20, "avVerPos": 100, "rcRows": 2, "ccCols": 40 }],
+  "events": [
+    { "tStartMs": 0, "dDurationMs": 24000, "id": 1, "wpWinPosId": 1, "wsWinStyleId": 1 },
+    {
+      "tStartMs": 30,
+      "dDurationMs": 2840,
+      "wWinId": 1,
+      "segs": [
+        { "utf8": "so", "acAsrConf": 0 },
+        { "utf8": " the", "tOffsetMs": 689, "acAsrConf": 0 },
+        { "utf8": " first", "tOffsetMs": 990, "acAsrConf": 0 },
+        { "utf8": " thing", "tOffsetMs": 1409, "acAsrConf": 0 },
+        { "utf8": " we", "tOffsetMs": 1770, "acAsrConf": 0 },
+        { "utf8": " need", "tOffsetMs": 2070, "acAsrConf": 0 }
+      ]
+    },
+    { "tStartMs": 2870, "dDurationMs": 2799, "wWinId": 1, "aAppend": 1, "segs": [{ "utf8": "\n" }] },
+    {
+      "tStartMs": 2880,
+      "dDurationMs": 2789,
+      "wWinId": 1,
+      "segs": [
+        { "utf8": "to", "acAsrConf": 0 },
+        { "utf8": " talk", "tOffsetMs": 359, "acAsrConf": 0 },
+        { "utf8": " about", "tOffsetMs": 720, "acAsrConf": 0 },
+        { "utf8": " is", "tOffsetMs": 1139, "acAsrConf": 0 },
+        { "utf8": " entropy", "tOffsetMs": 1620, "acAsrConf": 0 }
+      ]
+    },
+    { "tStartMs": 5669, "dDurationMs": 2881, "wWinId": 1, "aAppend": 1, "segs": [{ "utf8": "\n" }] },
+    {
+      "tStartMs": 5679,
+      "dDurationMs": 2871,
+      "wWinId": 1,
+      "segs": [
+        { "utf8": "and", "acAsrConf": 0 },
+        { "utf8": " entropy", "tOffsetMs": 321, "acAsrConf": 0 },
+        { "utf8": " is", "tOffsetMs": 681, "acAsrConf": 0 },
+        { "utf8": " a", "tOffsetMs": 1041, "acAsrConf": 0 },
+        { "utf8": " measure", "tOffsetMs": 1340, "acAsrConf": 0 }
+      ]
+    },
+    { "tStartMs": 8550, "dDurationMs": 3120, "wWinId": 1, "aAppend": 1, "segs": [{ "utf8": "\n" }] },
+    {
+      "tStartMs": 8560,
+      "wWinId": 1,
+      "segs": [
+        { "utf8": "of", "acAsrConf": 0 },
+        { "utf8": " disorder", "tOffsetMs": 400, "acAsrConf": 0 },
+        { "utf8": " in", "tOffsetMs": 960, "acAsrConf": 0 },
+        { "utf8": " a", "tOffsetMs": 1240, "acAsrConf": 0 },
+        { "utf8": " system", "tOffsetMs": 1520, "acAsrConf": 0 }
+      ]
+    },
+    { "tStartMs": 11670, "dDurationMs": 2400, "wWinId": 1, "aAppend": 1, "segs": [{ "utf8": "\n" }] },
+    {
+      "tStartMs": 11680,
+      "dDurationMs": 2390,
+      "wWinId": 1,
+      "segs": [
+        { "utf8": "which", "acAsrConf": 0 },
+        { "utf8": " sounds", "tOffsetMs": 360, "acAsrConf": 0 },
+        { "utf8": " simple", "tOffsetMs": 800, "acAsrConf": 0 },
+        { "utf8": " until", "tOffsetMs": 1280, "acAsrConf": 0 },
+        { "utf8": " you", "tOffsetMs": 1600, "acAsrConf": 0 },
+        { "utf8": " measure", "tOffsetMs": 1840, "acAsrConf": 0 },
+        { "utf8": " it", "tOffsetMs": 2160, "acAsrConf": 0 }
+      ]
+    }
+  ]
+}
