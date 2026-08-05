@@ -112,6 +112,8 @@ with the values in force on your machine.
 | `OBSERVER_HOME` | `$XDG_DATA_HOME/observer` | Where sessions, transcripts and artifacts live |
 | `OBSERVER_TRANSCRIPT` | `auto` | `auto`, `captions`, `endpoint-asr`, or `file` |
 | `OBSERVER_ASR_URL` | unset | OpenAI-compatible transcription endpoint |
+| `YTDLP_BIN` | `yt-dlp` | The caption fetcher binary, when it is not on PATH |
+| `FFMPEG_BIN` | `ffmpeg` | The audio converter, when it is not on PATH |
 
 ## Repository
 

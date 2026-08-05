@@ -8,6 +8,7 @@ import type { AgentIo, ArtifactPort, IngestPort, TranscriptPort } from '#agent-i
 import { build } from '#artifact'
 import type { Config } from '#config'
 import { resolve } from '#ingest'
+import type { Source } from '#ingest'
 import { createKnowledge } from '#knowledge'
 import { createStore } from '#session'
 import { at, fetch as fetchTranscript, read } from '#transcript'
@@ -28,7 +29,7 @@ export async function wire(config: Config): Promise<Wiring> {
   const ingest: IngestPort = { resolve }
   const transcript: TranscriptPort = {
     // The binaries are the process's business, not the agent's: the box takes them per call.
-    fetch: (source, options) =>
+    fetch: (source: Source, options) =>
       fetchTranscript(source, { ...options, ytdlpBin: config.ytdlpBin, ffmpegBin: config.ffmpegBin }),
     read,
     at,

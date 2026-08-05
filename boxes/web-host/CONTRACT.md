@@ -51,7 +51,7 @@ answers resolves as a failed verification, never as a hang.
 |---|---|---|
 | `/` and the app's assets | GET | The built frontend, with SPA fallback |
 | `/s/:id` | GET | The same app, deep-linked to a session |
-| `/api/session` | POST | Resolve a URL and create a session; returns the record |
+| `/api/session` | POST | `{ url, hasAds?, settings?, userPrompt? }` becomes a session; returns the record |
 | `/api/session/:id` | GET | The record, once, for a page that just loaded or reloaded |
 | `/api/session/:id/transcript` | GET | Paginated segments, `?from&to&offset&limit` |
 | `/api/artifact/:sessionId/:artifactId` | GET | The built bundle, as a JavaScript module |

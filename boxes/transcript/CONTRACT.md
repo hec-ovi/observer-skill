@@ -10,12 +10,15 @@ was being said at second N" without a scan.
 Schema: [`src/schema.ts`](src/schema.ts)
 
 ```ts
-fetch(source, { home, sessionId, provider?, language?, file?, onProgress }): Promise<TranscriptRef>
+fetch(source, { home, sessionId, provider?, language?, file?,
+                ytdlpBin?, ffmpegBin?, onProgress }): Promise<TranscriptRef>
 ```
 
 - `provider`: one of the providers below, or `auto` (the default), which tries them in
   order and stops at the first that produces text.
 - `file`: path to the SRT or VTT the `file` provider reads. The other providers ignore it.
+- `ytdlpBin` (`yt-dlp`) and `ffmpegBin` (`ffmpeg`): the binaries to run. Named by the
+  caller, because which ones this machine has is the process's business, not this box's.
 - `onProgress({ step, done, total, message })` fires often enough for a loader to move on a
   three-hour podcast, and the totals are real, not invented.
 

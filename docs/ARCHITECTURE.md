@@ -245,8 +245,11 @@ registry line, and no other box is edited.
 ## Configuration
 
 Environment only, with defaults that work unset: `OBSERVER_PORT` (4830), `OBSERVER_HOME`
-(`$XDG_DATA_HOME/observer`), `OBSERVER_TRANSCRIPT`, `OBSERVER_ASR_URL`, `OBSERVER_ASR_KEY`.
-No path from a home directory is written into code.
+(`$XDG_DATA_HOME/observer`), `OBSERVER_TRANSCRIPT`, `OBSERVER_ASR_URL`, `YTDLP_BIN`, and the
+rest. `shared/config.ts` reads all of them, once, and is the only file in the project that
+touches the environment; `observer --help` prints the whole list from `Config` itself, so a
+setting cannot exist without a line describing it. No path from a home directory is written
+into code.
 
 ## Tests
 

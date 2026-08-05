@@ -13,9 +13,9 @@ agentIo.serve(): Promise<void>   // speaks MCP on stdin/stdout until the stream 
 agentIo.openSession(input): Promise<Session>
 ```
 
-`config` is `{ home, transcript, openBrowser, version? }`: where sessions live, which
-transcript provider to ask for, whether to put the page in front of the user, and what to
-report as the server version.
+`config` is `{ home, transcript, openBrowser, prompts?, version? }`: where sessions live,
+which transcript provider to ask for, whether to put the page in front of the user, where
+the prompt files are, and what to report as the server version.
 
 The CLI spawns `observer mcp`, which builds the boxes, calls `serve`, and starts the HTTP
 listener lazily the first time a session is opened. The one other call in is `openSession`,
@@ -193,7 +193,7 @@ Exposed as MCP prompts and shipped as skill references, one file each in `prompt
 the agent does not have to remember to ask for it.
 
 The directory is `../prompts/` beside the module in the source layout and `./prompts/` in
-the published one, first that exists, overridden by `OBSERVER_PROMPTS`. They are read once
+the published one, first that exists, unless `config.prompts` names one. They are read once
 at startup, so a broken install says so before the first tool call.
 
 No prompt text lives in code. Tool descriptions are the only words in this box: one or two

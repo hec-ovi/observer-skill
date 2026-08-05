@@ -13,6 +13,8 @@ the CLI spawns it and there is nothing to start by hand.
   a file, normalized to sentences with every word kept exactly once.
 - Twelve tools on stdio with phase gates, six prompt files, and the rule that a live answer is
   text first.
+- Two ways to open a video, one path: the `open` tool and the page's feed screen both run
+  `agent-io`'s open call, so a link pasted in the browser starts the session the agent works.
 - Artifact pipeline: static lint, esbuild bundle, and verification inside the open page under a
   content policy derived from that document. The agent gets a snapshot back to look at.
 - Voice out and voice in as ports with three providers each, browser first.
