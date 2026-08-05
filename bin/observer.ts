@@ -38,17 +38,17 @@ function commandOf(argv: readonly string[]): Command | null {
 }
 
 /** MCP on stdio. The listener stays down until a session opens a page. */
-async function mcp(config: Config): Promise<void> {
+async function mcp(config: Config): Promise<never> {
   const wiring = await wire(config)
   const shutdown = new Shutdown(wiring.close).onSignals()
   // `agent-io` reads stdin itself and returns when the client closes it, so nothing else here
   // may touch that stream. A signal gets there first or the stream does; either one ends it.
   await Promise.race([wiring.agentIo.serve(), shutdown.run()])
-  await shutdown.now()
+  return shutdown.now()
 }
 
 /** The page, listening now, for someone who wants it without an agent attached. */
-async function serve(config: Config): Promise<void> {
+async function serve(config: Config): Promise<never> {
   const wiring = await wire(config)
   const shutdown = new Shutdown(wiring.close).onSignals().onClosed(process.stdin)
 
@@ -59,7 +59,7 @@ async function serve(config: Config): Promise<void> {
   console.error(`[observer] the page is at ${url}`)
   console.error('[observer] stop it with ctrl-c.')
 
-  await shutdown.run()
+  return shutdown.run()
 }
 
 async function run(command: Command, config: Config): Promise<number> {
@@ -73,17 +73,16 @@ async function run(command: Command, config: Config): Promise<number> {
     case 'doctor':
       return report(await diagnose(config), (line) => process.stdout.write(`${line}\n`))
     case 'serve':
-      await serve(config)
-      return 0
+      return serve(config)
     case 'mcp':
-      await mcp(config)
-      return 0
+      return mcp(config)
   }
 }
 
-const command = commandOf(process.argv.slice(2))
+const argv = process.argv.slice(2)
+const command = commandOf(argv)
 if (command === null) {
-  console.error(`[observer] no such command: ${process.argv[2]}`)
+  console.error(`[observer] no such command: ${argv[0]}`)
   console.error(usage())
   process.exit(2)
 }
