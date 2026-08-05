@@ -1,8 +1,8 @@
 /**
  * Replays recorded lookups. Every fixture under `fixtures/` was captured from the live
  * endpoints on 2026-08-05; the innertube captures keep only the branches this box reads.
- * The one exception is `innertube-refused.json`, a challenge YouTube serves on its own
- * schedule: it carries YouTube's wording in the shape the player endpoint answers with.
+ * The exception is `innertube-refused.json`: a bot challenge arrives on YouTube's schedule,
+ * so it is written out in the shape and wording the player endpoint uses for one.
  * Nothing here reaches the network.
  */
 
@@ -10,6 +10,9 @@ import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 const DIR = join(import.meta.dirname, 'fixtures')
+
+type FetchInput = Parameters<typeof fetch>[0]
+type FetchInit = Parameters<typeof fetch>[1]
 
 interface OEmbedFixture {
   status: number
@@ -33,9 +36,6 @@ export interface Plan {
 function load<T>(name: string): T {
   return JSON.parse(readFileSync(join(DIR, name), 'utf8')) as T
 }
-
-type FetchInput = Parameters<typeof fetch>[0]
-type FetchInit = Parameters<typeof fetch>[1]
 
 function urlOf(input: FetchInput): string {
   if (typeof input === 'string') return input

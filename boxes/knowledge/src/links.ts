@@ -9,7 +9,7 @@ import type { Concept, ConceptInput } from '#session'
  * what its contract promises.
  */
 function linkPatch(conceptId: string, artifactIds: string[]): ConceptInput {
-  return { id: conceptId, artifactIds } as unknown as ConceptInput
+  return { id: conceptId, artifactIds } as ConceptInput
 }
 
 /**

@@ -24,7 +24,7 @@ export interface SessionSignals {
 export interface Connection {
   record: Session | null
   segments: readonly Segment[]
-  /** Why the record could not be read. A dropped stream is not one: it reconnects. */
+  /** Why the session could not be read. A dropped stream is not one: it reconnects. */
   failure: Failure | null
   /** Move the local record now, without waiting for the server to echo the change back. */
   apply(patch: SessionPatch): void
@@ -95,9 +95,13 @@ export function useSession(sessionId: string, signals: SessionSignals): Connecti
   useEffect(() => {
     if (segmentCount === 0) return
     let live = true
-    void readTranscript(sessionId).then((read) => {
-      if (live) setSegments(read)
-    })
+    void readTranscript(sessionId)
+      .then((read) => {
+        if (live) setSegments(read)
+      })
+      .catch((error: unknown) => {
+        if (live) setFailure(failureOf(error))
+      })
     return () => {
       live = false
     }

@@ -1,0 +1,47 @@
+/* The loader: a phase, a count, and the names of what has landed. */
+
+.preparing {
+  display: grid;
+  gap: var(--space-3);
+  align-content: start;
+  padding: var(--space-4);
+}
+
+.preparing-head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  margin: 0;
+}
+
+.preparing-phase {
+  color: var(--text);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  letter-spacing: var(--tracking-tight);
+}
+
+.preparing-count {
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.preparing-message {
+  margin: 0;
+  color: var(--text-dim);
+  font-size: var(--text-md);
+  line-height: var(--leading);
+}
+
+.preparing-names {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--text);
+  font-size: var(--text-md);
+  line-height: var(--leading);
+}

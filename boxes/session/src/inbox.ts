@@ -23,6 +23,8 @@ interface Waiter {
 /**
  * Ordered events with a monotonic cursor. A question asked while the agent was busy sits
  * here until it is taken, and a cursor that came back from a take never sees it twice.
+ * Events live in this process; the cursor that orders them is on the record, so a restart
+ * begins with an empty inbox and still never hands out a cursor twice.
  */
 export class Inbox {
   readonly #events: InboxEvent[] = []

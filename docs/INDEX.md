@@ -14,7 +14,7 @@ Start here. Open one box, read its `CONTRACT.md`, change its folder, run its tes
 
 | Box | Purpose | Depends on |
 |---|---|---|
-| [`session`](../boxes/session/CONTRACT.md) | The session record, phase machine, durable inbox, subscriber bus, disk | none |
+| [`session`](../boxes/session/CONTRACT.md) | The session record, phase machine, event inbox, subscriber bus, disk | none |
 | [`ingest`](../boxes/ingest/CONTRACT.md) | A URL becomes a source: id, title, duration, publish date, captions, embeddable | none |
 | [`transcript`](../boxes/transcript/CONTRACT.md) | A source becomes timed sentences and a lookup by second | `ingest` |
 | [`knowledge`](../boxes/knowledge/CONTRACT.md) | Concepts, jargon, research notes, artifact bindings | `session` |

@@ -15,16 +15,29 @@ const FRAMEWORK_CODE: Record<number, ErrorCode> = {
   413: 'ARTIFACT_TOO_LARGE',
 }
 
+/**
+ * What the client is told when a framework decided the status. Its own text is never copied:
+ * serve-static writes the absolute path it stat'd, and that path belongs on stderr only.
+ */
+const FRAMEWORK_MESSAGE: Record<number, string> = {
+  400: 'That request body could not be read.',
+  404: 'Nothing is served at that path.',
+  413: 'That request body is larger than this route accepts.',
+}
+
 function shapeOf(error: unknown, status: number): ErrorShape {
-  const shape = toErrorShape(error)
-  if (isObserverError(error)) return shape
+  if (isObserverError(error)) return toErrorShape(error)
   const code = FRAMEWORK_CODE[status] ?? (status < 500 ? 'INVALID_PATCH' : 'INTERNAL')
-  return { code, message: shape.message, hint: 'Check the request against the web-host contract.' }
+  const message = FRAMEWORK_MESSAGE[status] ?? 'This request could not be served.'
+  return { code, message, hint: 'Check the request against the web-host contract.' }
 }
 
 /** Every failure leaves this box as `{ code, message, hint }`, and never as a stack trace. */
 export function sendError(res: Response, error: unknown): void {
   const status = isObserverError(error) ? error.status : (frameworkStatus(error) ?? 500)
+  if (!isObserverError(error)) {
+    console.error(`[observer] ${status} from the framework:`, toErrorShape(error).message)
+  }
   res.status(status).json(shapeOf(error, status))
 }
 

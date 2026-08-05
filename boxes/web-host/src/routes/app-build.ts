@@ -2,6 +2,7 @@ import { join } from 'node:path'
 import express from 'express'
 import type { Express } from 'express'
 import type { HostContext } from '../context.ts'
+import { notFound } from '../respond.ts'
 import { sendFile } from '../send-file.ts'
 
 /** Paths this server answers itself. The page never gets served over one of them. */
@@ -29,6 +30,11 @@ export function mountAppBuild(app: Express, ctx: HostContext): void {
       setHeaders: (res) => res.setHeader('Access-Control-Allow-Origin', '*'),
     }),
   )
+
+  // The verify document ships in the build beside the shell, so the general layer below would
+  // hand it out bare. It runs whatever module a framer names, so the only address it has is
+  // `/sandbox/frame`, where the content policy is stamped on the response.
+  app.all('/sandbox.html', notFound)
 
   app.use(express.static(ctx.appDir, { index: false, maxAge: 0 }))
 

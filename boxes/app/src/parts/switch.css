@@ -1,0 +1,25 @@
+/* A switch is its box and its name. The name is the label; there is no second line. */
+
+.switch {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--text);
+  font-size: var(--text-md);
+  line-height: var(--leading-tight);
+  cursor: pointer;
+}
+
+.switch input {
+  inline-size: 1rem;
+  block-size: 1rem;
+  margin: 0;
+  border-radius: var(--radius);
+  accent-color: var(--accent);
+  cursor: inherit;
+}
+
+.switch:has(input:disabled) {
+  color: var(--text-dim);
+  cursor: default;
+}

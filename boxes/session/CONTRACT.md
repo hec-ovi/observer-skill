@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Hold one study session: its record, its phase, its durable event inbox, and its live
+Hold one study session: its record, its phase, its event inbox, and its live
 subscribers. Every other box reads and writes the session through here, and nothing else
 touches the disk.
 
@@ -181,8 +181,8 @@ Transient, not persisted, delivered to live subscribers only:
 
 ### Inbox
 
-Durable, ordered, and consumed with a cursor, so a question asked while the agent is busy
-is never lost and never delivered twice.
+Ordered and consumed with a cursor, so a question asked while the agent is busy waits for
+it and is never delivered twice.
 
 ```ts
 store.push(id, event): Promise<number>                      // the new cursor
@@ -193,8 +193,12 @@ store.take(id, { after?, timeoutMs?, signal? }): Promise<{ events, cursor }>
 (thirty seconds by default) and resolves with an empty list and the cursor it was given. An
 aborted signal resolves empty rather than throwing, and leaves no timer or listener behind.
 Inbox events are `{ cursor, at, kind: 'ask'|'pause'|'seek'|'settings'|'ready', ... }`, where
-`at` is the second of the video the user was on. The cursor is on the record, so a restart
-never hands out one twice.
+`at` is the second of the video the user was on.
+
+Events live in this process, and a restart starts with an empty inbox: a `seek` or a `pause`
+from before it points at a moment the user has already left, and the page pushes what it
+still wants once it reconnects. The cursor is on the record, so a restart never hands out one
+twice.
 
 ### Shutdown
 
@@ -223,7 +227,8 @@ None.
 - `id` is a short opaque string, safe as a path segment and as a URL segment.
 - Records handed out are deeply frozen. A reader cannot corrupt the store by accident.
 - A session read back from disk after a restart is identical to the one held in memory,
-  including its cursor. Live subscribers are not restored; the page resubscribes.
+  including its cursor. Live subscribers and pending inbox events are not restored; the page
+  resubscribes and pushes again.
 - Persisted files never contain a machine-specific absolute path. Paths inside the record
   are relative to `home`.
 - `home` comes from the caller, never from an environment variable read inside this box.

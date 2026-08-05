@@ -29,6 +29,8 @@ what it just wrote.
 - `Note`: `{ kind: 'background'|'current', text, source? }`. `current` marks something that
   changed after the video was recorded.
 - `range` on a link overrides the concept's own range for when that artifact is relevant.
+  Linking a visual that is already bound to another concept moves it: it leaves the list of
+  the concept it was on and joins the new one, with the range given here or none.
 
 `writeConcepts` merges: a concept whose label already exists has its range widened, its
 summary and kind replaced by what the new pass says, and keeps its notes and links. A
@@ -68,9 +70,13 @@ all(sessionId): Concept[]
 
 ## Invariants
 
-- A concept's range sits inside `[0, source.duration]`.
+- A concept's range sits inside `[0, source.duration]`. So does a link range.
 - Notes are appended and never edited. A later note that contradicts an earlier one wins by
   being later, and both stay, because the agent reads them in order.
+- A visual is on one concept at a time, the one its last link named.
+- Concept writes on one session take turns. A link, a note and a second research pass fired
+  together all land: a link writes artifact ids only, a pass writes range, kind and summary
+  only, so neither erases the other's work.
 - `at` is a pure function of the stored concepts. It performs no I/O and is safe to call on
   every position event.
 - Ordering is deterministic: same concepts and same second always give the same list.
@@ -82,6 +88,10 @@ all(sessionId): Concept[]
 concept spanning the whole video. Keep it allocation-light and keep it pure: the sorted
 index in `src/timeline.ts` is built once per record and reused by every lookup, so a change
 that sorts inside `at` is a change in the wrong direction.
+
+Writes that read the record before writing it back (widening a range, adding an artifact id)
+run one at a time per session through `src/queue.ts`, and each one re-reads inside its turn.
+The taking of turns lives in the `Knowledge` object, so one store gets one `Knowledge`.
 
 Ids come from `src/ids.ts` and are stable by construction: normalize the label, then a
 digest of the normalized form. Changing that normalization renames every concept already on

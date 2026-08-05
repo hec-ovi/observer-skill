@@ -75,7 +75,11 @@ export class Knowledge {
     return requireConcept(written, conceptId)
   }
 
-  /** Binds a built visual to a concept, and to the stretch of video where it applies. */
+  /**
+   * Binds a built visual to a concept, and to the stretch of video where it applies. The
+   * whole read and write takes a turn on the session queue, so a second link started in the
+   * same tick adds its visual instead of writing over the first.
+   */
   async linkArtifact(
     sessionId: string,
     conceptId: string,
@@ -84,30 +88,42 @@ export class Knowledge {
   ): Promise<Concept> {
     const session = this.#store.get(sessionId)
     const concept = requireConcept(session, conceptId)
-    const artifact = session.artifacts.find((candidate) => candidate.id === artifactId)
-    if (artifact === undefined) {
-      fail(
-        'UNKNOWN_ARTIFACT',
-        `Session ${sessionId} has no artifact ${artifactId}.`,
-        'Build the visual before binding it to a concept.',
-      )
-    }
+    requireArtifact(session, artifactId)
     let bound: TimeRange | null = null
     if (range !== undefined) {
       bound = readRange(range)
-      assertInBounds(`The link from "${concept.label}" to ${artifactId}`, bound, session.source.duration)
+      assertInBounds(
+        `The link from "${concept.label}" to ${artifactId}`,
+        bound,
+        session.source.duration,
+      )
     }
+    return this.#writes.run(sessionId, () => this.#link(sessionId, conceptId, artifactId, bound))
+  }
 
-    await this.#store.putArtifact(sessionId, {
+  /** The link itself, on the record as it stands when this session's turn comes. */
+  async #link(
+    sessionId: string,
+    conceptId: string,
+    artifactId: string,
+    bound: TimeRange | null,
+  ): Promise<Concept> {
+    const artifact = requireArtifact(this.#store.get(sessionId), artifactId)
+    const boundTo = artifact.conceptId
+    const stored = await this.#store.putArtifact(sessionId, {
       ...artifact,
       conceptId,
       startsAt: bound === null ? null : bound.startsAt,
       endsAt: bound === null ? null : bound.endsAt,
     })
-    const artifactIds = concept.artifactIds.includes(artifactId)
-      ? concept.artifactIds
-      : [...concept.artifactIds, artifactId]
-    const written = await this.#store.appendConcepts(sessionId, [{ ...concept, artifactIds }])
+    const previous =
+      boundTo === null || boundTo === conceptId
+        ? null
+        : (stored.concepts.find((candidate) => candidate.id === boundTo) ?? null)
+    const written = await this.#store.appendConcepts(
+      sessionId,
+      planLink(requireConcept(stored, conceptId), previous, artifactId),
+    )
     return requireConcept(written, conceptId)
   }
 

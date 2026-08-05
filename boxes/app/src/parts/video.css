@@ -1,0 +1,41 @@
+/* The video fills the region it shares with the stage, and fades out when the stage takes it. */
+
+.video {
+  position: absolute;
+  inset: 0;
+  opacity: 1;
+  transition:
+    opacity var(--motion) var(--ease),
+    transform var(--motion) var(--ease);
+}
+
+.video[data-covered='true'] {
+  opacity: 0;
+  transform: translateY(calc(var(--motion-shift) * -1));
+  pointer-events: none;
+}
+
+.video-host,
+.video-host iframe,
+.video-host > div {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  border: 0;
+}
+
+/* The lock is the server's phase made physical: the frame is there and cannot be touched. */
+.video-lock {
+  position: absolute;
+  inset: 0;
+  background: var(--surface);
+  opacity: 0.35;
+}
+
+.video-failure {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 0;
+  padding: var(--space-3);
+  background: var(--surface);
+}

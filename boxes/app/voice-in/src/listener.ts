@@ -35,6 +35,7 @@ class HoldListener implements Listener {
   #reason: string | null = null
   #capture: MicCapture | null = null
   #hold: Hold | null = null
+  #working: Hold | null = null
   #opening: Promise<void> = Promise.resolve()
   #disposed = false
 
@@ -103,7 +104,7 @@ class HoldListener implements Listener {
       }
 
       this.#setState('working')
-      const text = await hold.finish(recording)
+      const text = await this.#transcribe(hold, recording)
       this.#emitUtterance(text)
       this.#setState('idle')
     } catch (error) {
@@ -121,7 +122,9 @@ class HoldListener implements Listener {
   dispose = (): void => {
     this.#disposed = true
     this.#hold?.cancel()
+    this.#working?.cancel()
     this.#hold = null
+    this.#working = null
     const capture = this.#capture
     this.#capture = null
     // Nobody is waiting on this recording; the point of it is to release the device.
@@ -160,6 +163,19 @@ class HoldListener implements Listener {
       return
     }
     this.#capture = capture
+  }
+
+  /**
+   * The hold stays reachable for as long as the engine is working on it, so disposing during
+   * a transcription cancels the request instead of leaving it to run for nobody.
+   */
+  async #transcribe(hold: Hold, recording: Recording): Promise<string> {
+    this.#working = hold
+    try {
+      return await hold.finish(recording)
+    } finally {
+      this.#working = null
+    }
   }
 
   #fail(error: unknown): void {

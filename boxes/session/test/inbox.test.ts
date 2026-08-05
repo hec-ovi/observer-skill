@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict'
 import { getEventListeners } from 'node:events'
 import { describe, it } from 'node:test'
-import { openSession } from '../fixtures.ts'
+import { createStore } from '#session'
+import { SOURCE, newHome, openSession } from '../fixtures.ts'
 
 const ASK = { kind: 'ask', at: 130, text: 'why sines?', via: 'text' } as const
 
@@ -77,6 +78,23 @@ describe('the inbox', () => {
     await store.push(session.id, { kind: 'ready', at: 0 })
 
     assert.equal(store.get(session.id).cursor, 2)
+  })
+
+  it('starts a restart with an empty inbox and the cursor where it left off', async (t) => {
+    const home = await newHome(t)
+    const store = createStore({ home })
+    const created = await store.create({ source: SOURCE, settings: {} })
+    await store.push(created.id, ASK)
+    await store.close()
+
+    const reopened = createStore({ home })
+    t.after(() => reopened.close())
+
+    assert.deepEqual(await reopened.take(created.id, { after: 0, timeoutMs: 0 }), {
+      events: [],
+      cursor: 0,
+    })
+    assert.equal(await reopened.push(created.id, { kind: 'ready', at: 0 }), 2)
   })
 
   it('validates what is pushed', async (t) => {

@@ -1,0 +1,29 @@
+/* A failure reads as one line: what happened, then what to do. */
+
+.failure {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2) var(--space-3);
+  margin: 0;
+  color: var(--text);
+  font-size: var(--text-md);
+  line-height: var(--leading);
+}
+
+.failure-hint,
+.failure button {
+  color: var(--text-dim);
+  font-size: var(--text-sm);
+}
+
+.failure button {
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius);
+  background: none;
+  color: var(--accent);
+  font: inherit;
+  font-size: var(--text-sm);
+  cursor: pointer;
+}

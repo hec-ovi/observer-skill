@@ -358,6 +358,64 @@ export class FakeAudioContext extends EventTarget {
   }
 }
 
+/* -------------------------------------------------------------------------------- worker */
+
+/**
+ * A worker the test drives: read what was posted to it, reply, or break it.
+ *
+ * Deliberately left out of `installBrowserFakes()`. Code that asks whether this browser has
+ * `Worker` at all must keep seeing jsdom's answer, so a test that wants one stubs it itself
+ * with `vi.stubGlobal('Worker', FakeWorker)`. `instances` is left alone by
+ * `resetBrowserFakes()` for the same reason: a module that keeps its worker between calls
+ * still holds the one it built in the first test.
+ */
+export class FakeWorker extends EventTarget {
+  static instances: FakeWorker[] = []
+
+  readonly url: string
+  readonly options: WorkerOptions | undefined
+  posted: unknown[] = []
+  terminated = false
+
+  onmessage: ((event: MessageEvent) => void) | null = null
+  onmessageerror: ((event: MessageEvent) => void) | null = null
+  onerror: ((event: ErrorEvent) => void) | null = null
+
+  constructor(url: string | URL, options?: WorkerOptions) {
+    super()
+    this.url = String(url)
+    this.options = options
+    FakeWorker.instances.push(this)
+  }
+
+  postMessage(data: unknown, _transfer?: Transferable[]): void {
+    this.posted.push(data)
+  }
+
+  terminate(): void {
+    this.terminated = true
+  }
+
+  /** test-side: the worker answered. */
+  reply(data: unknown): void {
+    fire(this, new MessageEvent('message', { data }))
+  }
+
+  /** test-side: the worker itself broke, which takes every request on it down. */
+  fail(message: string): void {
+    fire(this, new ErrorEvent('error', { message }))
+  }
+
+  static last(): FakeWorker {
+    return newest(FakeWorker.instances, 'FakeWorker')
+  }
+
+  /** Workers still running. More than one means a module built a second one behind its own. */
+  static live(): FakeWorker[] {
+    return FakeWorker.instances.filter((worker) => !worker.terminated)
+  }
+}
+
 /* ------------------------------------------------------------------------ microphone */
 
 export class FakeMediaStreamTrack extends EventTarget {

@@ -1,5 +1,5 @@
 /**
- * session: the record, the phase machine, the durable inbox, the subscriber bus, and the
+ * session: the record, the phase machine, the event inbox, the subscriber bus, and the
  * only code in the system that writes session state to disk.
  */
 
