@@ -3,6 +3,7 @@ import { mkdir, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { after, test } from 'node:test'
 import { FakeStore, makeArtifact, makeSession, startHost } from '../fixtures.ts'
+import { inlineScripts, scriptHash } from '../src/sandbox-document.ts'
 
 /** One pixel, so the snapshot route serves real image bytes. */
 const PNG = Buffer.from(
@@ -116,6 +117,35 @@ test('the verify frame is served under its own policy', async () => {
 
   // The document is the app build's own, so the stage's loader runs the module.
   assert.match(await answer.text(), /<script type="module"/)
+})
+
+test('the policy carries a hash for every inline script the frame ships', async () => {
+  // The import map is inline and has no other spelling. A policy that does not name it
+  // blocks it, every artifact fails to resolve its library, and the toolkit is dead.
+  const answer = await fetch(`${running.base}/sandbox/frame`)
+  const policy = answer.headers.get('content-security-policy') ?? ''
+  const html = await answer.text()
+
+  const bodies = inlineScripts(html)
+  assert.ok(bodies.length > 0, 'the fixture frame has no inline script to protect')
+  for (const body of bodies) {
+    assert.ok(policy.includes(scriptHash(body)), `no hash in script-src for: ${body.slice(0, 60)}`)
+  }
+})
+
+test('the policy follows the document when the build changes', async () => {
+  const before = await fetch(`${running.base}/sandbox/frame`)
+  const beforePolicy = before.headers.get('content-security-policy') ?? ''
+
+  await writeFile(
+    join(running.appDir, 'sandbox.html'),
+    '<!doctype html><title>verify</title><script>window.rebuilt = 1</script>',
+  )
+
+  const after = await fetch(`${running.base}/sandbox/frame`)
+  const afterPolicy = after.headers.get('content-security-policy') ?? ''
+  assert.notEqual(afterPolicy, beforePolicy)
+  assert.ok(afterPolicy.includes(scriptHash('window.rebuilt = 1')))
 })
 
 test('the verify document has no second address that skips the policy', async () => {

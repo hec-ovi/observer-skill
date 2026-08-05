@@ -9,13 +9,18 @@ import { describe, expect, it } from 'vitest'
 import { buildThemes } from '../vendor/themes.ts'
 import { importMapScript } from '../src/registry.ts'
 
-// Under jsdom `import.meta.url` is an http url whose path is relative to the repo root.
-const sandboxDocument = readFileSync(
-  resolve(process.cwd(), `.${new URL('../../sandbox.html', import.meta.url).pathname}`),
-  'utf8',
-)
+/** A document under `boxes/app`, as the bytes the browser parses and a policy hashes. */
+function sourceOf(name: string): string {
+  // Under jsdom `import.meta.url` is an http url whose path is relative to the repo root.
+  return readFileSync(
+    resolve(process.cwd(), `.${new URL(`../../${name}`, import.meta.url).pathname}`),
+    'utf8',
+  )
+}
 
-const bare = (text: string): string => text.replace(/\s+/g, '')
+function occurrences(text: string, part: string): number {
+  return text.split(part).length - 1
+}
 
 /** Every `borderRadius` anywhere in a theme object. */
 function radii(value: unknown): number[] {

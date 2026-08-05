@@ -150,9 +150,12 @@ export async function makeAppDir(): Promise<string> {
   await mkdir(join(dir, 'assets'))
   await mkdir(join(dir, 'sandbox', 'vendor'), { recursive: true })
   await writeFile(join(dir, 'index.html'), '<!doctype html><title>observer</title><div id="app"></div>')
+  // Shaped like the real frame: an inline import map plus the module that uses it.
   await writeFile(
     join(dir, 'sandbox.html'),
-    '<!doctype html><title>verify</title><script type="module" src="/assets/sandbox-abc123.js"></script>',
+    '<!doctype html><title>verify</title>' +
+      '<script type="importmap">{"imports":{"echarts":"/sandbox/vendor/echarts.js"}}</script>' +
+      '<script type="module" src="/assets/sandbox-abc123.js"></script>',
   )
   await writeFile(join(dir, 'assets', 'app-abc123.js'), 'export const app = 1\n')
   await writeFile(join(dir, 'sandbox', 'vendor', 'echarts.js'), 'export const echarts = 1\n')

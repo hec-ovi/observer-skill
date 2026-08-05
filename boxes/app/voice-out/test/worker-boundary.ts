@@ -65,7 +65,8 @@ export interface WorkerScope {
 
 /**
  * Installs `self` for the worker module and hands back both directions. Import the module
- * under test after calling this: it registers its listener at import.
+ * under test after calling this: it registers its listener at import. `self` stays stubbed
+ * for the rest of the file, so everything else a test file needs is imported at the top.
  */
 export function fakeWorkerScope(): WorkerScope {
   const posted: EngineMessage[] = []
