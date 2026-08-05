@@ -1,12 +1,13 @@
 # Architecture
 
-One Node process. It serves the study page, speaks MCP to the coding agent, and holds the
-session both of them read. Nothing else runs.
+One Node process, spawned by the CLI. It speaks MCP on stdio, serves the study page on a
+local port, and holds the session both of them read. Nothing else runs, and nothing has to
+be started by hand.
 
 ```
    Claude Code (CLI)                     Browser (the study page)
           |                                        |
-      MCP tools                          HTTP + SSE live channel
+    MCP tools on stdio                   HTTP + SSE live channel
           |                                        |
           v                                        v
    +------------------------- observer -------------------------+
@@ -17,6 +18,12 @@ session both of them read. Nothing else runs.
    |     +--> artifact                                           |
    +-------------------------------------------------------------+
 ```
+
+The transport is stdio because an HTTP-only endpoint assumes something is already
+listening, and the CLI connects to its servers when a session begins. Spawning removes that
+whole class of failure. One consequence runs through every box: **stdout belongs to the
+protocol**, so all logging goes to stderr. The HTTP listener starts lazily, the first time a
+video is opened, on `OBSERVER_PORT` or the next free port above it.
 
 ## Who thinks, who serves
 
@@ -48,7 +55,7 @@ A box is one folder with a `CONTRACT.md`. Outsiders read the contract, never the
 | `transcript` | A source becomes timed segments and a time index | `ingest` |
 | `knowledge` | Concepts, jargon, notes, and what artifact explains what | `session` |
 | `artifact` | Source becomes a checked bundle: allowlist, style lint, esbuild | nothing |
-| `web-host` | HTTP: the app build, the REST face, the SSE live channel, `/mcp` mount | `session` |
+| `web-host` | HTTP: the app build, the REST face, the SSE live channel, the sandbox route | `session` |
 | `agent-io` | The MCP tools, the prompts, the phase gates, the error set | all of the above |
 | `app` | The page shell: phases, layout, theme, settings (nests the four below) | `web-host` contract |
 | `app/player` | The video port and its YouTube provider, position and state events | nothing |
@@ -63,7 +70,8 @@ nothing about the server beyond `web-host`'s HTTP shape.
 ## The session record
 
 One JSON document per session under `$OBSERVER_HOME/sessions/<id>.json`. It is the only
-shared state; both faces read and write it through `session`.
+shared state; both faces read and write it through `session`. The transcript itself lives
+beside it in its own file, so a patch never carries a hundred kilobytes of text.
 
 ```
 {
@@ -72,7 +80,7 @@ shared state; both faces read and write it through `session`.
   settings: { theme, language, extraKnowledge, toolkit,
               voiceOut: { provider, voice }, voiceIn: { provider, endpoint } },
   phase, progress: { step, done, total, message },
-  transcript: { provider, language, segments: [{ start, end, text }] },
+  transcript: { provider, language, segmentCount, duration },
   concepts: [{ id, label, kind, startsAt, endsAt, summary, notes[], artifactIds[] }],
   artifacts:[{ id, title, kind, conceptId, status, bundlePath, snapshotPath, error }],
   position: { time, state },
@@ -117,35 +125,36 @@ Page to server:
 
 ## The agent's tool surface
 
-All tools are listed at all times (the 2026-07-28 spec makes list results connection
-independent). A tool called in the wrong phase returns `WRONG_PHASE` and names the legal
-next call, so the stage discipline is enforced without hiding anything.
+All tools are listed at all times (the protocol's tool list is connection independent). A
+tool called in the wrong phase returns `WRONG_PHASE` and names the legal next call, so the
+stage discipline is enforced without hiding anything. Names are short because the client
+namespaces them (`mcp__observer__wait`).
 
 | Tool | Phase | Does |
 |---|---|---|
-| `observer_open` | feed | Take a URL and options, start transcription, return the session id and the page URL |
-| `observer_status` | any | Phase, progress, counts, and what is still missing |
-| `observer_transcript` | after transcribing | Read the transcript whole or by time range, paginated |
-| `observer_concepts` | researching, building | Write the concept list: label, kind, range, summary |
-| `observer_note` | researching | Attach a research finding to a concept |
-| `observer_artifact_build` | building, live | Compile and verify an artifact, return errors or a snapshot path |
-| `observer_artifact_link` | building | Bind an artifact to a concept and a time range |
-| `observer_ready` | building | Close preparation, unlock the player |
-| `observer_wait` | live | Block until the user asks, pauses, or changes a setting; returns the event with the transcript window and matching concepts |
-| `observer_where` | live | The same context on demand, for questions typed in the CLI |
-| `observer_say` | live | Send an answer to the page, optionally spoken, optionally showing an artifact |
-| `observer_show` / `observer_hide` | live | Move the stage between video and artifact |
+| `open` | feed | Take a URL and options, start transcription, open the page, return its URL |
+| `status` | any | Phase, progress, counts, whether a page is connected, what is still missing |
+| `transcript` | after transcribing | Read the transcript whole or by time range, paginated |
+| `concepts` | researching, building | Write the concept list: label, kind, range, summary |
+| `note` | researching | Attach a research finding to a concept |
+| `build` | building, live | Compile and verify a visual, return errors or the snapshot to look at |
+| `link` | building | Bind a visual to a concept and a time range |
+| `ready` | building | Close preparation, unlock the player |
+| `wait` | live | Block until the user asks, pauses, or changes a setting; returns the event with its context |
+| `where` | live | The same context on demand, for questions typed in the CLI |
+| `say` | live | Send an answer to the page, optionally spoken, optionally showing a visual |
+| `show` / `hide` | live | Move the stage between video and visual |
 
-`observer_wait` is the session loop. It long-polls with a bounded timeout and returns
-`{ idle: true }` when nothing happened, so the agent calls it again and stays present for
-the whole video without burning a turn per second.
+`wait` is the session loop. It blocks with a bounded timeout, returns `{ idle: true }` when
+nothing happened, and always names the next call, so the agent stays present for the whole
+video without burning a turn per second.
 
 ### The rule that keeps answers fast
 
-In `live`, an answer comes first and it comes as text. `observer_artifact_build` in `live`
-requires the id of an answer that already went out, so nothing can be authored while the
-user waits. Building during a session is for a follow-up the user explicitly asked to see,
-never for the first reply.
+In `live`, an answer comes first and it comes as text. `build` in `live` requires the id of
+an answer that already went out, so nothing can be authored while the user waits. Building
+during a session is for a follow-up the user explicitly asked to see, never for the first
+reply.
 
 ## The artifact pipeline
 

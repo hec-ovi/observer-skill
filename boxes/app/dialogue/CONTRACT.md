@@ -37,6 +37,11 @@ holding the talk button and releasing, or the user typing in their terminal inst
 hold button shows what it heard as it hears it, and a hold that produced nothing says so
 in place rather than silently doing nothing.
 
+**Waiting** is shown from the moment a question leaves the page until the answer lands: the
+question sits in the log with a working indicator under it. The page knows a question is
+outstanding without being told, so the user is never looking at a dead screen wondering
+whether it went anywhere.
+
 **Answers** appear as they arrive, newest last, each with the timestamp it was asked at.
 An answer that came with a visual keeps a way to open it again. An answer that was spoken
 can be replayed. Nothing is collapsed, truncated, or hidden behind "show more".

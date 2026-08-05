@@ -1,0 +1,92 @@
+{
+  "name": "observer-skill",
+  "version": "0.1.0",
+  "description": "Study a video or podcast with a coding agent: transcript, prepared concepts, verified charts, and answers at the second you paused.",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "agent-skills",
+    "claude-code",
+    "video",
+    "transcript",
+    "data-visualization"
+  ],
+  "homepage": "https://github.com/hec-ovi/observer-skill",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hec-ovi/observer-skill.git"
+  },
+  "license": "MIT",
+  "author": {
+    "name": "Hector Oviedo",
+    "url": "https://github.com/hec-ovi"
+  },
+  "type": "module",
+  "engines": {
+    "node": ">=24.12.0"
+  },
+  "bin": {
+    "observer": "./dist/observer.js"
+  },
+  "files": [
+    "dist",
+    "skills",
+    "SKILL.md",
+    "references"
+  ],
+  "imports": {
+    "#session": "./boxes/session/src/index.ts",
+    "#ingest": "./boxes/ingest/src/index.ts",
+    "#transcript": "./boxes/transcript/src/index.ts",
+    "#knowledge": "./boxes/knowledge/src/index.ts",
+    "#artifact": "./boxes/artifact/src/index.ts",
+    "#web-host": "./boxes/web-host/src/index.ts",
+    "#agent-io": "./boxes/agent-io/src/index.ts",
+    "#errors": "./shared/errors.ts",
+    "#config": "./shared/config.ts"
+  },
+  "scripts": {
+    "dev": "node --watch bin/observer.ts serve",
+    "dev:app": "vite",
+    "build": "node scripts/build.ts",
+    "prepare": "node scripts/build.ts",
+    "test": "node --test && vitest run",
+    "test:server": "node --test",
+    "test:app": "vitest run",
+    "test:watch": "node --test --watch",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p boxes/app/tsconfig.json"
+  },
+  "dependencies": {
+    "@huggingface/transformers": "4.2.0",
+    "@modelcontextprotocol/server": "2.0.0",
+    "acorn": "8.18.0",
+    "acorn-walk": "8.3.5",
+    "compression": "1.8.1",
+    "d3": "7.9.0",
+    "echarts": "6.1.0",
+    "esbuild": "0.28.1",
+    "express": "5.2.1",
+    "katex": "0.18.1",
+    "onnxruntime-web": "1.27.0",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@testing-library/dom": "10.4.1",
+    "@testing-library/jest-dom": "7.0.0",
+    "@testing-library/react": "16.3.2",
+    "@testing-library/user-event": "14.6.3",
+    "@types/d3": "7.4.3",
+    "@types/express": "5.0.6",
+    "@types/node": "^24.13.3",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.4",
+    "@types/youtube": "0.3.0",
+    "@vitejs/plugin-react": "6.0.5",
+    "jsdom": "30.0.1",
+    "typescript": "7.0.2",
+    "vite": "8.2.0",
+    "vitest": "4.1.10"
+  }
+}

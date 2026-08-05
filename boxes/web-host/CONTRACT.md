@@ -2,17 +2,18 @@
 
 ## Purpose
 
-One HTTP server on one port: it serves the built app, carries the live channel to and from
-the page, and hosts the MCP endpoint the agent connects to.
+The HTTP half of the process: it serves the built app and carries the live channel to and
+from the page. The agent talks to `agent-io` over stdio and never comes through here.
 
 ## Inputs
 
 ```ts
-createHost({ store, mcp, appDir, port, bind }): Promise<Host>
+createHost({ store, appDir, port, bind }): Promise<Host>
 ```
 
-`Host` is `{ url, port, close() }`. `mcp` is a request handler supplied by `agent-io`;
-this box mounts it and knows nothing about what it does.
+`Host` is `{ url, port, close() }`. The listener is started on demand, the first time a
+session exists, so a CLI session that never opens a video costs nothing. If `port` is taken
+the host moves up one at a time and reports the port it got.
 
 ## HTTP surface
 
@@ -27,7 +28,7 @@ this box mounts it and knows nothing about what it does.
 | `/api/snapshot/:sessionId/:artifactId` | GET | The PNG the agent looked at |
 | `/live/:id` | GET | Server-sent events for this session |
 | `/live/:id/event` | POST | One upstream event from the page |
-| `/mcp` | POST, GET | The MCP endpoint, mounted from `agent-io` |
+| `/sandbox/:sessionId/:artifactId` | GET | The isolated document that verification runs a module in |
 | `/healthz` | GET | Liveness, and the version |
 
 ## The live channel
@@ -67,11 +68,12 @@ disturbing the others.
 
 ## Invariants
 
-- One port serves everything. There is no second process and no second origin.
+- One port serves everything the browser needs. There is no second process and no second
+  origin.
 - Binds to loopback by default. Serving to a network is opt-in and is logged when it
   happens.
-- The MCP mount receives the request body untouched; body parsing for the API routes is
-  scoped to those routes only.
+- Nothing is written to stdout. The process speaks MCP on stdout, so every log line goes to
+  stderr, and a stray `console.log` anywhere in this box corrupts the protocol.
 - SSE responses set no-transform and no buffering, flush on write, heartbeat on an
   interval, and clean up their subscription when the socket closes, including when the
   client vanishes without a close frame.

@@ -10,23 +10,26 @@ parameter properties). The server keeps types as the contract-enforcement layer 
 starts with `node src/main.ts`. The frontend is built by Vite because the browser needs a
 bundle anyway.
 
-## Protocol: MCP 2026-07-28 over Streamable HTTP, `@modelcontextprotocol/sdk` v2
+## Protocol: MCP over stdio, with the page served by the same process
 
-The 2026-07-28 spec is stateless at the core: no `Mcp-Session-Id`, list results are
-cacheable and identical per connection, and server-to-client asks (elicitation, sampling)
-travel as Multi Round-Trip Requests instead of a held-open stream. Two consequences we
-design around:
+The CLI spawns `observer mcp`. That one process speaks MCP on stdio and listens on a local
+port for the browser, which is what makes it a single unified service with nothing to start
+by hand. An HTTP MCP endpoint is mounted on the same port as well, for a second client that
+wants to attach to a running session.
 
-- **Tool lists do not vary per connection.** Stage-specific tool sets are enforced by the
-  session phase inside each tool (`WRONG_PHASE` plus the next legal call), not by hiding
-  tools from `tools/list`.
-- **Streamable HTTP on the same port as the page.** One `node` process, `/mcp` for the
-  agent, `/` for the app, `/live` for the browser stream. That is the single unified
-  service asked for.
+Stdio is the default because an HTTP-only entry assumes something is already listening: the
+CLI connects to its MCP servers when the session begins, and a server that only starts
+later is a failed server on every launch. Spawning it removes that whole class of friction,
+and the port is chosen at startup (moving up if it is taken), so two sessions never fight.
+
+The 2026-07-28 spec is stateless at the core and its list results are identical per
+connection, so stage-specific tool sets are enforced by the session phase inside each tool
+(`WRONG_PHASE` plus the next legal call) rather than by hiding tools from `tools/list`.
 
 Sources: [2026-07-28 spec](https://blog.modelcontextprotocol.io/posts/2026-07-28/),
 [changelog](https://modelcontextprotocol.io/specification/2026-07-28/changelog),
-[TypeScript SDK](https://www.npmjs.com/package/@modelcontextprotocol/sdk).
+[TypeScript SDK](https://www.npmjs.com/package/@modelcontextprotocol/sdk),
+[Claude Code MCP](https://code.claude.com/docs/en/mcp).
 
 ## Transcript: captions first, ASR endpoint second
 
