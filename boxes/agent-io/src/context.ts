@@ -11,7 +11,7 @@ import type { Runtime } from './runtime.ts'
 import { seconds } from './schema.ts'
 
 const noteView = z.object({
-  kind: z.enum(knowledgeSchema.NOTE_KINDS),
+  kind: z.enum(NOTE_KINDS),
   text: z.string(),
   source: z.string().nullable(),
 })
@@ -19,7 +19,7 @@ const noteView = z.object({
 export const conceptView = z.object({
   id: z.string(),
   label: z.string(),
-  kind: z.enum(knowledgeSchema.CONCEPT_KINDS),
+  kind: z.enum(CONCEPT_KINDS),
   startsAt: seconds,
   endsAt: seconds,
   summary: z.string(),

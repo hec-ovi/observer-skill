@@ -25,7 +25,7 @@ describe('a live session', () => {
     render(<App />)
     await screen.findByLabelText('Ask about this moment')
 
-    await user.click(screen.getByRole('button', { name: /Sentence 3\./ }))
+    await user.click(await screen.findByRole('button', { name: /Sentence 3\./ }))
     await user.type(screen.getByLabelText('Ask about this moment'), 'why is it flat here?{Enter}')
 
     expect(postedOf(server, 'ask')).toEqual([
@@ -63,6 +63,6 @@ describe('a live session', () => {
     render(<App />)
 
     expect(await screen.findByText(ANSWER)).toBeInTheDocument()
-    expect(screen.getByRole('button', { current: true })).toHaveTextContent('Sentence 64.')
+    expect(await screen.findByRole('button', { current: true })).toHaveTextContent('Sentence 64.')
   })
 })
