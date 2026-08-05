@@ -17,16 +17,21 @@ import { parseSubtitles } from '../formats/subtitles.ts'
 import { cuesToSegments } from '../normalize.ts'
 import type { Availability, Provider, ProviderContext, ProviderOutcome } from '../provider.ts'
 import { nothing, produced } from '../provider.ts'
+import type { Segment } from '../schema.ts'
 import { YTDLP_INSTALL, reason, ytdlp, ytdlpPresent } from '../ytdlp.ts'
 
 interface Track {
   language: string
   file: string
+  kind: 'json3' | 'vtt'
 }
+
+type PassOutcome = { segments: Segment[]; language: string } | { error: string } | null
 
 function languageList(source: Source, asked: string | undefined): string {
   const wanted = asked ?? source.captionLanguages[0] ?? 'en'
-  return `${wanted.split('-')[0]}.*,-live_chat`
+  const stem = wanted.split('-')[0] ?? wanted
+  return `${stem}.*,-live_chat`
 }
 
 /** `<id>.<lang>.<ext>`; the shortest language tag is the plain one, not a translation. */
@@ -35,7 +40,7 @@ function pick(files: string[], ext: string): string | null {
   return matching[0] ?? null
 }
 
-async function collect(dir: string): Promise<Track & { kind: 'json3' | 'vtt' } | null> {
+async function collect(dir: string): Promise<Track | null> {
   const files = await readdir(dir).catch(() => [])
   const json3 = pick(files, 'json3')
   const chosen = json3 ?? pick(files, 'vtt')
@@ -52,7 +57,7 @@ async function pass(
   context: ProviderContext,
   dir: string,
   automatic: boolean,
-): Promise<{ segments: ReturnType<typeof cuesToSegments>; language: string } | { error: string } | null> {
+): Promise<PassOutcome> {
   const outcome = await ytdlp([
     '--no-progress',
     '--no-playlist',
