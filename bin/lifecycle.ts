@@ -1,10 +1,12 @@
 /**
- * How the process ends. SIGINT and SIGTERM are the user and the supervisor; a closed stdin is
- * whoever spawned this going away, which leaves nobody to talk to. All three mean the same
- * thing, and the first one to arrive is the one that runs.
+ * How the process ends: SIGINT from the user, SIGTERM from a supervisor, and nothing else.
+ *
+ * A closed stdin deliberately does NOT end it. `serve` exists to stay up, and every ordinary
+ * way of running a server in the background hands it a stdin that is already closed: `nohup`,
+ * a unit file with no standard input, a detached container. `mcp` does not need it either,
+ * because `agent-io` reads that stream itself and returns when the client lets go of it.
  */
 
-import type { Readable } from 'node:stream'
 import { toErrorShape } from '#errors'
 
 export class Shutdown {
@@ -23,16 +25,6 @@ export class Shutdown {
     return this
   }
 
-  /**
-   * A stream that has ended. Only for a face that does not read stdin itself: resuming that
-   * stream here would take the bytes the MCP transport is waiting for.
-   */
-  onClosed(stream: Readable): this {
-    stream.resume()
-    stream.once('end', this.#ask)
-    stream.once('close', this.#ask)
-    return this
-  }
 
   /** Park until something asks, then land what is owed and leave. */
   async run(): Promise<never> {

@@ -50,7 +50,7 @@ async function mcp(config: Config): Promise<never> {
 /** The page, listening now, for someone who wants it without an agent attached. */
 async function serve(config: Config): Promise<never> {
   const wiring = await wire(config)
-  const shutdown = new Shutdown(wiring.close).onSignals().onClosed(process.stdin)
+  const shutdown = new Shutdown(wiring.close).onSignals()
 
   const { url, port } = await wiring.host.start()
   if (port !== config.port) {

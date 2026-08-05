@@ -5,6 +5,8 @@
  */
 
 import assert from 'node:assert/strict'
+import { spawn } from 'node:child_process'
+import { once } from 'node:events'
 import { mkdtemp, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -200,5 +202,37 @@ describe('observer mcp', () => {
       await delay(25)
     }
     assert.fail(`process ${pid} was still running five seconds after the client closed`)
+  })
+})
+
+describe('observer serve', () => {
+  it('stays up when stdin is closed, which is how a background server is started', async () => {
+    const home = await mkdtemp(join(tmpdir(), 'observer-serve-'))
+    const child = spawn(process.execPath, [OBSERVER, 'serve'], {
+      // `nohup`, a unit file with no standard input, and a detached container all look
+      // like this. A server that ends here would never survive being put in the background.
+      stdio: ['ignore', 'pipe', 'pipe'],
+      env: { ...process.env, OBSERVER_HOME: home, OBSERVER_PORT: '0', OBSERVER_OPEN: '0' },
+    })
+    const ended = once(child, 'exit')
+
+    let notice = ''
+    for await (const chunk of child.stderr) {
+      notice += String(chunk)
+      if (notice.includes('the page is at')) break
+    }
+    const url = /the page is at (\S+)/.exec(notice)?.[1]
+    assert.ok(url, `no url in: ${notice}`)
+
+    // Still there a beat later, and still answering.
+    await delay(300)
+    assert.equal(child.exitCode, null, 'serve ended on its own')
+    const health = await fetch(`${url}/healthz`)
+    assert.equal(health.status, 200)
+
+    child.kill('SIGINT')
+    const [code] = await ended
+    assert.equal(code, 0)
+    await rm(home, { recursive: true, force: true })
   })
 })
