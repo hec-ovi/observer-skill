@@ -10,8 +10,9 @@ import { fail } from '#errors'
 /** A bundle carries its own inline source map; past this it is data, not a visual. */
 export const MAX_BUNDLE_BYTES = 2 * 1024 * 1024
 
+/** Beside the rest of the session's files, so removing a session removes its artifacts. */
 export function bundlePathFor(home: string, sessionId: string, id: string): string {
-  return join(home, 'artifacts', sessionId, `${id}.js`)
+  return join(home, 'sessions', sessionId, 'artifacts', `${id}.js`)
 }
 
 export function guardSize(contents: Uint8Array): void {

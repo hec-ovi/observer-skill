@@ -50,7 +50,7 @@ test('a good module bundles to an ESM file with the registry left external', asy
   assert.equal(result.ok, true)
   if (!result.ok) return
 
-  assert.equal(result.bundlePath, join(home, 'artifacts', 'session-1', 'good-chart.js'))
+  assert.equal(result.bundlePath, join(home, 'sessions', 'session-1', 'artifacts', 'good-chart.js'))
   assert.deepEqual(result.warnings, [])
 
   const bundle = await readFile(result.bundlePath, 'utf8')
@@ -80,7 +80,7 @@ test('an import outside the registry fails the check and writes nothing', async 
   assert.ok(error.snippet?.includes('^'))
   assertPointsAt(source, error, 'lodash')
 
-  await assert.rejects(stat(join(home, 'artifacts', 'session-1', 'bad-import.js')))
+  await assert.rejects(stat(join(home, 'sessions', 'session-1', 'artifacts', 'bad-import.js')))
 })
 
 test('require() fails the check, naming the import to write instead', async () => {
@@ -156,7 +156,7 @@ test('a bundle over the size limit is refused and nothing is written', async () 
     build({ sessionId: 'session-1', id: 'huge', source, home }),
     (error: unknown) => error instanceof ObserverError && error.code === 'ARTIFACT_TOO_LARGE',
   )
-  await assert.rejects(stat(join(home, 'artifacts', 'session-1', 'huge.js')))
+  await assert.rejects(stat(join(home, 'sessions', 'session-1', 'artifacts', 'huge.js')))
 })
 
 test('a home that cannot be written to fails with STORE_UNWRITABLE', async () => {

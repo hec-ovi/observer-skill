@@ -8,7 +8,7 @@ import type { Phase, Settings } from './schema.ts'
  *                           ├──────────────────┘                  ▲
  *                           └──────────────────────────────────────┘
  */
-export const TRANSITIONS: Readonly<Record<Phase, readonly Phase[]>> = {
+const TRANSITIONS: Readonly<Record<Phase, readonly Phase[]>> = {
   feed: ['transcribing'],
   transcribing: ['researching', 'building', 'ready'],
   researching: ['building', 'ready'],
@@ -24,13 +24,13 @@ function enabled(phase: Phase, settings: Settings): boolean {
   return true
 }
 
-export function legalNext(from: Phase, settings: Settings): Phase[] {
+function legalNext(from: Phase, settings: Settings): Phase[] {
   return TRANSITIONS[from].filter((to) => enabled(to, settings))
 }
 
 export function assertTransition(from: Phase, to: Phase, settings: Settings): void {
-  if (legalNext(from, settings).includes(to)) return
   const allowed = legalNext(from, settings)
+  if (allowed.includes(to)) return
   fail(
     'ILLEGAL_PHASE',
     `A session in ${from} cannot move to ${to}.`,

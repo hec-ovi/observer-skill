@@ -11,3 +11,8 @@ data/
 
 # Raw personal notes
 docs/private/
+
+# Agent scratch
+.capture-tmp*
+*.probe.mts
+probe.mts

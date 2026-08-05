@@ -10,6 +10,7 @@ import type { AnyNode } from 'acorn'
 import * as walk from 'acorn-walk'
 import type { BuildError } from '../schema.ts'
 import { checkError, type Check, type CheckContext } from './context.ts'
+import { forEachString } from './strings.ts'
 
 const HEADING_MARKUP = /<h([1-6])\b[^>]*>([\s\S]*?)<\/h\1\s*>/gi
 const HEADING_TAGS = new Set(['h1', 'h2', 'h3', 'h4', 'h5', 'h6'])
@@ -82,13 +83,9 @@ export const checkHeading: Check = (context) => {
     for (const match of markup.matchAll(HEADING_MARKUP)) flag(match[2] ?? '', node)
   }
 
+  forEachString(context.ast, flagMarkup)
+
   walk.simple(context.ast, {
-    Literal(node) {
-      if (typeof node.value === 'string') flagMarkup(node.value, node)
-    },
-    TemplateLiteral(node) {
-      for (const quasi of node.quasis) flagMarkup(quasi.value.cooked ?? quasi.value.raw, node)
-    },
     AssignmentExpression(node) {
       const target = node.left
       if (target.type !== 'MemberExpression' || target.computed) return

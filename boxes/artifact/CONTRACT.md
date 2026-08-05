@@ -55,7 +55,7 @@ BuildError = { stage: 'check'|'bundle', message, line?, column?, snippet?, fix? 
 `fix` is a sentence naming what to do, because the reader is an agent under time pressure
 and a raw compiler message costs it a round trip.
 
-The bundle is written to `<home>/artifacts/<sessionId>/<id>.js`: ESM, browser targeted,
+The bundle is written to `<home>/sessions/<sessionId>/artifacts/<id>.js`: ESM, browser targeted,
 source map inline, with `echarts`, `d3` and `katex` left as bare imports for the stage to
 resolve.
 
@@ -65,7 +65,7 @@ Also exported: `ARTIFACT_KINDS`, `ARTIFACT_REGISTRY`, and the types above.
 
 | Check | Why |
 |---|---|
-| Only `echarts`, `d3`, `katex` are imported | Everything else is unavailable at runtime, and an unknown import is a silent blank screen |
+| Only `echarts`, `d3`, `katex` are imported, and only as ES imports | Everything else is unavailable at runtime, and an unknown import (or a `require`) is a silent blank screen |
 | No `fetch`, `XMLHttpRequest`, `WebSocket`, or dynamic `import()` | A visual is drawn from data it was given, not from the network |
 | No `border-radius` other than `0` | The design has no rounded corners, and this is where that is enforced |
 | No heading element whose text repeats `meta.title` | The stage renders the title; repeating it is the exact bloat we refuse |
@@ -76,7 +76,8 @@ Every failed check names the line and what to write instead.
 ## Errors
 
 `ARTIFACT_INVALID` (a check or the bundle failed; the errors are in the result, not thrown),
-`ARTIFACT_TOO_LARGE`, `STORE_UNWRITABLE`.
+`ARTIFACT_TOO_LARGE` (the built bundle is over 2 MB), `STORE_UNWRITABLE`. The last two are
+thrown; everything else comes back as `{ ok: false, errors }`.
 
 ## Dependencies
 

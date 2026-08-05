@@ -10,6 +10,7 @@ import type { AnyNode } from 'acorn'
 import * as walk from 'acorn-walk'
 import type { BuildError } from '../schema.ts'
 import { checkError, type Check } from './context.ts'
+import { forEachString } from './strings.ts'
 
 /** borderRadius, borderTopLeftRadius, … as written in a style object or an ECharts option. */
 const CAMEL_KEY = /^border(?:(?:Top|Bottom)(?:Left|Right))?Radius$/
@@ -82,13 +83,9 @@ export const checkBorderRadius: Check = (context) => {
     }
   }
 
+  forEachString(context.ast, flagCss)
+
   walk.simple(context.ast, {
-    Literal(node) {
-      if (typeof node.value === 'string') flagCss(node.value, node)
-    },
-    TemplateLiteral(node) {
-      for (const quasi of node.quasis) flagCss(quasi.value.cooked ?? quasi.value.raw, node)
-    },
     Property(node) {
       if (node.computed) return
       const key =

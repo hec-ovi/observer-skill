@@ -1,6 +1,6 @@
 import { mkdir, open, rename, rm } from 'node:fs/promises'
 import { dirname } from 'node:path'
-import { fail, isObserverError } from '#errors'
+import { ObserverError, fail, isObserverError } from '#errors'
 import { newId } from './ids.ts'
 
 /** A burst of writes inside this window lands on disk as one file write. */
@@ -73,7 +73,13 @@ export class RecordWriter {
       await this.#write(JSON.stringify(this.#snapshot(), null, 2))
       for (const waiter of batch) waiter.resolve()
     } catch (error) {
-      const reason = isObserverError(error) ? error : new Error(String(error))
+      const reason = isObserverError(error)
+        ? error
+        : new ObserverError(
+            'STORE_UNWRITABLE',
+            `Could not prepare the session for ${this.#file}: ${String(error)}`,
+            'Report this with the message above; the record in memory is still intact.',
+          )
       for (const waiter of batch) waiter.reject(reason)
     } finally {
       this.#current = null
