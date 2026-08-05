@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { createServer } from 'node:http'
 import { once } from 'node:events'
-import { test } from 'node:test'
+import { after, test } from 'node:test'
 import { createHost } from '../src/index.ts'
 import { FakeStore, makeAppDir, makeHome, openSse, startHost } from '../fixtures.ts'
 
@@ -73,4 +73,16 @@ test('close returns with a stream still attached', async () => {
   assert.ok(Date.now() - started < 2_000, 'close waited on the open stream')
 
   await assert.rejects(() => fetch(`${running.base}/healthz`))
+})
+
+test('says whether a page is following a session, which is what verification needs', async () => {
+  const running = await startHost()
+  after(() => running.stop())
+
+  assert.equal(running.host.hasPage('s1'), false)
+  const client = await openSse(`${running.base}/live/s1`)
+  assert.equal(running.host.hasPage('s1'), true)
+  assert.equal(running.host.hasPage('other'), false)
+
+  client.vanish()
 })

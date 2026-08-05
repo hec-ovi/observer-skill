@@ -48,6 +48,8 @@ export interface Host {
   readonly port: number | null
   /** Listen, or return where it is already listening. Called when a session first exists. */
   start(): Promise<{ url: string; port: number }>
+  /** Whether a browser is following this session, which is what verification needs. */
+  hasPage(sessionId: string): boolean
   /** Run one artifact in the open page's sandbox and wait for what it reports. */
   verify(request: VerifyRequest): Promise<VerifyResult>
   close(): Promise<void>
@@ -100,9 +102,13 @@ class WebHost implements Host {
     return this.#starting
   }
 
+  hasPage(sessionId: string): boolean {
+    return this.#hub.hasPage(sessionId)
+  }
+
   async verify(request: VerifyRequest): Promise<VerifyResult> {
     const { sessionId, artifactId } = request
-    if (!this.#hub.hasPage(sessionId)) {
+    if (!this.hasPage(sessionId)) {
       fail(
         'PAGE_NOT_OPEN',
         `No page is listening to session ${sessionId}.`,

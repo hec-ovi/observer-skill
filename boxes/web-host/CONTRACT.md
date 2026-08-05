@@ -29,6 +29,7 @@ Host = {
   url: string | null            // null until the listener starts
   port: number | null
   start(): Promise<{ url, port }>
+  hasPage(sessionId): boolean
   verify({ sessionId, artifactId, timeoutMs? }): Promise<VerifyResult>
   close(): Promise<void>
 }
