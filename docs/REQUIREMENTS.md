@@ -53,3 +53,9 @@ Every request from Hector, raw and in the order it arrived. Nothing here is rewr
 > is this one https://huggingface.co/spaces/KevinAHM/pocket-tts-web < for the audio and runs on the browser, no dependencies
 
 > all as isolated as possible, all part can change in the future meaning tts could go to cloud, or similar, etc etc
+
+> okey proceed with the whole development end to end, i do not want bloating, loosing gaps, frictions, untested things, deprecated issues, incompatibility, issues with the video player, wrong tooling, poor tooling or poor skill instructions. take your time to learn about how to do every single part, and the prompts are extreme important, when you have it e2e you tell me and i test it
+
+> if you need me to test microphone, tts or sst or loading a video or verifying the toolkit for charts/graphs/big data you let me know
+
+> oh, important on the web search step (i wil throw you ideas while you work just additions, nothing to drift the project) but would be nice if, the agent makes an up to date research and finds something more innovative/modern that the trasncrtipt is old, update it when talking about it, so this adds value, specially in technology etc
