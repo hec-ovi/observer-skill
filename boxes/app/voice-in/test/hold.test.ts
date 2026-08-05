@@ -90,3 +90,46 @@ describe('a hold', () => {
     }
   })
 })
+
+describe('the listener', () => {
+  it('is unavailable when the named engine cannot run here', async () => {
+    // jsdom has no Worker, which is what whisper-web needs to keep inference off the page.
+    const { listener, states } = recordedListener({ provider: 'whisper-web' })
+
+    expect(listener.supported).toBe(false)
+    expect(listener.engine).toBeNull()
+    expect(listener.state).toBe('unavailable')
+    expect(listener.reason).toBe('NO_PROVIDER')
+
+    await listener.start()
+    expect(states).toEqual([])
+    expect(navigator.mediaDevices.getUserMedia).not.toHaveBeenCalled()
+  })
+
+  it('takes a new language on the next hold', async () => {
+    const { listener } = recordedListener({ provider: 'web-speech' })
+
+    listener.setLanguage('es-ES')
+    await listener.start()
+
+    expect(FakeSpeechRecognition.last().lang).toBe('es-ES')
+    await listener.stop()
+  })
+
+  it('gives the microphone back when disposed mid-hold', async () => {
+    const { listener, heard } = recordedListener({ provider: 'auto' })
+
+    await listener.start()
+    hear(1, 0.5)
+    listener.dispose()
+
+    expect(FakeMediaStream.live()).toHaveLength(0)
+    expect(FakeSpeechRecognition.last().started).toBe(false)
+
+    await listener.start()
+    await listener.stop()
+
+    expect(heard).toEqual([])
+    expect(navigator.mediaDevices.getUserMedia).toHaveBeenCalledTimes(1)
+  })
+})

@@ -9,7 +9,7 @@ import type { Provider } from './provider.ts'
 import { webSpeechProvider } from './web-speech.ts'
 import { whisperWebProvider } from './whisper-web.ts'
 
-export const PROVIDERS: readonly Provider[] = [
+const PROVIDERS: readonly Provider[] = [
   endpointProvider,
   webSpeechProvider,
   whisperWebProvider,

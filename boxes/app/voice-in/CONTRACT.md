@@ -13,9 +13,12 @@ Schema: [`schema/voice-in.ts`](schema/voice-in.ts)
 createListener({ config, language, onPartial, onUtterance, onState, onDiagnostic }): Listener
 ```
 
-- `config`: `{ provider, model?, baseUrl?, apiKey?, minSeconds = 0.6, minPeak = 0.01 }`.
+- `config`: `{ provider, model?, baseUrl?, apiKey?, minSeconds = 0.6, minPeak = 0.01,
+  moduleUrl? }`. `provider` is `auto`, which picks in the order below, or one engine by name.
+  `moduleUrl` overrides the pinned transformers.js build `whisper-web` imports at runtime.
 - `Listener`: `{ supported, engine, state, reason, start, stop, setLanguage, dispose }`.
-  `start` opens a hold, `stop` closes it and is idempotent.
+  `start` opens a hold, `stop` closes it and is idempotent. Both resolve when the hold has
+  settled, so a caller can await one; neither rejects.
 
 ## Providers
 

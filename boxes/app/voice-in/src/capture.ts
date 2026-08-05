@@ -11,7 +11,7 @@ import workletUrl from './pcm.worklet.ts?worker&url'
 import { EngineFailure, ListenError, messageOf, nameOf } from './errors.ts'
 import { toRate } from './resample.ts'
 
-export const TARGET_RATE = 16000
+const TARGET_RATE = 16000
 const PROCESSOR = 'pcm-capture'
 
 /** Denied for good, versus worth another press. */

@@ -21,8 +21,6 @@ import { EngineFailure, ListenError, messageOf } from './errors.ts'
 import type { Hold, Provider } from './providers/provider.ts'
 import { pickProvider } from './providers/registry.ts'
 
-const NOTHING_CAPTURED: Diagnostic = { device: 'none', seconds: 0, peak: 0 }
-
 class HoldListener implements Listener {
   #config: ResolvedConfig
   #language: string
@@ -59,7 +57,7 @@ class HoldListener implements Listener {
   }
 
   get supported(): boolean {
-    return this.#provider !== null
+    return this.#provider !== null && this.#state !== 'unavailable'
   }
 
   get engine(): EngineId | null {
@@ -145,7 +143,7 @@ class HoldListener implements Listener {
     } catch (error) {
       hold.cancel()
       this.#hold = null
-      if (!this.#disposed) this.#onDiagnostic(NOTHING_CAPTURED)
+      if (!this.#disposed) this.#onDiagnostic({ device: 'none', seconds: 0, peak: 0 })
       this.#fail(error)
     }
   }

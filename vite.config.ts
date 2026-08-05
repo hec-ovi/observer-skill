@@ -41,6 +41,10 @@ export default defineConfig({
     emptyOutDir: true,
     assetsDir: 'assets',
     sourcemap: true,
+    // The page, and the isolated document `stage` verifies a module in.
+    rollupOptions: {
+      input: { app: at('./boxes/app/index.html'), sandbox: at('./boxes/app/sandbox.html') },
+    },
   },
 
   // iife keeps workers and AudioWorklets import-free in the build output, which is what

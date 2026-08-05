@@ -21,7 +21,7 @@ export class ListenError extends Error {
 }
 
 /** Where a failed hold leaves the listener. `unavailable` means the engine is out for good. */
-export type Settles = 'idle' | 'unavailable'
+type Settles = 'idle' | 'unavailable'
 
 export class EngineFailure extends Error {
   readonly settles: Settles

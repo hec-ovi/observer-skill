@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <title>Artifact verification</title>
+    <!-- The registry. Import maps are per document, so this is the same string the page
+         carries, and it must come before any module that resolves a bare specifier. -->
+    <script type="importmap">
+      {
+        "imports": {
+          "echarts": "/api/vendor/echarts.js",
+          "d3": "/api/vendor/d3.js",
+          "katex": "/api/vendor/katex.js"
+        }
+      }
+    </script>
+    <style>
+      html,
+      body {
+        margin: 0;
+        block-size: 100%;
+      }
+      #root {
+        block-size: 100%;
+        overflow: hidden;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/stage/sandbox/main.ts"></script>
+  </body>
+</html>

@@ -13,8 +13,7 @@ import type { Recording } from '../capture.ts'
 import { EngineFailure, messageOf } from '../errors.ts'
 import type { Hold, HoldOptions, Provider } from './provider.ts'
 
-export const TRANSFORMERS_MODULE_URL =
-  'https://cdn.jsdelivr.net/npm/@huggingface/transformers@4.2.0'
+const TRANSFORMERS_MODULE_URL = 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@4.2.0'
 
 /** 28 MB at q8, English, and stronger than whisper-tiny on utterances this short. */
 const DEFAULT_MODEL = 'onnx-community/moonshine-tiny-ONNX'
@@ -71,14 +70,12 @@ function transcribe(request: TranscribeRequest): Promise<string> {
 
 class WhisperHold implements Hold {
   #options: HoldOptions
-  #cancelled = false
 
   constructor(options: HoldOptions) {
     this.#options = options
   }
 
   async finish(recording: Recording): Promise<string> {
-    if (this.#cancelled) return ''
     const { config, language } = this.#options
     try {
       return await transcribe({
@@ -94,7 +91,7 @@ class WhisperHold implements Hold {
   }
 
   cancel(): void {
-    this.#cancelled = true
+    // Nothing has been sent: the model only ever sees a hold that passed the gate.
   }
 }
 
