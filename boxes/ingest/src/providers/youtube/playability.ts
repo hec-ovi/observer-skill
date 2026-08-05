@@ -5,6 +5,8 @@
  * keeps the video with fewer facts attached.
  */
 
+import { PICK_ANOTHER } from '../../hints.ts'
+
 export type Verdict =
   | { kind: 'playable' }
   | { kind: 'not-embeddable' }
@@ -29,8 +31,6 @@ const AGE_STATUS = new Set([
 const AGE_REASON = /confirm your age|age.?restrict|may be inappropriate/i
 const REGION_REASON = /in your country|available in your|country.?restrict/i
 const PRIVATE_REASON = /private video|this video is private/i
-
-const PICK_ANOTHER = 'Pick another video, or paste a link you can open while signed out.'
 
 function unavailable(message: string, hint: string): Verdict {
   return { kind: 'unavailable', message, hint }

@@ -22,7 +22,7 @@ export const Source = z.object({
   title: z.string(),
   channel: z.string(),
   /** Seconds. Null when the richer lookup could not run. */
-  duration: z.number().int().positive().nullable(),
+  duration: z.number().int().nonnegative().nullable(),
   /** `YYYY-MM-DD`. Null when the richer lookup could not run. */
   publishedAt: z.iso.date().nullable(),
   /** Null when the richer lookup could not run, so "no captions" is never guessed. */

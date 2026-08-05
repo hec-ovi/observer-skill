@@ -8,14 +8,13 @@
  */
 
 import { fail } from '#errors'
-import type { Source } from '../../schema.ts'
-import { checkEmbeddable, type EmbedCheck } from './oembed.ts'
-import { lookupDetails, type Details } from './details.ts'
+import { PASTE_ANOTHER, PICK_ANOTHER, RETRY_LATER } from '../../hints.ts'
+import { checkEmbeddable } from './oembed.ts'
+import { lookupDetails } from './details.ts'
 import { parseVideoId, watchUrl } from './url.ts'
-
-const PASTE_ANOTHER =
-  'Paste a YouTube watch link, a youtu.be link, or an eleven-character video id.'
-const PICK_ANOTHER = 'Pick another video, or paste a link you can open while signed out.'
+import type { Source } from '../../schema.ts'
+import type { EmbedCheck } from './oembed.ts'
+import type { Details } from './details.ts'
 
 type Refusal = Extract<EmbedCheck, { ok: false }>['reason']
 
@@ -32,26 +31,28 @@ function refuse(reason: Refusal): never {
     case 'bad-id':
       fail('BAD_SOURCE', 'YouTube does not recognise that video id.', PASTE_ANOTHER)
     case 'unreachable':
-      fail(
-        'PROVIDER_UNAVAILABLE',
-        'YouTube did not answer the embed check.',
-        'Check the network connection and try the same link again.',
-      )
+      fail('PROVIDER_UNAVAILABLE', 'YouTube did not answer the embed check.', RETRY_LATER)
   }
 }
 
-/** What the richer lookup would have filled in, when it could not run. */
-const UNKNOWN = {
+/** Everything only the richer lookup can settle. */
+type Facts = Pick<
+  Source,
+  'duration' | 'publishedAt' | 'hasCaptions' | 'captionLanguages' | 'degraded'
+>
+
+const UNKNOWN: Facts = {
   duration: null,
   publishedAt: null,
   hasCaptions: null,
   captionLanguages: [],
   degraded: true,
-} as const
+}
 
-function fill(details: Details): Omit<Source, keyof typeof BASE_KEYS> {
+function facts(details: Details | null): Facts {
+  if (details === null) return UNKNOWN
+
   const { verdict } = details
-
   if (verdict.kind === 'unavailable') fail('SOURCE_UNAVAILABLE', verdict.message, verdict.hint)
   if (verdict.kind === 'not-embeddable') refuse('embedding-disabled')
   if (verdict.kind === 'refused') return UNKNOWN
@@ -65,17 +66,6 @@ function fill(details: Details): Omit<Source, keyof typeof BASE_KEYS> {
   }
 }
 
-/** The fields the keyless lookup already settled. */
-const BASE_KEYS = {
-  provider: true,
-  videoId: true,
-  url: true,
-  title: true,
-  channel: true,
-  hasAds: true,
-  embeddable: true,
-} as const
-
 async function resolve(url: string, hasAds: boolean): Promise<Source> {
   const videoId = parseVideoId(url)
   if (videoId === null) {
@@ -85,8 +75,6 @@ async function resolve(url: string, hasAds: boolean): Promise<Source> {
   const embed = await checkEmbeddable(videoId)
   if (!embed.ok) refuse(embed.reason)
 
-  const details = await lookupDetails(videoId)
-
   return {
     provider: 'youtube',
     videoId,
@@ -95,7 +83,7 @@ async function resolve(url: string, hasAds: boolean): Promise<Source> {
     channel: embed.channel,
     hasAds,
     embeddable: true,
-    ...(details === null ? UNKNOWN : fill(details)),
+    ...facts(await lookupDetails(videoId)),
   }
 }
 

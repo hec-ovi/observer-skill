@@ -1,23 +1,23 @@
 import { describe, expect, it } from 'vitest'
 
-async function load(url: string): Promise<Record<string, unknown>> {
-  return (await import(/* @vite-ignore */ url)) as Record<string, unknown>
+async function load(url: string): Promise<unknown> {
+  return await import(/* @vite-ignore */ url)
 }
 
-describe('dynamic import shapes', () => {
-  it('href', async () => {
-    const url = new URL('./fixtures/probe.ts', import.meta.url).href
-    console.log('href', url)
-    const m = await load(url)
-    expect(typeof m.mount).toBe('function')
-  })
-  it('pathname', async () => {
-    const url = new URL('./fixtures/probe.ts', import.meta.url).pathname
-    console.log('pathname', url)
-    const m = await load(url)
-    expect(typeof m.mount).toBe('function')
-  })
-  it('missing url rejects', async () => {
-    await expect(load('/nope/missing.ts')).rejects.toThrow()
+describe('probe', () => {
+  it('reports', async () => {
+    const seen: string[] = []
+    for (const url of [
+      new URL('./fixtures/missing-library.ts', import.meta.url).pathname,
+      '/boxes/app/stage/test/fixtures/nope.ts',
+    ]) {
+      try {
+        await load(url)
+        seen.push('no error')
+      } catch (error) {
+        seen.push(`${(error as Error).name} :: ${(error as Error).message}`)
+      }
+    }
+    expect(seen).toEqual([])
   })
 })
