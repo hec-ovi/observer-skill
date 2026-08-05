@@ -1,0 +1,32 @@
+{
+  "wireMagic": "pb3",
+  "pens": [{}],
+  "wsWinStyles": [{}],
+  "wpWinPositions": [{}],
+  "events": [
+    {
+      "tStartMs": 0,
+      "dDurationMs": 3940,
+      "segs": [{ "utf8": "In a single minute your body produces 120 million red blood cells." }]
+    },
+    {
+      "tStartMs": 3940,
+      "dDurationMs": 5891,
+      "segs": [
+        { "utf8": "Each one carries oxygen from your lungs\nto every tissue that needs it." }
+      ]
+    },
+    {
+      "tStartMs": 9831,
+      "dDurationMs": 4200,
+      "segs": [{ "utf8": "The whole round trip takes about twenty seconds." }]
+    },
+    {
+      "tStartMs": 14031,
+      "dDurationMs": 6100,
+      "segs": [
+        { "utf8": "That is why a shortage of iron &amp; a shortage of oxygen feel like the same thing." }
+      ]
+    }
+  ]
+}
