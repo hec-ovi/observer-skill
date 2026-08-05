@@ -62,7 +62,8 @@ Events:
 
 `INVALID_VOICE_CONFIG` throws from the call, because the settings are wrong and no line ever
 starts: an unknown provider, or `endpoint` without an http URL. It is the only error `speak`,
-`voices`, and `providerInfo` throw.
+`voices`, and `providerInfo` throw. `warm` reads the same settings before it downloads
+anything, so it rejects with this code too: it is the one call that can end in either error.
 
 `VOICE_UNAVAILABLE` is discovered while trying, so it arrives two ways. On `onEnd`, when a
 line could not be spoken: the chosen provider falls back to `web-speech` when the browser has

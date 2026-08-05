@@ -75,6 +75,15 @@ describe('a config that is wrong before any line starts', () => {
     }
   })
 
+  it('refuses to warm a provider that does not exist, before any download', async () => {
+    const config = { provider: 'elevenlabs' } as unknown as VoiceOutConfig
+    const error = await warm(config).catch((reason: unknown) => reason)
+
+    expect(error).toBeInstanceOf(VoiceOutError)
+    expect((error as VoiceOutError).code).toBe('INVALID_VOICE_CONFIG')
+    expect(fetched).not.toHaveBeenCalled()
+  })
+
   it('refuses the endpoint provider without a URL to reach', () => {
     expect(() => speak(LINE, { config: { provider: 'endpoint' } })).toThrow(
       /needs a baseUrl/,
