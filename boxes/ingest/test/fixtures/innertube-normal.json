@@ -1,0 +1,1836 @@
+[
+  {
+    "url": "https://www.youtube.com/youtubei/v1/player?prettyPrint=false&alt=json",
+    "body": {
+      "playabilityStatus": {
+        "status": "OK",
+        "playableInEmbed": true,
+        "offlineability": {
+          "buttonRenderer": {
+            "navigationEndpoint": {
+              "clickTrackingParams": "CBMQ6ewBIhMI0vewk7CJlgMVIq2VAh0bKQoAygEEW3zRSA==",
+              "ypcGetOfflineUpsellEndpoint": {
+                "params": "ChPqqN25AQ0KC2FpcmNBcnV2bktrIgthaXJjQXJ1dm5LayoVCAkYAVIPCgthaXJjQXJ1dm5LayAB"
+              }
+            },
+            "trackingParams": "CBMQ6ewBIhMI0vewk7CJlgMVIq2VAh0bKQoA"
+          }
+        },
+        "pictureInPicture": {
+          "pictureInPictureRenderer": {
+            "playableInPip": true,
+            "offByDefault": false,
+            "shouldResumeOnHead": false
+          }
+        },
+        "miniplayer": {
+          "miniplayerRenderer": {
+            "playbackMode": "PLAYBACK_MODE_ALLOW"
+          }
+        },
+        "contextParams": "Q0FFU0FnZ0M="
+      },
+      "videoDetails": {
+        "videoId": "aircAruvnKk",
+        "title": "But what is a neural network? | Deep learning chapter 1",
+        "lengthSeconds": "1120",
+        "channelId": "UCYO_jab_esuFRV4b17AJtAw",
+        "isOwnerViewing": false,
+        "shortDescription": "What are the neurons, why are there layers, and what is the math underlying it?\nHelp fund future projects: https://www.patreon.com/3blue1brown\nWritten/interactive form of this series: https://www.3blue1brown.com/topics/neural-networks\n\nAdditional funding for this project was provided by Amplify Partners\n\nFor those who want to learn more, I highly recommend the book by Michael Nielsen that introduces neural networks and deep learning: https://goo.gl/Zmczdy\n\nThere are two neat things about this book.  First, it's available for free, so consider joining me in making a donation to Nielsen if you get something out of it.  And second, it's centered around walking through some code and data, which you can download yourself, and which covers the same example that I introduced in this video.  Yay for active learning!\nhttps://github.com/mnielsen/neural-networks-and-deep-learning\n\nI also highly recommend Chris Olah's blog: http://colah.github.io/\n\nFor more videos, Welch Labs also has some great series on machine learning: \nhttps://youtu.be/i8D90DkCLhI\nhttps://youtu.be/bxe2T-V8XRs\n\nFor those of you looking to go *even* deeper, check out the text \"Deep Learning\" by Goodfellow, Bengio, and Courville.  \n\nAlso, the publication Distill is just utterly beautiful: https://distill.pub/\n\nLion photo by Kevin Pluck\n\nЗвуковая дорожка на русском языке: Влад Бурмистров.\n\nThanks to these viewers for their contributions to translations\nGerman: @fpgro\nHebrew: Omer Tuchfeld\nHungarian: Máté Kaszap\nItalian: @teobucci, Teo Bucci\n\n-----------------\nTimeline: \n0:00 - Introduction example\n1:07 - Series preview\n2:42 - What are neurons?\n3:35 - Introducing layers\n5:31 - Why layers?\n8:38 - Edge detection example\n11:34 - Counting weights and biases\n12:30 - How learning relates\n13:26 - Notation and linear algebra\n15:17 - Recap\n16:27 - Some final words\n17:03 - ReLU vs Sigmoid\n\nCorrection 14:45 - The final index on the bias vector should be \"k\"\n\n------------------\nAnimations largely made using manim, a scrappy open source python library.  https://github.com/3b1b/manim\n\nIf you want to check it out, I feel compelled to warn you that it's not the most well-documented tool, and has many other quirks you might expect in a library someone wrote with only their own use in mind.\n\nMusic by Vincent Rubinetti.\nDownload the music on Bandcamp:\nhttps://vincerubinetti.bandcamp.com/album/the-music-of-3blue1brown\n\nStream the music on Spotify:\nhttps://open.spotify.com/album/1dVyjwS8FBqXhRunaG5W5u\n\nIf you want to contribute translated subtitles or to help review those that have already been made by others and need approval, you can click the gear icon in the video and go to subtitles/cc, then \"add subtitles/cc\".  I really appreciate those who do this, as it helps make the lessons accessible to more people.\n------------------\n\n3blue1brown is a channel about animating math, in all senses of the word animate.  And you know the drill with YouTube, if you want to stay posted on new videos, subscribe, and click the bell to receive notifications (if you're into that).\n\nIf you are new to this channel and want to see more, a good place to start is this playlist: http://3b1b.co/recommended\n\nVarious social media stuffs:\nWebsite: https://www.3blue1brown.com\nTwitter: https://twitter.com/3Blue1Brown\nPatreon: https://patreon.com/3blue1brown\nFacebook: https://www.facebook.com/3blue1brown\nReddit: https://www.reddit.com/r/3Blue1Brown",
+        "isCrawlable": true,
+        "thumbnail": {
+          "thumbnails": [
+            {
+              "url": "https://i.ytimg.com/vi/aircAruvnKk/hqdefault.jpg?sqp=-oaymwEaCOADEI4CSFryq4qpAwwIARUAAIhCGAG4Ahc=&rs=AOn4CLAkam8pO30io1HTnD7-FDZIhUd9ag&usqp=CBc",
+              "width": 480,
+              "height": 270
+            },
+            {
+              "url": "https://i.ytimg.com/vi/aircAruvnKk/hqdefault.jpg",
+              "width": 480,
+              "height": 360
+            },
+            {
+              "url": "https://i.ytimg.com/vi/aircAruvnKk/hq720.jpg?sqp=-oaymwEkCIAFEOgCSFryq4qpAxYIARUAAAAAGAElAADIQj0AgKJDuAIX&rs=AOn4CLAjzA150n9p6Zxsu9WNv0tOx0yJKg&usqp=CBc",
+              "width": 640,
+              "height": 360
+            }
+          ]
+        },
+        "allowRatings": true,
+        "viewCount": "23830959",
+        "author": "3Blue1Brown",
+        "isPrivate": false,
+        "isUnpluggedCorpus": false,
+        "isLiveContent": false,
+        "isTvfilmVideo": false
+      },
+      "captions": {
+        "playerCaptionsTracklistRenderer": {
+          "captionTracks": [
+            {
+              "baseUrl": "https://www.youtube.com/api/timedtext?v=aircAruvnKk&ei=Vh1zatL0KqLa1sQPm9Io&caps=asr&opi=112496729&xoaf=5&xowf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1785954246&sparams=ip,ipbits,expire,v,ei,caps,opi,xoaf&signature=D75F869F5E438090588CD720EFBA6464F1185099.59EAFD6166194CE42B2428F43934CCC88D6F0BF7&key=yt8&lang=ar",
+              "name": {
+                "runs": [
+                  {
+                    "text": "Arabic"
+                  }
+                ]
+              },
+              "vssId": ".ar",
+              "languageCode": "ar",
+              "rtl": true,
+              "isTranslatable": true,
+              "trackName": ""
+            },
+            {
+              "baseUrl": "https://www.youtube.com/api/timedtext?v=aircAruvnKk&ei=Vh1zatL0KqLa1sQPm9Io&caps=asr&opi=112496729&xoaf=5&xowf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1785954246&sparams=ip,ipbits,expire,v,ei,caps,opi,xoaf&signature=D75F869F5E438090588CD720EFBA6464F1185099.59EAFD6166194CE42B2428F43934CCC88D6F0BF7&key=yt8&lang=bn",
+              "name": {
+                "runs": [
+                  {
+                    "text": "Bangla"
+                  }
+                ]
+              },
+              "vssId": ".bn",
+              "languageCode": "bn",
+              "isTranslatable": true,
+              "trackName": ""
+            },
+            {
+              "baseUrl": "https://www.youtube.com/api/timedtext?v=aircAruvnKk&ei=Vh1zatL0KqLa1sQPm9Io&caps=asr&opi=112496729&xoaf=5&xowf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1785954246&sparams=ip,ipbits,expire,v,ei,caps,opi,xoaf&signature=D75F869F5E438090588CD720EFBA6464F1185099.59EAFD6166194CE42B2428F43934CCC88D6F0BF7&key=yt8&lang=zh",
+              "name": {
+                "runs": [
+                  {
+                    "text": "Chinese"
+                  }
+                ]
+              },
+              "vssId": ".zh",
+              "languageCode": "zh",
+              "isTranslatable": true,
+              "trackName": ""
+            },
+            {
+              "baseUrl": "https://www.youtube.com/api/timedtext?v=aircAruvnKk&ei=Vh1zatL0KqLa1sQPm9Io&caps=asr&opi=112496729&xoaf=5&xowf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1785954246&sparams=ip,ipbits,expire,v,ei,caps,opi,xoaf&signature=D75F869F5E438090588CD720EFBA6464F1185099.59EAFD6166194CE42B2428F43934CCC88D6F0BF7&key=yt8&lang=zh-CN",
+              "name": {
+                "runs": [
+                  {
+                    "text": "Chinese (China)"
+                  }
+                ]
+              },
+              "vssId": ".zh-CN",
+              "languageCode": "zh-CN",
+              "isTranslatable": true,
+              "trackName": ""
+            },
+            {
+              "baseUrl": "https://www.youtube.com/api/timedtext?v=aircAruvnKk&ei=Vh1zatL0KqLa1sQPm9Io&caps=asr&opi=112496729&xoaf=5&xowf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1785954246&sparams=ip,ipbits,expire,v,ei,caps,opi,xoaf&signature=D75F869F5E438090588CD720EFBA6464F1185099.59EAFD6166194CE42B2428F43934CCC88D6F0BF7&key=yt8&lang=zh-TW",
+              "name": {
+                "runs": [
+                  {
+                    "text": "Chinese (Taiwan)"
+                  }
+                ]
+              },
+              "vssId": ".zh-TW",
+              "languageCode": "zh-TW",
+              "isTranslatable": true,
+              "trackName": ""
+            },
+            {
+              "baseUrl": "https://www.youtube.com/api/timedtext?v=aircAruvnKk&ei=Vh1zatL0KqLa1sQPm9Io&caps=asr&opi=112496729&xoaf=5&xowf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1785954246&sparams=ip,ipbits,expire,v,ei,caps,opi,xoaf&signature=D75F869F5E438090588CD720EFBA6464F1185099.59EAFD6166194CE42B2428F43934CCC88D6F0BF7&key=yt8&lang=cs",
+              "name": {
+                "runs": [
+                  {
+                    "text": "Czech"
+                  }
+                ]
+              },
+              "vssId": ".cs",
+              "languageCode": "cs",
+              "isTranslatable": true,
+              "trackName": ""
+            },
+            {
+              "baseUrl": "https://www.youtube.com/api/timedtext?v=aircAruvnKk&ei=Vh1zatL0KqLa1sQPm9Io&caps=asr&opi=112496729&xoaf=5&xowf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1785954246&sparams=ip,ipbits,expire,v,ei,caps,opi,xoaf&signature=D75F869F5E438090588CD720EFBA6464F1185099.59EAFD6166194CE42B2428F43934CCC88D6F0BF7&key=yt8&lang=en",
+              "name": {
+                "runs": [
+                  {
+                    "text": "English"
+                  }
+                ]
+              },
+              "vssId": ".en",
+              "languageCode": "en",
+              "isTranslatable": true,
+              "trackName": ""
+            },
+            {
+              "baseUrl": "https://www.youtube.com/api/timedtext?v=aircAruvnKk&ei=Vh1zatL0KqLa1sQPm9Io&caps=asr&opi=112496729&xoaf=5&xowf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1785954246&sparams=ip,ipbits,expire,v,ei,caps,opi,xoaf&signature=D75F869F5E438090588CD720EFBA6464F1185099.59EAFD6166194CE42B2428F43934CCC88D6F0BF7&key=yt8&kind=asr&lang=en",
+              "name": {
+                "runs": [
+                  {
+                    "text": "English (auto-generated)"
+                  }
+                ]
+              },
+              "vssId": "a.en",
+              "languageCode": "en",
+              "kind": "asr",
+              "isTranslatable": true,
+              "trackName": ""
+            },
+            {
+              "baseUrl": "https://www.youtube.com/api/timedtext?v=aircAruvnKk&ei=Vh1zatL0KqLa1sQPm9Io&caps=asr&opi=112496729&xoaf=5&xowf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1785954246&sparams=ip,ipbits,expire,v,ei,caps,opi,xoaf&signature=D75F869F5E438090588CD720EFBA6464F1185099.59EAFD6166194CE42B2428F43934CCC88D6F0BF7&key=yt8&lang=fil",
+              "name": {
+                "runs": [
+                  {
+                    "text": "Filipino"
+                  }
+                ]
+              },
+              "vssId": ".fil",
+              "languageCode": "fil",
+              "isTranslatable": true,
+              "trackName": ""
+            },
+            {
+              "baseUrl": "https://www.youtube.com/api/timedtext?v=aircAruvnKk&ei=Vh1zatL0KqLa1sQPm9Io&caps=asr&opi=112496729&xoaf=5&xowf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1785954246&sparams=ip,ipbits,expire,v,ei,caps,opi,xoaf&signature=D75F869F5E438090588CD720EFBA6464F1185099.59EAFD6166194CE42B2428F43934CCC88D6F0BF7&key=yt8&lang=fr",
+              "name": {
+                "runs": [
+                  {
+                    "text": "French"
+                  }
+                ]
+              },
+              "vssId": ".fr",
+              "languageCode": "fr",
+              "isTranslatable": true,
+              "trackName": ""
+            },
+            {
+              "baseUrl": "https://www.youtube.com/api/timedtext?v=aircAruvnKk&ei=Vh1zatL0KqLa1sQPm9Io&caps=asr&opi=112496729&xoaf=5&xowf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1785954246&sparams=ip,ipbits,expire,v,ei,caps,opi,xoaf&signature=D75F869F5E438090588CD720EFBA6464F1185099.59EAFD6166194CE42B2428F43934CCC88D6F0BF7&key=yt8&lang=de",
+              "name": {
+                "runs": [
+                  {
+                    "text": "German"
+                  }
+                ]
+              },
+              "vssId": ".de",
+              "languageCode": "de",
+              "isTranslatable": true,
+              "trackName": ""
+            },
+            {
+              "baseUrl": "https://www.youtube.com/api/timedtext?v=aircAruvnKk&ei=Vh1zatL0KqLa1sQPm9Io&caps=asr&opi=112496729&xoaf=5&xowf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1785954246&sparams=ip,ipbits,expire,v,ei,caps,opi,xoaf&signature=D75F869F5E438090588CD720EFBA6464F1185099.59EAFD6166194CE42B2428F43934CCC88D6F0BF7&key=yt8&lang=el",
+              "name": {
+                "runs": [
+                  {
+                    "text": "Greek"
+                  }
+                ]
+              },
+              "vssId": ".el",
+              "languageCode": "el",
+              "isTranslatable": true,
+              "trackName": ""
+            },
+            {
+              "baseUrl": "https://www.youtube.com/api/timedtext?v=aircAruvnKk&ei=Vh1zatL0KqLa1sQPm9Io&caps=asr&opi=112496729&xoaf=5&xowf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1785954246&sparams=ip,ipbits,expire,v,ei,caps,opi,xoaf&signature=D75F869F5E438090588CD720EFBA6464F1185099.59EAFD6166194CE42B2428F43934CCC88D6F0BF7&key=yt8&lang=iw",
+              "name": {
+                "runs": [
+                  {
+                    "text": "Hebrew"
+                  }
+                ]
+              },
+              "vssId": ".iw",
+              "languageCode": "iw",
+              "rtl": true,
+              "isTranslatable": true,
+              "trackName": ""
+            },
+            {
+              "baseUrl": "https://www.youtube.com/api/timedtext?v=aircAruvnKk&ei=Vh1zatL0KqLa1sQPm9Io&caps=asr&opi=112496729&xoaf=5&xowf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1785954246&sparams=ip,ipbits,expire,v,ei,caps,opi,xoaf&signature=D75F869F5E438090588CD720EFBA6464F1185099.59EAFD6166194CE42B2428F43934CCC88D6F0BF7&key=yt8&lang=hi",
+              "name": {
+                "runs": [
+                  {
+                    "text": "Hindi"
+                  }
+                ]
+              },
+              "vssId": ".hi",
+              "languageCode": "hi",
+              "isTranslatable": true,
+              "trackName": ""
+            },
+            {
+              "baseUrl": "https://www.youtube.com/api/timedtext?v=aircAruvnKk&ei=Vh1zatL0KqLa1sQPm9Io&caps=asr&opi=112496729&xoaf=5&xowf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1785954246&sparams=ip,ipbits,expire,v,ei,caps,opi,xoaf&signature=D75F869F5E438090588CD720EFBA6464F1185099.59EAFD6166194CE42B2428F43934CCC88D6F0BF7&key=yt8&lang=hu",
+              "name": {
+                "runs": [
+                  {
+                    "text": "Hungarian"
+                  }
+                ]
+              },
+              "vssId": ".hu",
+              "languageCode": "hu",
+              "isTranslatable": true,
+              "trackName": ""
+            },
+            {
+              "baseUrl": "https://www.youtube.com/api/timedtext?v=aircAruvnKk&ei=Vh1zatL0KqLa1sQPm9Io&caps=asr&opi=112496729&xoaf=5&xowf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1785954246&sparams=ip,ipbits,expire,v,ei,caps,opi,xoaf&signature=D75F869F5E438090588CD720EFBA6464F1185099.59EAFD6166194CE42B2428F43934CCC88D6F0BF7&key=yt8&lang=it",
+              "name": {
+                "runs": [
+                  {
+                    "text": "Italian"
+                  }
+                ]
+              },
+              "vssId": ".it",
+              "languageCode": "it",
+              "isTranslatable": true,
+              "trackName": ""
+            },
+            {
+              "baseUrl": "https://www.youtube.com/api/timedtext?v=aircAruvnKk&ei=Vh1zatL0KqLa1sQPm9Io&caps=asr&opi=112496729&xoaf=5&xowf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1785954246&sparams=ip,ipbits,expire,v,ei,caps,opi,xoaf&signature=D75F869F5E438090588CD720EFBA6464F1185099.59EAFD6166194CE42B2428F43934CCC88D6F0BF7&key=yt8&lang=ja",
+              "name": {
+                "runs": [
+                  {
+                    "text": "Japanese"
+                  }
+                ]
+              },
+              "vssId": ".ja",
+              "languageCode": "ja",
+              "isTranslatable": true,
+              "trackName": ""
+            },
+            {
+              "baseUrl": "https://www.youtube.com/api/timedtext?v=aircAruvnKk&ei=Vh1zatL0KqLa1sQPm9Io&caps=asr&opi=112496729&xoaf=5&xowf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1785954246&sparams=ip,ipbits,expire,v,ei,caps,opi,xoaf&signature=D75F869F5E438090588CD720EFBA6464F1185099.59EAFD6166194CE42B2428F43934CCC88D6F0BF7&key=yt8&lang=ko",
+              "name": {
+                "runs": [
+                  {
+                    "text": "Korean"
+                  }
+                ]
+              },
+              "vssId": ".ko",
+              "languageCode": "ko",
+              "isTranslatable": true,
+              "trackName": ""
+            },
+            {
+              "baseUrl": "https://www.youtube.com/api/timedtext?v=aircAruvnKk&ei=Vh1zatL0KqLa1sQPm9Io&caps=asr&opi=112496729&xoaf=5&xowf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1785954246&sparams=ip,ipbits,expire,v,ei,caps,opi,xoaf&signature=D75F869F5E438090588CD720EFBA6464F1185099.59EAFD6166194CE42B2428F43934CCC88D6F0BF7&key=yt8&lang=mr",
+              "name": {
+                "runs": [
+                  {
+                    "text": "Marathi"
+                  }
+                ]
+              },
+              "vssId": ".mr",
+              "languageCode": "mr",
+              "isTranslatable": true,
+              "trackName": ""
+            },
+            {
+              "baseUrl": "https://www.youtube.com/api/timedtext?v=aircAruvnKk&ei=Vh1zatL0KqLa1sQPm9Io&caps=asr&opi=112496729&xoaf=5&xowf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1785954246&sparams=ip,ipbits,expire,v,ei,caps,opi,xoaf&signature=D75F869F5E438090588CD720EFBA6464F1185099.59EAFD6166194CE42B2428F43934CCC88D6F0BF7&key=yt8&lang=fa",
+              "name": {
+                "runs": [
+                  {
+                    "text": "Persian"
+                  }
+                ]
+              },
+              "vssId": ".fa",
+              "languageCode": "fa",
+              "rtl": true,
+              "isTranslatable": true,
+              "trackName": ""
+            },
+            {
+              "baseUrl": "https://www.youtube.com/api/timedtext?v=aircAruvnKk&ei=Vh1zatL0KqLa1sQPm9Io&caps=asr&opi=112496729&xoaf=5&xowf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1785954246&sparams=ip,ipbits,expire,v,ei,caps,opi,xoaf&signature=D75F869F5E438090588CD720EFBA6464F1185099.59EAFD6166194CE42B2428F43934CCC88D6F0BF7&key=yt8&lang=fa-IR",
+              "name": {
+                "runs": [
+                  {
+                    "text": "Persian (Iran)"
+                  }
+                ]
+              },
+              "vssId": ".fa-IR",
+              "languageCode": "fa-IR",
+              "rtl": true,
+              "isTranslatable": true,
+              "trackName": ""
+            },
+            {
+              "baseUrl": "https://www.youtube.com/api/timedtext?v=aircAruvnKk&ei=Vh1zatL0KqLa1sQPm9Io&caps=asr&opi=112496729&xoaf=5&xowf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1785954246&sparams=ip,ipbits,expire,v,ei,caps,opi,xoaf&signature=D75F869F5E438090588CD720EFBA6464F1185099.59EAFD6166194CE42B2428F43934CCC88D6F0BF7&key=yt8&lang=pl",
+              "name": {
+                "runs": [
+                  {
+                    "text": "Polish"
+                  }
+                ]
+              },
+              "vssId": ".pl",
+              "languageCode": "pl",
+              "isTranslatable": true,
+              "trackName": ""
+            },
+            {
+              "baseUrl": "https://www.youtube.com/api/timedtext?v=aircAruvnKk&ei=Vh1zatL0KqLa1sQPm9Io&caps=asr&opi=112496729&xoaf=5&xowf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1785954246&sparams=ip,ipbits,expire,v,ei,caps,opi,xoaf&signature=D75F869F5E438090588CD720EFBA6464F1185099.59EAFD6166194CE42B2428F43934CCC88D6F0BF7&key=yt8&lang=pt",
+              "name": {
+                "runs": [
+                  {
+                    "text": "Portuguese"
+                  }
+                ]
+              },
+              "vssId": ".pt",
+              "languageCode": "pt",
+              "isTranslatable": true,
+              "trackName": ""
+            },
+            {
+              "baseUrl": "https://www.youtube.com/api/timedtext?v=aircAruvnKk&ei=Vh1zatL0KqLa1sQPm9Io&caps=asr&opi=112496729&xoaf=5&xowf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1785954246&sparams=ip,ipbits,expire,v,ei,caps,opi,xoaf&signature=D75F869F5E438090588CD720EFBA6464F1185099.59EAFD6166194CE42B2428F43934CCC88D6F0BF7&key=yt8&lang=pt-BR",
+              "name": {
+                "runs": [
+                  {
+                    "text": "Portuguese (Brazil)"
+                  }
+                ]
+              },
+              "vssId": ".pt-BR",
+              "languageCode": "pt-BR",
+              "isTranslatable": true,
+              "trackName": ""
+            },
+            {
+              "baseUrl": "https://www.youtube.com/api/timedtext?v=aircAruvnKk&ei=Vh1zatL0KqLa1sQPm9Io&caps=asr&opi=112496729&xoaf=5&xowf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1785954246&sparams=ip,ipbits,expire,v,ei,caps,opi,xoaf&signature=D75F869F5E438090588CD720EFBA6464F1185099.59EAFD6166194CE42B2428F43934CCC88D6F0BF7&key=yt8&lang=ro",
+              "name": {
+                "runs": [
+                  {
+                    "text": "Romanian"
+                  }
+                ]
+              },
+              "vssId": ".ro",
+              "languageCode": "ro",
+              "isTranslatable": true,
+              "trackName": ""
+            },
+            {
+              "baseUrl": "https://www.youtube.com/api/timedtext?v=aircAruvnKk&ei=Vh1zatL0KqLa1sQPm9Io&caps=asr&opi=112496729&xoaf=5&xowf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1785954246&sparams=ip,ipbits,expire,v,ei,caps,opi,xoaf&signature=D75F869F5E438090588CD720EFBA6464F1185099.59EAFD6166194CE42B2428F43934CCC88D6F0BF7&key=yt8&lang=ru",
+              "name": {
+                "runs": [
+                  {
+                    "text": "Russian"
+                  }
+                ]
+              },
+              "vssId": ".ru",
+              "languageCode": "ru",
+              "isTranslatable": true,
+              "trackName": ""
+            },
+            {
+              "baseUrl": "https://www.youtube.com/api/timedtext?v=aircAruvnKk&ei=Vh1zatL0KqLa1sQPm9Io&caps=asr&opi=112496729&xoaf=5&xowf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1785954246&sparams=ip,ipbits,expire,v,ei,caps,opi,xoaf&signature=D75F869F5E438090588CD720EFBA6464F1185099.59EAFD6166194CE42B2428F43934CCC88D6F0BF7&key=yt8&lang=es",
+              "name": {
+                "runs": [
+                  {
+                    "text": "Spanish"
+                  }
+                ]
+              },
+              "vssId": ".es",
+              "languageCode": "es",
+              "isTranslatable": true,
+              "trackName": ""
+            },
+            {
+              "baseUrl": "https://www.youtube.com/api/timedtext?v=aircAruvnKk&ei=Vh1zatL0KqLa1sQPm9Io&caps=asr&opi=112496729&xoaf=5&xowf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1785954246&sparams=ip,ipbits,expire,v,ei,caps,opi,xoaf&signature=D75F869F5E438090588CD720EFBA6464F1185099.59EAFD6166194CE42B2428F43934CCC88D6F0BF7&key=yt8&lang=th",
+              "name": {
+                "runs": [
+                  {
+                    "text": "Thai"
+                  }
+                ]
+              },
+              "vssId": ".th",
+              "languageCode": "th",
+              "isTranslatable": true,
+              "trackName": ""
+            },
+            {
+              "baseUrl": "https://www.youtube.com/api/timedtext?v=aircAruvnKk&ei=Vh1zatL0KqLa1sQPm9Io&caps=asr&opi=112496729&xoaf=5&xowf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1785954246&sparams=ip,ipbits,expire,v,ei,caps,opi,xoaf&signature=D75F869F5E438090588CD720EFBA6464F1185099.59EAFD6166194CE42B2428F43934CCC88D6F0BF7&key=yt8&lang=tr",
+              "name": {
+                "runs": [
+                  {
+                    "text": "Turkish"
+                  }
+                ]
+              },
+              "vssId": ".tr",
+              "languageCode": "tr",
+              "isTranslatable": true,
+              "trackName": ""
+            },
+            {
+              "baseUrl": "https://www.youtube.com/api/timedtext?v=aircAruvnKk&ei=Vh1zatL0KqLa1sQPm9Io&caps=asr&opi=112496729&xoaf=5&xowf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1785954246&sparams=ip,ipbits,expire,v,ei,caps,opi,xoaf&signature=D75F869F5E438090588CD720EFBA6464F1185099.59EAFD6166194CE42B2428F43934CCC88D6F0BF7&key=yt8&lang=uk",
+              "name": {
+                "runs": [
+                  {
+                    "text": "Ukrainian"
+                  }
+                ]
+              },
+              "vssId": ".uk",
+              "languageCode": "uk",
+              "isTranslatable": true,
+              "trackName": ""
+            },
+            {
+              "baseUrl": "https://www.youtube.com/api/timedtext?v=aircAruvnKk&ei=Vh1zatL0KqLa1sQPm9Io&caps=asr&opi=112496729&xoaf=5&xowf=1&hl=en&ip=0.0.0.0&ipbits=0&expire=1785954246&sparams=ip,ipbits,expire,v,ei,caps,opi,xoaf&signature=D75F869F5E438090588CD720EFBA6464F1185099.59EAFD6166194CE42B2428F43934CCC88D6F0BF7&key=yt8&lang=ur",
+              "name": {
+                "runs": [
+                  {
+                    "text": "Urdu"
+                  }
+                ]
+              },
+              "vssId": ".ur",
+              "languageCode": "ur",
+              "rtl": true,
+              "isTranslatable": true,
+              "trackName": ""
+            }
+          ],
+          "audioTracks": [
+            {
+              "captionTrackIndices": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16,
+                17,
+                18,
+                19,
+                20,
+                21,
+                22,
+                23,
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30,
+                7
+              ],
+              "defaultCaptionTrackIndex": 6,
+              "hasDefaultTrack": true,
+              "audioTrackId": "fr.3",
+              "captionsInitialState": "CAPTIONS_INITIAL_STATE_ON_RECOMMENDED"
+            },
+            {
+              "captionTrackIndices": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16,
+                17,
+                18,
+                19,
+                20,
+                21,
+                22,
+                23,
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30,
+                7
+              ],
+              "defaultCaptionTrackIndex": 6,
+              "hasDefaultTrack": true,
+              "audioTrackId": "de.3",
+              "captionsInitialState": "CAPTIONS_INITIAL_STATE_ON_RECOMMENDED"
+            },
+            {
+              "captionTrackIndices": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16,
+                17,
+                18,
+                19,
+                20,
+                21,
+                22,
+                23,
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30,
+                7
+              ],
+              "defaultCaptionTrackIndex": 6,
+              "hasDefaultTrack": true,
+              "audioTrackId": "ar.3",
+              "captionsInitialState": "CAPTIONS_INITIAL_STATE_ON_RECOMMENDED"
+            },
+            {
+              "captionTrackIndices": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16,
+                17,
+                18,
+                19,
+                20,
+                21,
+                22,
+                23,
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30,
+                7
+              ],
+              "defaultCaptionTrackIndex": 6,
+              "hasDefaultTrack": true,
+              "audioTrackId": "es.3",
+              "captionsInitialState": "CAPTIONS_INITIAL_STATE_ON_RECOMMENDED"
+            },
+            {
+              "captionTrackIndices": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16,
+                17,
+                18,
+                19,
+                20,
+                21,
+                22,
+                23,
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30,
+                7
+              ],
+              "defaultCaptionTrackIndex": 6,
+              "hasDefaultTrack": true,
+              "audioTrackId": "hi.3",
+              "captionsInitialState": "CAPTIONS_INITIAL_STATE_ON_RECOMMENDED"
+            },
+            {
+              "captionTrackIndices": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16,
+                17,
+                18,
+                19,
+                20,
+                21,
+                22,
+                23,
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30,
+                7
+              ],
+              "defaultCaptionTrackIndex": 6,
+              "hasDefaultTrack": true,
+              "audioTrackId": "ru.3",
+              "captionsInitialState": "CAPTIONS_INITIAL_STATE_ON_RECOMMENDED"
+            },
+            {
+              "captionTrackIndices": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16,
+                17,
+                18,
+                19,
+                20,
+                21,
+                22,
+                23,
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30,
+                7
+              ],
+              "defaultCaptionTrackIndex": 6,
+              "hasDefaultTrack": true,
+              "audioTrackId": "th.3",
+              "captionsInitialState": "CAPTIONS_INITIAL_STATE_ON_RECOMMENDED"
+            },
+            {
+              "captionTrackIndices": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16,
+                17,
+                18,
+                19,
+                20,
+                21,
+                22,
+                23,
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30,
+                7
+              ],
+              "defaultCaptionTrackIndex": 6,
+              "hasDefaultTrack": true,
+              "audioTrackId": "en.4",
+              "captionsInitialState": "CAPTIONS_INITIAL_STATE_OFF_RECOMMENDED"
+            },
+            {
+              "captionTrackIndices": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16,
+                17,
+                18,
+                19,
+                20,
+                21,
+                22,
+                23,
+                24,
+                25,
+                26,
+                27,
+                28,
+                29,
+                30,
+                7
+              ],
+              "defaultCaptionTrackIndex": 6,
+              "hasDefaultTrack": true,
+              "audioTrackId": "uz.3",
+              "captionsInitialState": "CAPTIONS_INITIAL_STATE_ON_RECOMMENDED"
+            }
+          ],
+          "translationLanguages": [
+            {
+              "languageCode": "ar",
+              "languageName": {
+                "runs": [
+                  {
+                    "text": "Arabic"
+                  }
+                ]
+              }
+            },
+            {
+              "languageCode": "zh-Hant",
+              "languageName": {
+                "runs": [
+                  {
+                    "text": "Chinese (Traditional)"
+                  }
+                ]
+              }
+            },
+            {
+              "languageCode": "nl",
+              "languageName": {
+                "runs": [
+                  {
+                    "text": "Dutch"
+                  }
+                ]
+              }
+            },
+            {
+              "languageCode": "en",
+              "languageName": {
+                "runs": [
+                  {
+                    "text": "English"
+                  }
+                ]
+              },
+              "translationSourceTrackIndices": [
+                0
+              ]
+            },
+            {
+              "languageCode": "fr",
+              "languageName": {
+                "runs": [
+                  {
+                    "text": "French"
+                  }
+                ]
+              }
+            },
+            {
+              "languageCode": "de",
+              "languageName": {
+                "runs": [
+                  {
+                    "text": "German"
+                  }
+                ]
+              }
+            },
+            {
+              "languageCode": "hi",
+              "languageName": {
+                "runs": [
+                  {
+                    "text": "Hindi"
+                  }
+                ]
+              }
+            },
+            {
+              "languageCode": "id",
+              "languageName": {
+                "runs": [
+                  {
+                    "text": "Indonesian"
+                  }
+                ]
+              }
+            },
+            {
+              "languageCode": "it",
+              "languageName": {
+                "runs": [
+                  {
+                    "text": "Italian"
+                  }
+                ]
+              }
+            },
+            {
+              "languageCode": "ja",
+              "languageName": {
+                "runs": [
+                  {
+                    "text": "Japanese"
+                  }
+                ]
+              }
+            },
+            {
+              "languageCode": "ko",
+              "languageName": {
+                "runs": [
+                  {
+                    "text": "Korean"
+                  }
+                ]
+              }
+            },
+            {
+              "languageCode": "pt",
+              "languageName": {
+                "runs": [
+                  {
+                    "text": "Portuguese"
+                  }
+                ]
+              }
+            },
+            {
+              "languageCode": "ru",
+              "languageName": {
+                "runs": [
+                  {
+                    "text": "Russian"
+                  }
+                ]
+              }
+            },
+            {
+              "languageCode": "es",
+              "languageName": {
+                "runs": [
+                  {
+                    "text": "Spanish"
+                  }
+                ]
+              }
+            },
+            {
+              "languageCode": "th",
+              "languageName": {
+                "runs": [
+                  {
+                    "text": "Thai"
+                  }
+                ]
+              }
+            },
+            {
+              "languageCode": "tr",
+              "languageName": {
+                "runs": [
+                  {
+                    "text": "Turkish"
+                  }
+                ]
+              }
+            },
+            {
+              "languageCode": "uk",
+              "languageName": {
+                "runs": [
+                  {
+                    "text": "Ukrainian"
+                  }
+                ]
+              }
+            },
+            {
+              "languageCode": "vi",
+              "languageName": {
+                "runs": [
+                  {
+                    "text": "Vietnamese"
+                  }
+                ]
+              }
+            }
+          ],
+          "defaultAudioTrackIndex": 7,
+          "defaultTranslationSourceTrackIndices": [
+            6
+          ]
+        }
+      }
+    }
+  },
+  {
+    "url": "https://www.youtube.com/youtubei/v1/next?prettyPrint=false&alt=json",
+    "body": {
+      "contents": {
+        "twoColumnWatchNextResults": {
+          "results": {
+            "results": {
+              "contents": [
+                {
+                  "videoPrimaryInfoRenderer": {
+                    "title": {
+                      "runs": [
+                        {
+                          "text": "But what is a neural network? | Deep learning chapter 1"
+                        }
+                      ]
+                    },
+                    "viewCount": {
+                      "videoViewCountRenderer": {
+                        "viewCount": {
+                          "simpleText": "23,830,959 views"
+                        },
+                        "shortViewCount": {
+                          "simpleText": "23M views"
+                        },
+                        "originalViewCount": "0"
+                      }
+                    },
+                    "videoActions": {
+                      "menuRenderer": {
+                        "items": [
+                          {
+                            "listItemViewModel": {
+                              "title": {
+                                "content": "Watch ad-free"
+                              },
+                              "leadingImage": {
+                                "sources": [
+                                  {
+                                    "clientResource": {
+                                      "imageName": "TV_OFF"
+                                    }
+                                  }
+                                ]
+                              },
+                              "elcShouldLogExplicitGestures": true,
+                              "entityKey": "Eh8veW91dHViZS9hcHAvd2F0Y2gvcGxheWVyX3N0YXRlIMMCKAE%3D",
+                              "entitySelectorType": "LIST_ITEM_VIEW_MODEL_ENTITY_SELECTOR_TYPE_REMOVE_ADS_AD_STATE",
+                              "rendererContext": {
+                                "loggingContext": {
+                                  "loggingDirectives": {
+                                    "trackingParams": "CJ0CEMyrARgAIhMI2tOxk7CJlgMVfBEeAB3qTRxN",
+                                    "clientVeSpec": {
+                                      "uiType": 140610,
+                                      "veCounter": 143653289
+                                    }
+                                  }
+                                },
+                                "commandContext": {
+                                  "onTap": {
+                                    "innertubeCommand": {
+                                      "clickTrackingParams": "CJ0CEMyrARgAIhMI2tOxk7CJlgMVfBEeAB3qTRxNygEEE_c9qw==",
+                                      "commandMetadata": {
+                                        "interactionLoggingCommandMetadata": {
+                                          "screenVisualElement": {
+                                            "uiType": 214295
+                                          }
+                                        }
+                                      },
+                                      "showDialogCommand": {
+                                        "panelLoadingStrategy": {
+                                          "requestTemplate": {
+                                            "panelId": "PApremium_upsell",
+                                            "params": "igkECAMYAA%3D%3D"
+                                          },
+                                          "screenVe": 214295
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "menuServiceItemRenderer": {
+                              "text": {
+                                "runs": [
+                                  {
+                                    "text": "Report"
+                                  }
+                                ]
+                              },
+                              "icon": {
+                                "iconType": "FLAG"
+                              },
+                              "serviceEndpoint": {
+                                "clickTrackingParams": "CJ0CEMyrARgAIhMI2tOxk7CJlgMVfBEeAB3qTRxNygEEE_c9qw==",
+                                "showEngagementPanelEndpoint": {
+                                  "identifier": {
+                                    "tag": "PAabuse_report"
+                                  },
+                                  "globalConfiguration": {
+                                    "params": "qgdxCAESC2FpcmNBcnV2bktrGmBFZ3RoYVhKalFYSjFkbTVMYTBBQldBQjRCWklCTWdvd0VpNW9kSFJ3Y3pvdkwya3VlWFJwYldjdVkyOXRMM1pwTDJGcGNtTkJjblYyYmt0ckwyUmxabUYxYkhRdWFuQm4%3D"
+                                  },
+                                  "engagementPanelPresentationConfigs": {
+                                    "engagementPanelPopupPresentationConfig": {
+                                      "popupType": "PANEL_POPUP_TYPE_DIALOG"
+                                    }
+                                  }
+                                }
+                              },
+                              "trackingParams": "CJ0CEMyrARgAIhMI2tOxk7CJlgMVfBEeAB3qTRxN"
+                            }
+                          }
+                        ],
+                        "trackingParams": "CJ0CEMyrARgAIhMI2tOxk7CJlgMVfBEeAB3qTRxN",
+                        "topLevelButtons": [
+                          {
+                            "segmentedLikeDislikeButtonViewModel": {
+                              "likeButtonViewModel": {
+                                "likeButtonViewModel": {
+                                  "toggleButtonViewModel": {
+                                    "toggleButtonViewModel": {
+                                      "defaultButtonViewModel": {
+                                        "buttonViewModel": {
+                                          "iconName": "LIKE",
+                                          "title": "555K",
+                                          "onTap": {
+                                            "serialCommand": {
+                                              "commands": [
+                                                {
+                                                  "logGestureCommand": {
+                                                    "gestureType": "GESTURE_EVENT_TYPE_LOG_GENERIC_CLICK",
+                                                    "trackingParams": "CKsCEKVBIhMI2tOxk7CJlgMVfBEeAB3qTRxN"
+                                                  }
+                                                },
+                                                {
+                                                  "innertubeCommand": {
+                                                    "clickTrackingParams": "CKsCEKVBIhMI2tOxk7CJlgMVfBEeAB3qTRxNygEEE_c9qw==",
+                                                    "commandMetadata": {
+                                                      "webCommandMetadata": {
+                                                        "ignoreNavigation": true
+                                                      }
+                                                    },
+                                                    "modalEndpoint": {
+                                                      "modal": {
+                                                        "modalWithTitleAndButtonRenderer": {
+                                                          "title": {
+                                                            "simpleText": "Like this video?"
+                                                          },
+                                                          "content": {
+                                                            "simpleText": "Sign in to make your opinion count."
+                                                          },
+                                                          "button": {
+                                                            "buttonRenderer": {
+                                                              "style": "STYLE_MONO_FILLED",
+                                                              "size": "SIZE_DEFAULT",
+                                                              "isDisabled": false,
+                                                              "text": {
+                                                                "simpleText": "Sign in"
+                                                              },
+                                                              "navigationEndpoint": {
+                                                                "clickTrackingParams": "CKwCEPqGBCITCNrTsZOwiZYDFXwRHgAd6k0cTcoBBBP3Pas=",
+                                                                "commandMetadata": {
+                                                                  "webCommandMetadata": {
+                                                                    "url": "https://accounts.google.com/ServiceLogin?service=youtube&uilel=3&passive=true&continue=https%3A%2F%2Fwww.youtube.com%2Fsignin%3Faction_handle_signin%3Dtrue%26app%3Ddesktop%26hl%3Den&hl=en&ec=66426",
+                                                                    "webPageType": "WEB_PAGE_TYPE_UNKNOWN",
+                                                                    "rootVe": 83769
+                                                                  }
+                                                                },
+                                                                "signInEndpoint": {
+                                                                  "nextEndpoint": {
+                                                                    "clickTrackingParams": "CKwCEPqGBCITCNrTsZOwiZYDFXwRHgAd6k0cTcoBBBP3Pas=",
+                                                                    "commandMetadata": {
+                                                                      "webCommandMetadata": {
+                                                                        "sendPost": true,
+                                                                        "apiUrl": "/youtubei/v1/like/like"
+                                                                      }
+                                                                    },
+                                                                    "likeEndpoint": {
+                                                                      "status": "LIKE",
+                                                                      "target": {
+                                                                        "videoId": "aircAruvnKk"
+                                                                      },
+                                                                      "likeParams": "Cg0KC2FpcmNBcnV2bktrIAAyCwjXuszTBhCRuK8y"
+                                                                    }
+                                                                  },
+                                                                  "idamTag": "66426"
+                                                                }
+                                                              },
+                                                              "trackingParams": "CKwCEPqGBCITCNrTsZOwiZYDFXwRHgAd6k0cTQ=="
+                                                            }
+                                                          }
+                                                        }
+                                                      }
+                                                    }
+                                                  }
+                                                }
+                                              ]
+                                            }
+                                          },
+                                          "accessibilityText": "like this video along with 555,418 other people",
+                                          "style": "BUTTON_VIEW_MODEL_STYLE_MONO",
+                                          "trackingParams": "CKsCEKVBIhMI2tOxk7CJlgMVfBEeAB3qTRxN",
+                                          "isFullWidth": false,
+                                          "type": "BUTTON_VIEW_MODEL_TYPE_TONAL",
+                                          "buttonSize": "BUTTON_VIEW_MODEL_SIZE_DEFAULT",
+                                          "accessibilityId": "id.video.like.button",
+                                          "tooltip": "I like this"
+                                        }
+                                      },
+                                      "toggledButtonViewModel": {
+                                        "buttonViewModel": {
+                                          "iconName": "LIKE",
+                                          "title": "555K",
+                                          "onTap": {
+                                            "serialCommand": {
+                                              "commands": [
+                                                {
+                                                  "logGestureCommand": {
+                                                    "gestureType": "GESTURE_EVENT_TYPE_LOG_GENERIC_CLICK",
+                                                    "trackingParams": "CKoCEKVBIhMI2tOxk7CJlgMVfBEeAB3qTRxN"
+                                                  }
+                                                },
+                                                {
+                                                  "innertubeCommand": {
+                                                    "clickTrackingParams": "CKoCEKVBIhMI2tOxk7CJlgMVfBEeAB3qTRxNygEEE_c9qw==",
+                                                    "commandMetadata": {
+                                                      "webCommandMetadata": {
+                                                        "sendPost": true,
+                                                        "apiUrl": "/youtubei/v1/like/removelike"
+                                                      }
+                                                    },
+                                                    "likeEndpoint": {
+                                                      "status": "INDIFFERENT",
+                                                      "target": {
+                                                        "videoId": "aircAruvnKk"
+                                                      },
+                                                      "removeLikeParams": "Cg0KC2FpcmNBcnV2bktrGAAqCwjXuszTBhDz8LAy"
+                                                    }
+                                                  }
+                                                }
+                                              ]
+                                            }
+                                          },
+                                          "accessibilityText": "like this video along with 555,418 other people",
+                                          "style": "BUTTON_VIEW_MODEL_STYLE_MONO",
+                                          "trackingParams": "CKoCEKVBIhMI2tOxk7CJlgMVfBEeAB3qTRxN",
+                                          "isFullWidth": false,
+                                          "type": "BUTTON_VIEW_MODEL_TYPE_TONAL",
+                                          "buttonSize": "BUTTON_VIEW_MODEL_SIZE_DEFAULT",
+                                          "accessibilityId": "id.video.like.button",
+                                          "tooltip": "Unlike"
+                                        }
+                                      },
+                                      "identifier": "watch-like",
+                                      "trackingParams": "CJ0CEMyrARgAIhMI2tOxk7CJlgMVfBEeAB3qTRxN",
+                                      "isTogglingDisabled": true
+                                    }
+                                  },
+                                  "likeStatusEntityKey": "EgthaXJjQXJ1dm5LayA-KAE%3D",
+                                  "likeStatusEntity": {
+                                    "key": "EgthaXJjQXJ1dm5LayA-KAE%3D",
+                                    "likeStatus": "INDIFFERENT"
+                                  }
+                                }
+                              },
+                              "dislikeButtonViewModel": {
+                                "dislikeButtonViewModel": {
+                                  "toggleButtonViewModel": {
+                                    "toggleButtonViewModel": {
+                                      "defaultButtonViewModel": {
+                                        "buttonViewModel": {
+                                          "iconName": "DISLIKE",
+                                          "title": "Dislike",
+                                          "onTap": {
+                                            "serialCommand": {
+                                              "commands": [
+                                                {
+                                                  "logGestureCommand": {
+                                                    "gestureType": "GESTURE_EVENT_TYPE_LOG_GENERIC_CLICK",
+                                                    "trackingParams": "CKgCEKiPCSITCNrTsZOwiZYDFXwRHgAd6k0cTQ=="
+                                                  }
+                                                },
+                                                {
+                                                  "innertubeCommand": {
+                                                    "clickTrackingParams": "CKgCEKiPCSITCNrTsZOwiZYDFXwRHgAd6k0cTcoBBBP3Pas=",
+                                                    "commandMetadata": {
+                                                      "webCommandMetadata": {
+                                                        "ignoreNavigation": true
+                                                      }
+                                                    },
+                                                    "modalEndpoint": {
+                                                      "modal": {
+                                                        "modalWithTitleAndButtonRenderer": {
+                                                          "title": {
+                                                            "simpleText": "Don't like this video?"
+                                                          },
+                                                          "content": {
+                                                            "simpleText": "Sign in to make your opinion count."
+                                                          },
+                                                          "button": {
+                                                            "buttonRenderer": {
+                                                              "style": "STYLE_MONO_FILLED",
+                                                              "size": "SIZE_DEFAULT",
+                                                              "isDisabled": false,
+                                                              "text": {
+                                                                "simpleText": "Sign in"
+                                                              },
+                                                              "navigationEndpoint": {
+                                                                "clickTrackingParams": "CKkCEPmGBCITCNrTsZOwiZYDFXwRHgAd6k0cTcoBBBP3Pas=",
+                                                                "commandMetadata": {
+                                                                  "webCommandMetadata": {
+                                                                    "url": "https://accounts.google.com/ServiceLogin?service=youtube&uilel=3&passive=true&continue=https%3A%2F%2Fwww.youtube.com%2Fsignin%3Faction_handle_signin%3Dtrue%26app%3Ddesktop%26hl%3Den&hl=en&ec=66425",
+                                                                    "webPageType": "WEB_PAGE_TYPE_UNKNOWN",
+                                                                    "rootVe": 83769
+                                                                  }
+                                                                },
+                                                                "signInEndpoint": {
+                                                                  "nextEndpoint": {
+                                                                    "clickTrackingParams": "CKkCEPmGBCITCNrTsZOwiZYDFXwRHgAd6k0cTcoBBBP3Pas=",
+                                                                    "commandMetadata": {
+                                                                      "webCommandMetadata": {
+                                                                        "sendPost": true,
+                                                                        "apiUrl": "/youtubei/v1/like/dislike"
+                                                                      }
+                                                                    },
+                                                                    "likeEndpoint": {
+                                                                      "status": "DISLIKE",
+                                                                      "target": {
+                                                                        "videoId": "aircAruvnKk"
+                                                                      },
+                                                                      "dislikeParams": "Cg0KC2FpcmNBcnV2bktrEAAiCwjXuszTBhDv_LIy"
+                                                                    }
+                                                                  },
+                                                                  "idamTag": "66425"
+                                                                }
+                                                              },
+                                                              "trackingParams": "CKkCEPmGBCITCNrTsZOwiZYDFXwRHgAd6k0cTQ=="
+                                                            }
+                                                          }
+                                                        }
+                                                      }
+                                                    }
+                                                  }
+                                                }
+                                              ]
+                                            }
+                                          },
+                                          "accessibilityText": "Dislike this video",
+                                          "style": "BUTTON_VIEW_MODEL_STYLE_MONO",
+                                          "trackingParams": "CKgCEKiPCSITCNrTsZOwiZYDFXwRHgAd6k0cTQ==",
+                                          "isFullWidth": false,
+                                          "type": "BUTTON_VIEW_MODEL_TYPE_TONAL",
+                                          "buttonSize": "BUTTON_VIEW_MODEL_SIZE_DEFAULT",
+                                          "accessibilityId": "id.video.dislike.button",
+                                          "tooltip": "I dislike this"
+                                        }
+                                      },
+                                      "toggledButtonViewModel": {
+                                        "buttonViewModel": {
+                                          "iconName": "DISLIKE",
+                                          "title": "Dislike",
+                                          "onTap": {
+                                            "serialCommand": {
+                                              "commands": [
+                                                {
+                                                  "logGestureCommand": {
+                                                    "gestureType": "GESTURE_EVENT_TYPE_LOG_GENERIC_CLICK",
+                                                    "trackingParams": "CKcCEKiPCSITCNrTsZOwiZYDFXwRHgAd6k0cTQ=="
+                                                  }
+                                                },
+                                                {
+                                                  "innertubeCommand": {
+                                                    "clickTrackingParams": "CKcCEKiPCSITCNrTsZOwiZYDFXwRHgAd6k0cTcoBBBP3Pas=",
+                                                    "commandMetadata": {
+                                                      "webCommandMetadata": {
+                                                        "sendPost": true,
+                                                        "apiUrl": "/youtubei/v1/like/removelike"
+                                                      }
+                                                    },
+                                                    "likeEndpoint": {
+                                                      "status": "INDIFFERENT",
+                                                      "target": {
+                                                        "videoId": "aircAruvnKk"
+                                                      },
+                                                      "removeLikeParams": "Cg0KC2FpcmNBcnV2bktrGAAqCwjXuszTBhDHqbMy"
+                                                    }
+                                                  }
+                                                }
+                                              ]
+                                            }
+                                          },
+                                          "accessibilityText": "Dislike this video",
+                                          "style": "BUTTON_VIEW_MODEL_STYLE_MONO",
+                                          "trackingParams": "CKcCEKiPCSITCNrTsZOwiZYDFXwRHgAd6k0cTQ==",
+                                          "isFullWidth": false,
+                                          "type": "BUTTON_VIEW_MODEL_TYPE_TONAL",
+                                          "buttonSize": "BUTTON_VIEW_MODEL_SIZE_DEFAULT",
+                                          "accessibilityId": "id.video.dislike.button",
+                                          "tooltip": "I dislike this"
+                                        }
+                                      },
+                                      "trackingParams": "CJ0CEMyrARgAIhMI2tOxk7CJlgMVfBEeAB3qTRxN",
+                                      "isTogglingDisabled": true
+                                    }
+                                  },
+                                  "dislikeEntityKey": "EgthaXJjQXJ1dm5LayA-KAE%3D"
+                                }
+                              },
+                              "iconType": "LIKE_ICON_TYPE_UNKNOWN",
+                              "likeCountEntity": {
+                                "key": "unset_like_count_entity_key"
+                              },
+                              "dynamicLikeCountUpdateData": {
+                                "updateStatusKey": "like_count_update_status_key",
+                                "placeholderLikeCountValuesKey": "like_count_placeholder_values_key",
+                                "updateDelayLoopId": "like_count_update_delay_loop_id",
+                                "updateDelaySec": 5
+                              },
+                              "teasersOrderEntityKey": "EgthaXJjQXJ1dm5LayD8AygB"
+                            }
+                          },
+                          {
+                            "buttonViewModel": {
+                              "iconName": "SHARE",
+                              "title": "Share",
+                              "onTap": {
+                                "serialCommand": {
+                                  "commands": [
+                                    {
+                                      "logGestureCommand": {
+                                        "gestureType": "GESTURE_EVENT_TYPE_LOG_GENERIC_CLICK",
+                                        "trackingParams": "CKUCEOWWARgEIhMI2tOxk7CJlgMVfBEeAB3qTRxN"
+                                      }
+                                    },
+                                    {
+                                      "innertubeCommand": {
+                                        "clickTrackingParams": "CKUCEOWWARgEIhMI2tOxk7CJlgMVfBEeAB3qTRxNygEEE_c9qw==",
+                                        "commandMetadata": {
+                                          "webCommandMetadata": {
+                                            "sendPost": true,
+                                            "apiUrl": "/youtubei/v1/share/get_share_panel"
+                                          }
+                                        },
+                                        "shareEntityServiceEndpoint": {
+                                          "serializedShareEntity": "CgthaXJjQXJ1dm5La6ABAQ%3D%3D",
+                                          "commands": [
+                                            {
+                                              "clickTrackingParams": "CKUCEOWWARgEIhMI2tOxk7CJlgMVfBEeAB3qTRxNygEEE_c9qw==",
+                                              "openPopupAction": {
+                                                "popup": {
+                                                  "unifiedSharePanelRenderer": {
+                                                    "trackingParams": "CKYCEI5iIhMI2tOxk7CJlgMVfBEeAB3qTRxN",
+                                                    "showLoadingSpinner": true
+                                                  }
+                                                },
+                                                "popupType": "DIALOG",
+                                                "beReused": true
+                                              }
+                                            }
+                                          ]
+                                        }
+                                      }
+                                    }
+                                  ]
+                                }
+                              },
+                              "accessibilityText": "Share",
+                              "style": "BUTTON_VIEW_MODEL_STYLE_MONO",
+                              "trackingParams": "CKUCEOWWARgEIhMI2tOxk7CJlgMVfBEeAB3qTRxN",
+                              "isFullWidth": false,
+                              "type": "BUTTON_VIEW_MODEL_TYPE_TONAL",
+                              "buttonSize": "BUTTON_VIEW_MODEL_SIZE_DEFAULT",
+                              "state": "BUTTON_VIEW_MODEL_STATE_ACTIVE",
+                              "accessibilityId": "id.video.share.button",
+                              "tooltip": "Share"
+                            }
+                          }
+                        ],
+                        "accessibility": {
+                          "accessibilityData": {
+                            "label": "More actions"
+                          }
+                        },
+                        "flexibleItems": [
+                          {
+                            "menuFlexibleItemRenderer": {
+                              "menuItem": {
+                                "menuServiceItemRenderer": {
+                                  "text": {
+                                    "runs": [
+                                      {
+                                        "text": "Save"
+                                      }
+                                    ]
+                                  },
+                                  "icon": {
+                                    "iconType": "PLAYLIST_ADD"
+                                  },
+                                  "serviceEndpoint": {
+                                    "clickTrackingParams": "CKMCEOuQCSITCNrTsZOwiZYDFXwRHgAd6k0cTcoBBBP3Pas=",
+                                    "commandMetadata": {
+                                      "webCommandMetadata": {
+                                        "ignoreNavigation": true
+                                      }
+                                    },
+                                    "modalEndpoint": {
+                                      "modal": {
+                                        "modalWithTitleAndButtonRenderer": {
+                                          "title": {
+                                            "runs": [
+                                              {
+                                                "text": "Want to watch this again later?"
+                                              }
+                                            ]
+                                          },
+                                          "content": {
+                                            "runs": [
+                                              {
+                                                "text": "Sign in to add this video to a playlist."
+                                              }
+                                            ]
+                                          },
+                                          "button": {
+                                            "buttonRenderer": {
+                                              "style": "STYLE_MONO_FILLED",
+                                              "size": "SIZE_DEFAULT",
+                                              "isDisabled": false,
+                                              "text": {
+                                                "simpleText": "Sign in"
+                                              },
+                                              "navigationEndpoint": {
+                                                "clickTrackingParams": "CKQCEPuGBCITCNrTsZOwiZYDFXwRHgAd6k0cTcoBBBP3Pas=",
+                                                "commandMetadata": {
+                                                  "webCommandMetadata": {
+                                                    "url": "https://accounts.google.com/ServiceLogin?service=youtube&uilel=3&passive=true&continue=https%3A%2F%2Fwww.youtube.com%2Fsignin%3Faction_handle_signin%3Dtrue%26app%3Ddesktop%26hl%3Den%26next%3D%252Fwatch%253Fv%253DaircAruvnKk&hl=en&ec=66427",
+                                                    "webPageType": "WEB_PAGE_TYPE_UNKNOWN",
+                                                    "rootVe": 83769
+                                                  }
+                                                },
+                                                "signInEndpoint": {
+                                                  "nextEndpoint": {
+                                                    "clickTrackingParams": "CKQCEPuGBCITCNrTsZOwiZYDFXwRHgAd6k0cTcoBBBP3Pas=",
+                                                    "commandMetadata": {
+                                                      "webCommandMetadata": {
+                                                        "url": "/watch?v=aircAruvnKk",
+                                                        "webPageType": "WEB_PAGE_TYPE_WATCH",
+                                                        "rootVe": 3832
+                                                      }
+                                                    },
+                                                    "watchEndpoint": {
+                                                      "videoId": "aircAruvnKk",
+                                                      "watchEndpointSupportedOnesieConfig": {
+                                                        "html5PlaybackOnesieConfig": {
+                                                          "commonConfig": {
+                                                            "url": "https://rr1---sn-ja5gv5g-gvne.googlevideo.com/initplayback?source=youtube&oeis=1&c=WEB&oad=3200&ovd=3200&oaad=11000&oavd=11000&ocs=700&oewis=1&oputc=1&olis=1&ofpcc=1&msp=1&odepv=1&id=6a2adc02bbaf9ca9&ip=190.3.40.114&initcwndbps=1456250&mt=1785928847&oweuc=&pxtags=Cg4KAnR4Egg1MTg3NTMwMA&rxtags=Cg4KAnR4Egg1MTg3NTI5OA%2CCg4KAnR4Egg1MTg3NTI5OQ%2CCg4KAnR4Egg1MTg3NTMwMA%2CCg4KAnR4Egg1MTg3NTMwMQ%2CCg4KAnR4Egg1MTg3NTMwMg"
+                                                          }
+                                                        }
+                                                      }
+                                                    }
+                                                  },
+                                                  "idamTag": "66427"
+                                                }
+                                              },
+                                              "trackingParams": "CKQCEPuGBCITCNrTsZOwiZYDFXwRHgAd6k0cTQ=="
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "trackingParams": "CKMCEOuQCSITCNrTsZOwiZYDFXwRHgAd6k0cTQ=="
+                                }
+                              },
+                              "topLevelButton": {
+                                "buttonViewModel": {
+                                  "iconName": "PLAYLIST_ADD",
+                                  "title": "Save",
+                                  "onTap": {
+                                    "serialCommand": {
+                                      "commands": [
+                                        {
+                                          "logGestureCommand": {
+                                            "gestureType": "GESTURE_EVENT_TYPE_LOG_GENERIC_CLICK",
+                                            "trackingParams": "CKECEOuQCSITCNrTsZOwiZYDFXwRHgAd6k0cTQ=="
+                                          }
+                                        },
+                                        {
+                                          "innertubeCommand": {
+                                            "clickTrackingParams": "CKECEOuQCSITCNrTsZOwiZYDFXwRHgAd6k0cTcoBBBP3Pas=",
+                                            "commandMetadata": {
+                                              "webCommandMetadata": {
+                                                "ignoreNavigation": true
+                                              }
+                                            },
+                                            "modalEndpoint": {
+                                              "modal": {
+                                                "modalWithTitleAndButtonRenderer": {
+                                                  "title": {
+                                                    "runs": [
+                                                      {
+                                                        "text": "Want to watch this again later?"
+                                                      }
+                                                    ]
+                                                  },
+                                                  "content": {
+                                                    "runs": [
+                                                      {
+                                                        "text": "Sign in to add this video to a playlist."
+                                                      }
+                                                    ]
+                                                  },
+                                                  "button": {
+                                                    "buttonRenderer": {
+                                                      "style": "STYLE_MONO_FILLED",
+                                                      "size": "SIZE_DEFAULT",
+                                                      "isDisabled": false,
+                                                      "text": {
+                                                        "simpleText": "Sign in"
+                                                      },
+                                                      "navigationEndpoint": {
+                                                        "clickTrackingParams": "CKICEPuGBCITCNrTsZOwiZYDFXwRHgAd6k0cTcoBBBP3Pas=",
+                                                        "commandMetadata": {
+                                                          "webCommandMetadata": {
+                                                            "url": "https://accounts.google.com/ServiceLogin?service=youtube&uilel=3&passive=true&continue=https%3A%2F%2Fwww.youtube.com%2Fsignin%3Faction_handle_signin%3Dtrue%26app%3Ddesktop%26hl%3Den%26next%3D%252Fwatch%253Fv%253DaircAruvnKk&hl=en&ec=66427",
+                                                            "webPageType": "WEB_PAGE_TYPE_UNKNOWN",
+                                                            "rootVe": 83769
+                                                          }
+                                                        },
+                                                        "signInEndpoint": {
+                                                          "nextEndpoint": {
+                                                            "clickTrackingParams": "CKICEPuGBCITCNrTsZOwiZYDFXwRHgAd6k0cTcoBBBP3Pas=",
+                                                            "commandMetadata": {
+                                                              "webCommandMetadata": {
+                                                                "url": "/watch?v=aircAruvnKk",
+                                                                "webPageType": "WEB_PAGE_TYPE_WATCH",
+                                                                "rootVe": 3832
+                                                              }
+                                                            },
+                                                            "watchEndpoint": {
+                                                              "videoId": "aircAruvnKk",
+                                                              "watchEndpointSupportedOnesieConfig": {
+                                                                "html5PlaybackOnesieConfig": {
+                                                                  "commonConfig": {
+                                                                    "url": "https://rr1---sn-ja5gv5g-gvne.googlevideo.com/initplayback?source=youtube&oeis=1&c=WEB&oad=3200&ovd=3200&oaad=11000&oavd=11000&ocs=700&oewis=1&oputc=1&olis=1&ofpcc=1&msp=1&odepv=1&id=6a2adc02bbaf9ca9&ip=190.3.40.114&initcwndbps=1456250&mt=1785928847&oweuc=&pxtags=Cg4KAnR4Egg1MTg3NTMwMA&rxtags=Cg4KAnR4Egg1MTg3NTI5OA%2CCg4KAnR4Egg1MTg3NTI5OQ%2CCg4KAnR4Egg1MTg3NTMwMA%2CCg4KAnR4Egg1MTg3NTMwMQ%2CCg4KAnR4Egg1MTg3NTMwMg"
+                                                                  }
+                                                                }
+                                                              }
+                                                            }
+                                                          },
+                                                          "idamTag": "66427"
+                                                        }
+                                                      },
+                                                      "trackingParams": "CKICEPuGBCITCNrTsZOwiZYDFXwRHgAd6k0cTQ=="
+                                                    }
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  "accessibilityText": "Save to playlist",
+                                  "style": "BUTTON_VIEW_MODEL_STYLE_MONO",
+                                  "trackingParams": "CKECEOuQCSITCNrTsZOwiZYDFXwRHgAd6k0cTQ==",
+                                  "isFullWidth": false,
+                                  "type": "BUTTON_VIEW_MODEL_TYPE_TONAL",
+                                  "buttonSize": "BUTTON_VIEW_MODEL_SIZE_DEFAULT",
+                                  "tooltip": "Save"
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "menuFlexibleItemRenderer": {
+                              "menuItem": {
+                                "menuServiceItemDownloadRenderer": {
+                                  "serviceEndpoint": {
+                                    "clickTrackingParams": "CKACENGqBSITCNrTsZOwiZYDFXwRHgAd6k0cTcoBBBP3Pas=",
+                                    "offlineVideoEndpoint": {
+                                      "videoId": "aircAruvnKk",
+                                      "onAddCommand": {
+                                        "clickTrackingParams": "CKACENGqBSITCNrTsZOwiZYDFXwRHgAd6k0cTcoBBBP3Pas=",
+                                        "getDownloadActionCommand": {
+                                          "videoId": "aircAruvnKk",
+                                          "params": "CAEQAA%3D%3D",
+                                          "offlineabilityEntityKey": "Eg0KC2FpcmNBcnV2bktrIPYBKAE%3D",
+                                          "isCrossDeviceDownload": false
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "trackingParams": "CKACENGqBSITCNrTsZOwiZYDFXwRHgAd6k0cTQ==",
+                                  "playerStateEntityKey": "Eh8veW91dHViZS9hcHAvd2F0Y2gvcGxheWVyX3N0YXRlIMMCKAE%3D"
+                                }
+                              },
+                              "topLevelButton": {
+                                "downloadButtonRenderer": {
+                                  "trackingParams": "CJ8CENGqBSITCNrTsZOwiZYDFXwRHgAd6k0cTQ==",
+                                  "style": "STYLE_DEFAULT",
+                                  "size": "SIZE_DEFAULT",
+                                  "targetId": "watch-download-button",
+                                  "command": {
+                                    "clickTrackingParams": "CJ8CENGqBSITCNrTsZOwiZYDFXwRHgAd6k0cTcoBBBP3Pas=",
+                                    "offlineVideoEndpoint": {
+                                      "videoId": "aircAruvnKk",
+                                      "onAddCommand": {
+                                        "clickTrackingParams": "CJ8CENGqBSITCNrTsZOwiZYDFXwRHgAd6k0cTcoBBBP3Pas=",
+                                        "getDownloadActionCommand": {
+                                          "videoId": "aircAruvnKk",
+                                          "params": "CAEQAA%3D%3D",
+                                          "offlineabilityEntityKey": "Eg0KC2FpcmNBcnV2bktrIPYBKAE%3D",
+                                          "isCrossDeviceDownload": false
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "playerStateEntityKey": "Eh8veW91dHViZS9hcHAvd2F0Y2gvcGxheWVyX3N0YXRlIMMCKAE%3D",
+                                  "hasLabel": true
+                                }
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    "trackingParams": "CJ0CEMyrARgAIhMI2tOxk7CJlgMVfBEeAB3qTRxN",
+                    "superTitleLink": {
+                      "runs": [
+                        {
+                          "text": "Neural networks",
+                          "navigationEndpoint": {
+                            "clickTrackingParams": "CJ4CEJmtCRgAIhMI2tOxk7CJlgMVfBEeAB3qTRxNygEEE_c9qw==",
+                            "commandMetadata": {
+                              "webCommandMetadata": {
+                                "url": "/playlist?list=PLZHQObOWTQDNU6R1_67000Dx_ZCJB-3pi",
+                                "webPageType": "WEB_PAGE_TYPE_PLAYLIST",
+                                "rootVe": 5754,
+                                "apiUrl": "/youtubei/v1/browse"
+                              }
+                            },
+                            "browseEndpoint": {
+                              "browseId": "VLPLZHQObOWTQDNU6R1_67000Dx_ZCJB-3pi"
+                            }
+                          },
+                          "loggingDirectives": {
+                            "trackingParams": "CJ4CEJmtCRgAIhMI2tOxk7CJlgMVfBEeAB3qTRxN",
+                            "visibility": {
+                              "types": "12"
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    "dateText": {
+                      "simpleText": "Oct 5, 2017"
+                    },
+                    "relativeDateText": {
+                      "accessibility": {
+                        "accessibilityData": {
+                          "label": "8 years ago"
+                        }
+                      },
+                      "simpleText": "8 years ago"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+]
