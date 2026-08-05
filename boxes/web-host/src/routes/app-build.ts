@@ -1,12 +1,16 @@
 import { join } from 'node:path'
 import express from 'express'
 import type { Express } from 'express'
+import { buildPath } from '../build-path.ts'
 import type { HostContext } from '../context.ts'
 import { notFound } from '../respond.ts'
 import { sendFile } from '../send-file.ts'
 
 /** Paths this server answers itself. The page never gets served over one of them. */
 const SERVER_PATHS = ['/api', '/live', '/sandbox', '/assets', '/healthz']
+
+/** The one file in the build no layer here may hand out. */
+const VERIFY_DOCUMENT = '/sandbox.html'
 
 /**
  * The built app, in three layers: hashed assets that never change, everything else in the
@@ -31,10 +35,17 @@ export function mountAppBuild(app: Express, ctx: HostContext): void {
     }),
   )
 
-  // The verify document ships in the build beside the shell, so the general layer below would
-  // hand it out bare. It runs whatever module a framer names, so the only address it has is
-  // `/sandbox/frame`, where the content policy is stamped on the response.
-  app.all('/sandbox.html', notFound)
+  // The verify document ships in the build beside the shell, so the layer below would hand it
+  // out bare. It runs whatever module a framer names, so its only address is `/sandbox/frame`,
+  // where the policy is stamped on the response. The guard reads the file the URL resolves to,
+  // not the URL, because serve-static decodes and normalizes before it reads.
+  app.use((req, res, next) => {
+    if (buildPath(req.url) === VERIFY_DOCUMENT) {
+      notFound(req, res)
+      return
+    }
+    next()
+  })
 
   app.use(express.static(ctx.appDir, { index: false, maxAge: 0 }))
 

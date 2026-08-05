@@ -17,19 +17,16 @@ async function openCache(): Promise<Cache | null> {
   }
 }
 
-/**
- * Keep what was downloaded, and shrug when it cannot be kept. `put` rejects on a near-full
- * origin, and losing 186 MiB already in hand over a cache write would be the worse outcome.
- */
+/** Keep what was downloaded. `put` rejects on a nearly full origin, and that is survivable. */
 async function store(
   cache: Cache | null,
   url: string,
-  bytes: ArrayBuffer | Uint8Array,
+  bytes: ArrayBuffer | Uint8Array<ArrayBuffer>,
 ): Promise<void> {
   try {
     await cache?.put(url, new Response(bytes))
   } catch {
-    // No room, or storage denied: this session speaks, the next one downloads again.
+    // Out of room: the bytes are already in hand, so only the next session pays again.
   }
 }
 

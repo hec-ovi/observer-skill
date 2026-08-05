@@ -119,9 +119,21 @@ test('the verify frame is served under its own policy', async () => {
 })
 
 test('the verify document has no second address that skips the policy', async () => {
-  const answer = await fetch(`${running.base}/sandbox.html`)
-  assert.equal(answer.status, 404)
-  assert.equal(((await answer.json()) as { code: string }).code, 'UNKNOWN_ARTIFACT')
+  // Every spelling serve-static would resolve to the same file, since it decodes and
+  // normalizes before it reads.
+  const spellings = [
+    '/sandbox.html',
+    '/%73andbox.html',
+    '//sandbox.html',
+    '/./sandbox.html',
+    '/a/../sandbox.html',
+    '/sandbox.html?x=1',
+  ]
+  for (const path of spellings) {
+    const answer = await fetch(`${running.base}${path}`)
+    assert.equal(answer.status, 404, `${path} was served`)
+    assert.equal(((await answer.json()) as { code: string }).code, 'UNKNOWN_ARTIFACT')
+  }
 })
 
 test('the registry modules are served with the CORS header a module fetch needs', async () => {

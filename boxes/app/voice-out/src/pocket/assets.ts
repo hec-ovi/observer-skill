@@ -17,9 +17,6 @@ export const POCKET_BASE_URL = 'https://kevinahm-pocket-tts-web.static.hf.space/
 /** The English bundle. Each bundle is self-contained: own tokenizer, voices, metadata. */
 export const POCKET_BUNDLE = 'english_2026-04'
 
-/** The rate the Mimi decoder produces. Also `bundle.json`'s `sample_rate`. */
-export const POCKET_SAMPLE_RATE = 24000
-
 /**
  * ONNX Runtime Web, wasm execution provider only. The default entry point of 1.27 pulls the
  * 26.8 MB WebGPU-capable wasm, which these dynamically quantized graphs cannot run on.
