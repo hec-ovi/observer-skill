@@ -7,16 +7,23 @@ way a question is asked, and the answers as they arrive.
 
 ## Inputs
 
+Types: [`src/types.ts`](src/types.ts)
+
 ```ts
 <TranscriptRail segments position onSeek />
-<AskBox onAsk listener disabled />
+<AskBox at listener disabled onAsk onOpenSettings />
 <AnswerLog entries onShow onReplay />
 ```
 
 - `segments` come from the server once; the rail does not refetch as the video plays.
-- `listener` is a `voice-in` listener, injected, so this box owns no microphone code.
+- `position` is the player's `{ time, state }` as the player reports it.
+- `at()` reads the player's second. It is called when the user starts asking, never when the
+  question is sent.
+- `listener` is `voice-in`'s `createListener` bound to the app's config: the box hands it the
+  callbacks one hold needs and disposes what it gets back, so it owns no microphone code.
 - `disabled` is true when no agent is attached, and the box says so in one line rather than
   letting the user speak into nothing.
+- `onOpenSettings` opens the settings panel, which is where a refused microphone is fixed.
 
 ## Outputs
 
@@ -42,9 +49,10 @@ question sits in the log with a working indicator under it. The page knows a que
 outstanding without being told, so the user is never looking at a dead screen wondering
 whether it went anywhere.
 
-**Answers** appear as they arrive, newest last, each with the timestamp it was asked at.
-An answer that came with a visual keeps a way to open it again. An answer that was spoken
-can be replayed. Nothing is collapsed, truncated, or hidden behind "show more".
+**Answers** appear as they arrive, newest last, each with the timestamp it was asked at,
+stamped once per moment rather than repeated under every line of the same exchange. An
+answer that came with a visual keeps a way to open it again. An answer that was spoken can
+be replayed. Nothing is collapsed, truncated, or hidden behind "show more".
 
 ## Errors
 
@@ -71,3 +79,8 @@ The three surfaces are separate components with no shared state beyond props. Te
 Testing Library with user-event: typing and pressing enter, a pointer hold on the talk
 button that fires an utterance, a click on a rail line, and an answer arriving while the
 user is mid-sentence in the box (it must not clear their draft).
+
+The rail is three units: `SegmentIndex` (which line is being spoken), `RowMetrics` (where
+each row sits, on an estimate until it has been on screen once), and `useRailWindow` (which
+rows exist, and whether the viewport is still following). A scroll that does not land where
+the hook put it is the user's, which is what stops the rail following them around.

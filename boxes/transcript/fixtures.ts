@@ -79,7 +79,7 @@ export function stubFetch(handler: (url: string, init?: RequestInit) => Promise<
 }
 
 /** The error a call was supposed to throw, so a test can read its code and its hint. */
-export async function caught(run: () => Promise<unknown>): Promise<ObserverError> {
+export async function caught(run: () => unknown): Promise<ObserverError> {
   try {
     await run()
   } catch (error) {
