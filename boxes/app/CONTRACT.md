@@ -22,8 +22,9 @@ There is one screen and it changes shape.
 
 **Feed.** A URL field and three switches: this video has ads, use extra knowledge, build
 visuals. Optionally a line saying what the user wants from the video, which reaches the
-agent as `userPrompt`. Nothing else. Resolving the source happens while they type the last
-character, so a video that cannot be embedded is refused here.
+agent as `userPrompt`. Nothing else. Opening the link resolves the source as the session is
+created, so a video that cannot be embedded is refused here, under the field, rather than
+eight seconds into a session that was never going to play.
 
 **Preparing.** The loader: the phase, what is happening, and a real count. Transcribing
 shows minutes done of minutes total. Researching and building show concepts and visuals as
