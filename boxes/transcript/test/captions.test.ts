@@ -15,7 +15,7 @@ import type { TranscriptRef } from '#transcript'
 import { fetch as fetchTranscript, read } from '#transcript'
 
 import type { Harness } from '../fixtures.ts'
-import { FAKE_YTDLP, fixture, harness, source, words } from '../fixtures.ts'
+import { FAKE_YTDLP, fixture, pool, source, words } from '../fixtures.ts'
 
 /** Every word the caption file carries, ignoring the rolling-window continuations. */
 async function json3Words(name: string): Promise<string[]> {
@@ -40,7 +40,7 @@ function transcribe(box: Harness, track: { manual?: string; auto?: string }): Pr
 }
 
 describe('captions', () => {
-  const boxes: Harness[] = []
+  const boxes = pool()
   let previousBin: string | undefined
 
   before(() => {
@@ -53,17 +53,11 @@ describe('captions', () => {
     else process.env['YTDLP_BIN'] = previousBin
     delete process.env['FAKE_YTDLP_MANUAL']
     delete process.env['FAKE_YTDLP_AUTO']
-    for (const box of boxes) await box.done()
+    await boxes.done()
   })
 
-  async function open(id: string): Promise<Harness> {
-    const box = await harness(id)
-    boxes.push(box)
-    return box
-  }
-
   test('a track a human wrote becomes one segment per sentence, and is not marked generated', async () => {
-    const box = await open('human')
+    const box = await boxes.open('human')
     const ref = await transcribe(box, { manual: 'human.json3' })
 
     assert.equal(ref.provider, 'captions')
@@ -86,7 +80,7 @@ describe('captions', () => {
   })
 
   test('a rolling machine track keeps every word exactly once, in order', async () => {
-    const box = await open('rolling')
+    const box = await boxes.open('rolling')
     await transcribe(box, { auto: 'rolling.json3' })
 
     const page = read(box.sessionId)
@@ -96,7 +90,7 @@ describe('captions', () => {
   })
 
   test('a rolling machine track is marked generated and never overlaps itself', async () => {
-    const box = await open('rolling-times')
+    const box = await boxes.open('rolling-times')
     const ref = await transcribe(box, { auto: 'rolling.json3' })
     assert.equal(ref.generated, true)
 
@@ -110,7 +104,7 @@ describe('captions', () => {
   })
 
   test('a rolling vtt drops the lines each window restates', async () => {
-    const box = await open('rolling-vtt')
+    const box = await boxes.open('rolling-vtt')
     await transcribe(box, { auto: 'rolling-auto.vtt' })
 
     const page = read(box.sessionId)
@@ -123,7 +117,7 @@ describe('captions', () => {
   })
 
   test('music and applause stay as their own segments and out of the speech', async () => {
-    const box = await open('markers')
+    const box = await boxes.open('markers')
     await transcribe(box, { auto: 'markers.json3' })
 
     const page = read(box.sessionId)
@@ -141,7 +135,7 @@ describe('captions', () => {
   })
 
   test('a fifteen-minute gap ends a segment instead of stretching one across it', async () => {
-    const box = await open('gap')
+    const box = await boxes.open('gap')
     await transcribe(box, { auto: 'gap.json3' })
 
     const page = read(box.sessionId)
@@ -155,7 +149,7 @@ describe('captions', () => {
   })
 
   test('captions a human wrote win over the machine ones', async () => {
-    const box = await open('both')
+    const box = await boxes.open('both')
     await transcribe(box, { manual: 'human.json3', auto: 'rolling.json3' })
 
     const page = read(box.sessionId)
@@ -163,7 +157,7 @@ describe('captions', () => {
   })
 
   test('progress reports the step it is on with a real total', async () => {
-    const box = await open('progress')
+    const box = await boxes.open('progress')
     await transcribe(box, { manual: 'human.json3' })
 
     assert.ok(box.progress.some((entry) => entry.step === 'captions' && entry.total === 2))

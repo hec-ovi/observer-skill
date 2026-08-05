@@ -11,9 +11,10 @@ import { after, before, describe, test } from 'node:test'
 import { at, fetch as fetchTranscript, read } from '#transcript'
 
 import type { Harness } from '../fixtures.ts'
-import { FAKE_YTDLP, caught, fixture, harness, source } from '../fixtures.ts'
+import { FAKE_YTDLP, caught, fixture, pool, source } from '../fixtures.ts'
 
 describe('read and at', () => {
+  const boxes = pool()
   let box: Harness
   let previousBin: string | undefined
 
@@ -23,7 +24,7 @@ describe('read and at', () => {
     process.env['FAKE_YTDLP_MANUAL'] = fixture('human.json3')
     delete process.env['FAKE_YTDLP_AUTO']
 
-    box = await harness('lookup')
+    box = await boxes.open('lookup')
     await fetchTranscript(source(), {
       home: box.home,
       sessionId: box.sessionId,
@@ -36,7 +37,7 @@ describe('read and at', () => {
     if (previousBin === undefined) delete process.env['YTDLP_BIN']
     else process.env['YTDLP_BIN'] = previousBin
     delete process.env['FAKE_YTDLP_MANUAL']
-    await box.done()
+    await boxes.done()
   })
 
   test('a page carries the whole transcript when nothing bounds it', () => {

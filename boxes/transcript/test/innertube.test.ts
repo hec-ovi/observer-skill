@@ -10,8 +10,7 @@ import { after, before, describe, test } from 'node:test'
 
 import { fetch as fetchTranscript, read } from '#transcript'
 
-import type { Harness } from '../fixtures.ts'
-import { FAKE_YTDLP, FIXTURES, harness, source, stubFetch } from '../fixtures.ts'
+import { FAKE_YTDLP, FIXTURES, pool, source, stubFetch } from '../fixtures.ts'
 
 const panel = (name: string): string => readFileSync(join(FIXTURES, 'innertube', name), 'utf8')
 
@@ -32,7 +31,7 @@ function serve(next: string): () => void {
 }
 
 describe('innertube', () => {
-  const boxes: Harness[] = []
+  const boxes = pool()
   let previousBin: string | undefined
 
   before(() => {
@@ -46,17 +45,11 @@ describe('innertube', () => {
   after(async () => {
     if (previousBin === undefined) delete process.env['YTDLP_BIN']
     else process.env['YTDLP_BIN'] = previousBin
-    for (const box of boxes) await box.done()
+    await boxes.done()
   })
 
-  async function open(id: string): Promise<Harness> {
-    const box = await harness(id)
-    boxes.push(box)
-    return box
-  }
-
   test('the panel becomes sentences, not the windows it was written in', async () => {
-    const box = await open('panel')
+    const box = await boxes.open('panel')
     const restore = serve(panel('next.json'))
     try {
       const ref = await fetchTranscript(source(), {
@@ -87,7 +80,7 @@ describe('innertube', () => {
   })
 
   test('auto walks past the caption binary when it finds nothing published', async () => {
-    const box = await open('auto-panel')
+    const box = await boxes.open('auto-panel')
     const restore = serve(panel('next.json'))
     try {
       const ref = await fetchTranscript(source(), {
@@ -102,7 +95,7 @@ describe('innertube', () => {
   })
 
   test('a video with no panel is not a failure, it is nothing to read', async () => {
-    const box = await open('no-panel')
+    const box = await boxes.open('no-panel')
     const restore = serve('{}')
     try {
       await assert.rejects(

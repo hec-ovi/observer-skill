@@ -10,13 +10,12 @@ import { after, before, describe, test } from 'node:test'
 
 import { fetch as fetchTranscript, read } from '#transcript'
 
-import type { Harness } from '../fixtures.ts'
-import { FAKE_FFMPEG, FAKE_YTDLP, fixture, harness, source, stubFetch } from '../fixtures.ts'
+import { FAKE_FFMPEG, FAKE_YTDLP, fixture, pool, source, stubFetch } from '../fixtures.ts'
 
 const BASE = 'http://127.0.0.1:9999'
 
 describe('endpoint-asr', () => {
-  const boxes: Harness[] = []
+  const boxes = pool()
   const kept: Record<string, string | undefined> = {}
 
   before(() => {
@@ -34,17 +33,11 @@ describe('endpoint-asr', () => {
       if (value === undefined) delete process.env[name]
       else process.env[name] = value
     }
-    for (const box of boxes) await box.done()
+    await boxes.done()
   })
 
-  async function open(id: string): Promise<Harness> {
-    const box = await harness(id)
-    boxes.push(box)
-    return box
-  }
-
   test('two audio chunks come back as one timeline', async () => {
-    const box = await open('asr')
+    const box = await boxes.open('asr')
     const calls: string[] = []
     const restore = stubFetch((url) => {
       const body = readFileSync(fixture(`asr-chunk-${calls.length}.json`), 'utf8')
@@ -87,12 +80,12 @@ describe('endpoint-asr', () => {
   })
 
   test('progress counts the chunks, which is what takes the time', async () => {
-    const box = await open('asr-progress')
-    const restore = stubFetch((url) =>
+    const box = await boxes.open('asr-progress')
+    const restore = stubFetch(() =>
       Promise.resolve(
         new Response(readFileSync(fixture('asr-chunk-0.json'), 'utf8'), {
           status: 200,
-          headers: { 'content-type': 'application/json', 'x-url': url },
+          headers: { 'content-type': 'application/json' },
         }),
       ),
     )
@@ -116,7 +109,7 @@ describe('endpoint-asr', () => {
   })
 
   test('an endpoint that refuses says what it answered', async () => {
-    const box = await open('asr-refused')
+    const box = await boxes.open('asr-refused')
     const restore = stubFetch(() =>
       Promise.resolve(new Response('model not loaded', { status: 503 })),
     )
@@ -137,7 +130,7 @@ describe('endpoint-asr', () => {
   })
 
   test('no endpoint configured names the setting that turns it on', async () => {
-    const box = await open('asr-unset')
+    const box = await boxes.open('asr-unset')
     delete process.env['OBSERVER_ASR_URL']
     try {
       await assert.rejects(

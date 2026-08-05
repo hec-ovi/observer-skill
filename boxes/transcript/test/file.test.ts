@@ -5,24 +5,17 @@ import { after, describe, test } from 'node:test'
 
 import { fetch as fetchTranscript, read } from '#transcript'
 
-import type { Harness } from '../fixtures.ts'
-import { caught, fixture, harness, source } from '../fixtures.ts'
+import { caught, fixture, pool, source } from '../fixtures.ts'
 
 describe('file', () => {
-  const boxes: Harness[] = []
+  const boxes = pool()
 
   after(async () => {
-    for (const box of boxes) await box.done()
+    await boxes.done()
   })
 
-  async function open(id: string): Promise<Harness> {
-    const box = await harness(id)
-    boxes.push(box)
-    return box
-  }
-
   test('an srt becomes sentences with the cue times a player would report', async () => {
-    const box = await open('srt')
+    const box = await boxes.open('srt')
     const ref = await fetchTranscript(source(), {
       home: box.home,
       sessionId: box.sessionId,
@@ -50,7 +43,7 @@ describe('file', () => {
   })
 
   test('a vtt the user supplies reads the same way the platform track does', async () => {
-    const box = await open('vtt')
+    const box = await boxes.open('vtt')
     const ref = await fetchTranscript(source(), {
       home: box.home,
       sessionId: box.sessionId,
@@ -66,7 +59,7 @@ describe('file', () => {
   })
 
   test('no file to read names what to pass', async () => {
-    const box = await open('no-file')
+    const box = await boxes.open('no-file')
     const error = await caught(() =>
       fetchTranscript(source(), { home: box.home, sessionId: box.sessionId, provider: 'file' }),
     )

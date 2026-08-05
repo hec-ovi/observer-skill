@@ -56,7 +56,7 @@ The transcript file lives at `$home/sessions/<id>/transcript.json` and is the on
 |---|---|---|
 | `captions` | The platform's own captions, human first, machine second | the caption fetcher binary |
 | `innertube` | The same captions through the platform's own transcript panel | nothing |
-| `endpoint-asr` | Audio, extracted and sent to an OpenAI-compatible transcription route | ffmpeg, an endpoint |
+| `endpoint-asr` | Audio, extracted and sent to an OpenAI-compatible transcription route | the caption fetcher binary, ffmpeg, an endpoint |
 | `file` | An SRT or VTT the user supplies | nothing |
 
 `auto` tries them in that order and stops at the first that produces text. The two caption

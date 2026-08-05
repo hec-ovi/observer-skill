@@ -44,24 +44,31 @@ export interface Harness {
   sessionId: string
   progress: Progress[]
   onProgress: (progress: Progress) => void
+}
+
+export interface Pool {
+  /** A throwaway home and a session id of its own, so no test reads another's transcript. */
+  open: (sessionId: string) => Promise<Harness>
   done: () => Promise<void>
 }
 
-/** A throwaway OBSERVER_HOME, restored when the test ends. */
-export async function harness(sessionId = 'sess-test'): Promise<Harness> {
-  const home = await mkdtemp(join(tmpdir(), 'observer-home-'))
+/** Every home one suite opened, with the environment put back the way it was found. */
+export function pool(): Pool {
+  const opened: string[] = []
   const previous = process.env['OBSERVER_HOME']
-  process.env['OBSERVER_HOME'] = home
-  const progress: Progress[] = []
+
   return {
-    home,
-    sessionId,
-    progress,
-    onProgress: (entry) => progress.push(entry),
+    open: async (sessionId) => {
+      const home = await mkdtemp(join(tmpdir(), 'observer-home-'))
+      opened.push(home)
+      process.env['OBSERVER_HOME'] = home
+      const progress: Progress[] = []
+      return { home, sessionId, progress, onProgress: (entry) => progress.push(entry) }
+    },
     done: async () => {
       if (previous === undefined) delete process.env['OBSERVER_HOME']
       else process.env['OBSERVER_HOME'] = previous
-      await rm(home, { recursive: true, force: true })
+      for (const home of opened) await rm(home, { recursive: true, force: true })
     },
   }
 }
