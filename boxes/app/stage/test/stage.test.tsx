@@ -83,4 +83,14 @@ describe('Stage', () => {
     const failure = await screen.findByRole('alert')
     expect(failure).toHaveTextContent('This page is missing the chart libraries this visual needs.')
   })
+
+  it('blames the registry only for a specifier it maps, not for a url that reads like one', async () => {
+    // No such fixture file: the import fails to load, and the url happens to spell `d3`.
+    render(
+      <Stage active artifact={{ ...panel, url: fixture('d3-force-layout') }} onDismiss={vi.fn()} />,
+    )
+
+    const failure = await screen.findByRole('alert')
+    expect(failure).toHaveTextContent('This visual could not be loaded.')
+  })
 })

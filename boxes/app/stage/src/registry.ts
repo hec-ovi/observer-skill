@@ -5,6 +5,10 @@
  * tenth chart costs nothing to open and every artifact sees the same registered themes.
  * Adding a library is one entry here, one line in the artifact contract's allowlist, and a
  * fourth entry in `vendor/vite.config.ts`.
+ *
+ * Import maps are per-document and cannot be loaded from a file, so `index.html` and
+ * `sandbox.html` each carry the map inline, with the same bytes. `test/registry.test.ts`
+ * holds them to this table and to each other.
  */
 
 export const REGISTRY = {
@@ -14,11 +18,3 @@ export const REGISTRY = {
 } as const
 
 export const REGISTRY_NAMES = Object.keys(REGISTRY)
-
-/**
- * The import map, as the tag both documents carry. Import maps are per-document and cannot
- * be loaded from a file, so the page and the verify frame each hold a copy of this string.
- */
-export function importMapScript(): string {
-  return `<script type="importmap">\n${JSON.stringify({ imports: REGISTRY }, null, 2)}\n</script>`
-}

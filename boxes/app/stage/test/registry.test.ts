@@ -7,7 +7,10 @@ import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { buildThemes } from '../vendor/themes.ts'
-import { importMapScript } from '../src/registry.ts'
+import { REGISTRY } from '../src/registry.ts'
+
+/** The two documents that mount artifacts: the page the user sees, the verify frame. */
+const DOCUMENTS = ['index.html', 'sandbox.html'] as const
 
 /** A document under `boxes/app`, as the bytes the browser parses and a policy hashes. */
 function sourceOf(name: string): string {
@@ -18,8 +21,10 @@ function sourceOf(name: string): string {
   )
 }
 
-function occurrences(text: string, part: string): number {
-  return text.split(part).length - 1
+/** The body of every `<script type="importmap">` in a document, in document order. */
+function importMaps(html: string): string[] {
+  const tag = /<script\b[^>]*\btype="importmap"[^>]*>([\s\S]*?)<\/script\s*>/gi
+  return [...html.matchAll(tag)].map((match) => match[1] ?? '')
 }
 
 /** Every `borderRadius` anywhere in a theme object. */
@@ -31,8 +36,15 @@ function radii(value: unknown): number[] {
 }
 
 describe('the registry', () => {
-  it('is mapped identically in the verify document', () => {
-    expect(bare(sandboxDocument)).toContain(bare(importMapScript()))
+  it.each(DOCUMENTS)('is the one import map %s carries', (name) => {
+    const maps = importMaps(sourceOf(name))
+
+    expect(maps).toHaveLength(1)
+    expect(JSON.parse(maps[0] ?? 'null')).toEqual({ imports: REGISTRY })
+  })
+
+  it('is the same bytes in both documents, so one script hash covers both', () => {
+    expect(importMaps(sourceOf('index.html'))).toEqual(importMaps(sourceOf('sandbox.html')))
   })
 
   it('builds a theme per mode from the page tokens, and leaves the document as it found it', () => {
