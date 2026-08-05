@@ -67,7 +67,7 @@ export async function harness(sessionId = 'sess-test'): Promise<Harness> {
 /** Replaces `globalThis.fetch` for the duration of one test. */
 export function stubFetch(handler: (url: string, init?: RequestInit) => Promise<Response>): () => void {
   const original = globalThis.fetch
-  globalThis.fetch = ((input: RequestInfo | URL, init?: RequestInit) => {
+  globalThis.fetch = ((input: string | URL | Request, init?: RequestInit) => {
     const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
     return handler(url, init)
   }) as typeof globalThis.fetch

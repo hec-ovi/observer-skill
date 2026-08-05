@@ -4,8 +4,8 @@
  * list the provider reads its offsets from, with the packet-boundary drift a real cut has.
  */
 
-const { writeFileSync } = require('node:fs')
-const { dirname, join } = require('node:path')
+import { writeFileSync } from 'node:fs'
+import { dirname, join } from 'node:path'
 
 const argv = process.argv.slice(2)
 

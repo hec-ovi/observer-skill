@@ -10,8 +10,8 @@
  *   FAKE_YTDLP_AUDIO   bytes to write as the downloaded audio file
  */
 
-const { copyFileSync, mkdirSync, writeFileSync } = require('node:fs')
-const { join } = require('node:path')
+import { copyFileSync, mkdirSync, writeFileSync } from 'node:fs'
+import { join } from 'node:path'
 
 const argv = process.argv.slice(2)
 
