@@ -16,11 +16,8 @@ import { FAKE_YTDLP, caught, fixture, pool, source } from '../fixtures.ts'
 describe('read and at', () => {
   const boxes = pool()
   let box: Harness
-  let previousBin: string | undefined
 
   before(async () => {
-    previousBin = process.env['YTDLP_BIN']
-    process.env['YTDLP_BIN'] = FAKE_YTDLP
     process.env['FAKE_YTDLP_MANUAL'] = fixture('human.json3')
     delete process.env['FAKE_YTDLP_AUTO']
 
@@ -29,13 +26,12 @@ describe('read and at', () => {
       home: box.home,
       sessionId: box.sessionId,
       provider: 'captions',
+      ytdlpBin: FAKE_YTDLP,
       onProgress: box.onProgress,
     })
   })
 
   after(async () => {
-    if (previousBin === undefined) delete process.env['YTDLP_BIN']
-    else process.env['YTDLP_BIN'] = previousBin
     delete process.env['FAKE_YTDLP_MANUAL']
     await boxes.done()
   })

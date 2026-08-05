@@ -4,6 +4,9 @@
  */
 
 import assert from 'node:assert/strict'
+import { mkdtemp, rm, writeFile } from 'node:fs/promises'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import { describe, it } from 'node:test'
 import { PROMPT_NAMES } from '../src/prompts.ts'
 import { VIDEO_URL, openAgentIo } from '../fixtures.ts'
@@ -42,6 +45,18 @@ describe('prompts', () => {
       assert.ok(text.startsWith('#'), `${name} did not come from its markdown file`)
       assert.ok(text.length > 200, `${name} rendered almost nothing`)
     }
+  })
+
+  it('reads them from the directory the process pointed it at', async (t) => {
+    const dir = await mkdtemp(join(tmpdir(), 'observer-prompts-'))
+    t.after(() => rm(dir, { recursive: true, force: true }))
+    for (const name of PROMPT_NAMES) {
+      await writeFile(join(dir, `${name}.md`), `# ${name} kept elsewhere\n\nThe words the agent works from.\n`)
+    }
+
+    const harness = await openAgentIo(t, { prompts: dir })
+
+    assert.match(await textOf(harness, 'study-plan'), /^# study-plan kept elsewhere/)
   })
 
   it('leaves the ad guidance out when the video carries no ads', async (t) => {

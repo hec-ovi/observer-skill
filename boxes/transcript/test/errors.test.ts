@@ -14,10 +14,8 @@ import { FAKE_YTDLP, caught, fixture, pool, source, stubFetch } from '../fixture
 
 describe('errors', () => {
   const boxes = pool()
-  let previousBin: string | undefined
 
   before(() => {
-    previousBin = process.env['YTDLP_BIN']
     delete process.env['FAKE_YTDLP_MANUAL']
     delete process.env['FAKE_YTDLP_AUTO']
     delete process.env['FAKE_YTDLP_FAIL']
@@ -25,17 +23,19 @@ describe('errors', () => {
   })
 
   after(async () => {
-    if (previousBin === undefined) delete process.env['YTDLP_BIN']
-    else process.env['YTDLP_BIN'] = previousBin
     await boxes.done()
   })
 
   test('a missing binary names what to install', async () => {
     const box = await boxes.open('missing-bin')
-    process.env['YTDLP_BIN'] = join(box.home, 'nothing-here')
 
     const error = await caught(() =>
-      fetchTranscript(source(), { home: box.home, sessionId: box.sessionId, provider: 'captions' }),
+      fetchTranscript(source(), {
+        home: box.home,
+        sessionId: box.sessionId,
+        provider: 'captions',
+        ytdlpBin: join(box.home, 'nothing-here'),
+      }),
     )
     assert.equal(error.code, 'PROVIDER_UNAVAILABLE')
     assert.match(error.message, /captions/)
@@ -44,13 +44,17 @@ describe('errors', () => {
 
   test('a provider that ran and refused carries what it said', async () => {
     const box = await boxes.open('refused')
-    process.env['YTDLP_BIN'] = FAKE_YTDLP
     process.env['FAKE_YTDLP_FAIL'] = "Sign in to confirm you're not a bot"
 
     let error
     try {
       error = await caught(() =>
-        fetchTranscript(source(), { home: box.home, sessionId: box.sessionId, provider: 'captions' }),
+        fetchTranscript(source(), {
+          home: box.home,
+          sessionId: box.sessionId,
+          provider: 'captions',
+          ytdlpBin: FAKE_YTDLP,
+        }),
       )
     } finally {
       delete process.env['FAKE_YTDLP_FAIL']
@@ -61,13 +65,16 @@ describe('errors', () => {
 
   test('nothing published anywhere is no transcript, and says how to get one', async () => {
     const box = await boxes.open('nothing')
-    process.env['YTDLP_BIN'] = FAKE_YTDLP
     const restore = stubFetch(() => Promise.resolve(new Response('{}', { status: 200 })))
 
     let error
     try {
       error = await caught(() =>
-        fetchTranscript(source(), { home: box.home, sessionId: box.sessionId }),
+        fetchTranscript(source(), {
+          home: box.home,
+          sessionId: box.sessionId,
+          ytdlpBin: FAKE_YTDLP,
+        }),
       )
     } finally {
       restore()

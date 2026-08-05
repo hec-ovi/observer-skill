@@ -32,16 +32,17 @@ function serve(...names: string[]): () => void {
   })
 }
 
+/** The two binaries this provider drives, faked at the subprocess boundary. */
+const BINS = { ytdlpBin: FAKE_YTDLP, ffmpegBin: FAKE_FFMPEG } as const
+
 describe('endpoint-asr', () => {
   const boxes = pool()
   const kept: Record<string, string | undefined> = {}
 
   before(() => {
-    for (const name of ['YTDLP_BIN', 'FFMPEG_BIN', 'OBSERVER_ASR_URL', 'OBSERVER_ASR_KEY']) {
+    for (const name of ['OBSERVER_ASR_URL', 'OBSERVER_ASR_KEY']) {
       kept[name] = process.env[name]
     }
-    process.env['YTDLP_BIN'] = FAKE_YTDLP
-    process.env['FFMPEG_BIN'] = FAKE_FFMPEG
     process.env['OBSERVER_ASR_URL'] = BASE
     process.env['OBSERVER_ASR_KEY'] = 'test-key'
   })
@@ -71,6 +72,7 @@ describe('endpoint-asr', () => {
         home: box.home,
         sessionId: box.sessionId,
         provider: 'endpoint-asr',
+        ...BINS,
         onProgress: box.onProgress,
       })
     } finally {
@@ -105,6 +107,7 @@ describe('endpoint-asr', () => {
         home: box.home,
         sessionId: box.sessionId,
         provider: 'endpoint-asr',
+        ...BINS,
         onProgress: box.onProgress,
       })
     } finally {
@@ -127,6 +130,7 @@ describe('endpoint-asr', () => {
         home: box.home,
         sessionId: box.sessionId,
         provider: 'endpoint-asr',
+        ...BINS,
         onProgress: box.onProgress,
       })
     } finally {
@@ -149,6 +153,7 @@ describe('endpoint-asr', () => {
         home: box.home,
         sessionId: box.sessionId,
         provider: 'endpoint-asr',
+        ...BINS,
         onProgress: box.onProgress,
       })
     } finally {
@@ -173,6 +178,7 @@ describe('endpoint-asr', () => {
           home: box.home,
           sessionId: box.sessionId,
           provider: 'endpoint-asr',
+          ...BINS,
           onProgress: box.onProgress,
         }),
         (error: { code: string; hint: string }) =>
@@ -192,6 +198,7 @@ describe('endpoint-asr', () => {
           home: box.home,
           sessionId: box.sessionId,
           provider: 'endpoint-asr',
+          ...BINS,
           onProgress: box.onProgress,
         }),
         (error: { code: string; hint: string }) =>

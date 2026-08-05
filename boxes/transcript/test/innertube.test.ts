@@ -37,19 +37,14 @@ function serve(over: { player?: string; next?: string; transcript?: string } = {
 
 describe('innertube', () => {
   const boxes = pool()
-  let previousBin: string | undefined
 
   before(() => {
-    previousBin = process.env['YTDLP_BIN']
-    process.env['YTDLP_BIN'] = FAKE_YTDLP
     delete process.env['FAKE_YTDLP_MANUAL']
     delete process.env['FAKE_YTDLP_AUTO']
     delete process.env['OBSERVER_ASR_URL']
   })
 
   after(async () => {
-    if (previousBin === undefined) delete process.env['YTDLP_BIN']
-    else process.env['YTDLP_BIN'] = previousBin
     await boxes.done()
   })
 
@@ -91,6 +86,7 @@ describe('innertube', () => {
       const ref = await fetchTranscript(source(), {
         home: box.home,
         sessionId: box.sessionId,
+        ytdlpBin: FAKE_YTDLP,
         onProgress: box.onProgress,
       })
       assert.equal(ref.provider, 'innertube')
@@ -140,6 +136,7 @@ describe('innertube', () => {
         home: box.home,
         sessionId: box.sessionId,
         file: fixture('talk.srt'),
+        ytdlpBin: FAKE_YTDLP,
         onProgress: box.onProgress,
       })
       assert.equal(ref.provider, 'file')

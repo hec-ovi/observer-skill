@@ -17,9 +17,12 @@ const running = await startHost({
 })
 after(() => running.stop())
 
-test('a URL posted by the page becomes a session', async () => {
+// `hasAds` is what makes the agent read sponsor breaks as noise, and the page is where the
+// user answers it, so the whole feature lives or dies on this route carrying the field.
+test('a URL posted by the page becomes a session, with everything the user chose', async () => {
   const answer = await postJson(`${running.base}/api/session`, {
     url: 'https://www.youtube.com/watch?v=abc123',
+    hasAds: true,
     settings: { theme: 'dark' },
   })
 
@@ -28,6 +31,7 @@ test('a URL posted by the page becomes a session', async () => {
   assert.deepEqual(asked, [
     {
       url: 'https://www.youtube.com/watch?v=abc123',
+      hasAds: true,
       settings: { theme: 'dark' },
       userPrompt: null,
     },

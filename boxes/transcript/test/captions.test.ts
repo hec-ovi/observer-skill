@@ -10,7 +10,7 @@
 import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
-import { after, before, describe, test } from 'node:test'
+import { after, describe, test } from 'node:test'
 
 import type { TranscriptRef } from '#transcript'
 import { fetch as fetchTranscript, read } from '#transcript'
@@ -36,22 +36,15 @@ function transcribe(box: Harness, track: { manual?: string; auto?: string }): Pr
     home: box.home,
     sessionId: box.sessionId,
     provider: 'captions',
+    ytdlpBin: FAKE_YTDLP,
     onProgress: box.onProgress,
   })
 }
 
 describe('captions', () => {
   const boxes = pool()
-  let previousBin: string | undefined
-
-  before(() => {
-    previousBin = process.env['YTDLP_BIN']
-    process.env['YTDLP_BIN'] = FAKE_YTDLP
-  })
 
   after(async () => {
-    if (previousBin === undefined) delete process.env['YTDLP_BIN']
-    else process.env['YTDLP_BIN'] = previousBin
     delete process.env['FAKE_YTDLP_MANUAL']
     delete process.env['FAKE_YTDLP_AUTO']
     await boxes.done()
@@ -72,6 +65,7 @@ describe('captions', () => {
         sessionId: box.sessionId,
         provider: 'captions',
         language: 'de-DE',
+        ytdlpBin: FAKE_YTDLP,
         onProgress: box.onProgress,
       })
     } finally {
