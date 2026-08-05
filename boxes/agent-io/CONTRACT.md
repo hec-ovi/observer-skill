@@ -80,14 +80,16 @@ Closes preparation and unlocks the player. Legal from `transcribing`, `researchi
 ### `observer_wait`
 
 `{ sessionId, after?, timeoutMs? }` →
-`{ events: Event[], cursor, idle }`
+`{ events: Event[], cursor, idle, next }`
 
 Blocks until something happens or the timeout elapses. Each event arrives with its context
 already assembled: for an `ask`, the question, the second it was asked at, the transcript
 window around that second, and the concepts covering it with their notes and artifacts.
 `idle: true` means nothing happened and the agent calls again. The cursor makes delivery
 exactly once, so a question asked while the agent was answering the previous one is still
-there.
+there. `next` names the call to make now (`observer_wait` with the returned cursor, until
+the user ends the session), because a loop that must not stop should not depend on the
+agent remembering that it is in one.
 
 ### `observer_where`
 
