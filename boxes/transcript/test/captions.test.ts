@@ -134,6 +134,19 @@ describe('captions', () => {
     assert.equal(music?.end, 5.2)
   })
 
+  test('a short utterance before a marker keeps the words after it on their own clock', async () => {
+    const box = await boxes.open('marker-cut')
+    await transcribe(box, { auto: 'marker-cut.json3' })
+
+    const page = read(box.sessionId)
+    assert.deepEqual(
+      page.segments.map((segment) => segment.text),
+      ['thank you', '[Applause]', 'so as i was saying'],
+    )
+    assert.equal(page.segments[0]?.end, 31.4)
+    assert.equal(page.segments[2]?.start, 35.4)
+  })
+
   test('a fifteen-minute gap ends a segment instead of stretching one across it', async () => {
     const box = await boxes.open('gap')
     await transcribe(box, { auto: 'gap.json3' })

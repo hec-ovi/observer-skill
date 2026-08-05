@@ -64,7 +64,8 @@ export const transcript = defineTool({
       offset: page.offset,
       total: page.total,
       ...(next < page.total ? { nextOffset: next } : {}),
-      generated: call.runtime.transcriptions.generated(session.id),
+      // Unknown until the words are in, and unknown reads as approximate.
+      generated: session.transcript?.generated ?? true,
     }
   },
 })

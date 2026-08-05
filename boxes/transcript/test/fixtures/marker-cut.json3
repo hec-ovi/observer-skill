@@ -1,0 +1,31 @@
+{
+  "wireMagic": "pb3",
+  "pens": [{}],
+  "wsWinStyles": [{}, { "mhModeHint": 2, "juJustifCode": 0, "sdScrollDir": 3 }],
+  "wpWinPositions": [{}, { "apPoint": 6, "ahHorPos": 20, "avVerPos": 100, "rcRows": 2 }],
+  "events": [
+    { "tStartMs": 0, "dDurationMs": 40000, "id": 1, "wpWinPosId": 1, "wsWinStyleId": 1 },
+    {
+      "tStartMs": 30000,
+      "dDurationMs": 1400,
+      "wWinId": 1,
+      "segs": [
+        { "utf8": "thank", "acAsrConf": 0 },
+        { "utf8": " you", "tOffsetMs": 600 }
+      ]
+    },
+    { "tStartMs": 31400, "dDurationMs": 4000, "wWinId": 1, "segs": [{ "utf8": "[Applause]", "acAsrConf": 255 }] },
+    {
+      "tStartMs": 35400,
+      "dDurationMs": 4000,
+      "wWinId": 1,
+      "segs": [
+        { "utf8": "so", "acAsrConf": 0 },
+        { "utf8": " as", "tOffsetMs": 300 },
+        { "utf8": " i", "tOffsetMs": 600 },
+        { "utf8": " was", "tOffsetMs": 900 },
+        { "utf8": " saying", "tOffsetMs": 1300 }
+      ]
+    }
+  ]
+}

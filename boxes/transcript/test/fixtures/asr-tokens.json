@@ -1,0 +1,32 @@
+{
+  "task": "transcribe",
+  "language": "english",
+  "duration": 12.0,
+  "text": " So the second half is about entropy.",
+  "segments": [
+    {
+      "id": 0,
+      "seek": 0,
+      "start": 1.2,
+      "end": 5.0,
+      "text": " So the second half is about entropy.",
+      "tokens": [50364, 407],
+      "temperature": 0.0,
+      "avg_logprob": -0.23,
+      "no_speech_prob": 0.02,
+      "words": [
+        { "word": " So", "start": 1.2, "end": 1.5 },
+        { "word": " the", "start": 1.5, "end": 1.8 },
+        { "word": " sec", "start": 1.8, "end": 2.1 },
+        { "word": "ond", "start": 2.1, "end": 2.4 },
+        { "word": " half", "start": 2.4, "end": 2.9 },
+        { "word": " is", "start": 2.9, "end": 3.2 },
+        { "word": " about", "start": 3.2, "end": 3.7 },
+        { "word": " en", "start": 3.7, "end": 4.0 },
+        { "word": "tro", "start": 4.0, "end": 4.3 },
+        { "word": "py", "start": 4.3, "end": 4.6 },
+        { "word": ".", "start": 4.6, "end": 4.7 }
+      ]
+    }
+  ]
+}

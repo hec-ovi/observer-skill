@@ -95,6 +95,9 @@ export function AskBox({ at, listener, disabled = false, onAsk, onOpenSettings }
         onPointerCancel={hold.release}
         onKeyDown={onTalkKeyDown}
         onKeyUp={onTalkKeyUp}
+        // A keyboard hold ends here too: the keyup of a window that went away is delivered
+        // somewhere else, and the microphone would stay open until it came back.
+        onBlur={hold.release}
       >
         Hold to talk
       </button>

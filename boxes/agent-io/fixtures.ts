@@ -70,8 +70,29 @@ export class FakeTranscript implements TranscriptPort {
   readonly segments = segmentsOf(360)
   /** Set to a code to make the background run fail the way a real provider does. */
   failWith: string | null = null
+  /** True once a run has reached the provider, which is when the session is transcribing. */
+  started = false
+  /** Whether the words were a human's, which is what the tool reports as `generated`. */
+  generated = false
+  #gate: Promise<void> | null = null
+  #open: (() => void) | null = null
+
+  /** Holds the next run inside `fetch`, so a test can act while the words are on their way. */
+  hold(): void {
+    this.#gate = new Promise((resolve) => {
+      this.#open = resolve
+    })
+  }
+
+  release(): void {
+    this.#open?.()
+    this.#gate = null
+    this.#open = null
+  }
 
   async fetch(): Promise<TranscriptRef> {
+    this.started = true
+    if (this.#gate !== null) await this.#gate
     if (this.failWith !== null) {
       fail('NO_TRANSCRIPT', this.failWith, 'Point OBSERVER_TRANSCRIPT at a provider.')
     }
@@ -80,7 +101,7 @@ export class FakeTranscript implements TranscriptPort {
       language: 'en',
       segmentCount: this.segments.length,
       duration: DURATION,
-      generated: false,
+      generated: this.generated,
     }
   }
 
@@ -179,9 +200,15 @@ export interface CallOutcome {
   content: { type: string; [key: string]: unknown }[]
 }
 
+export interface HarnessOptions {
+  /** An existing home, so a test can build a second process on sessions already on disk. */
+  home?: string
+}
+
 /** A real MCP client on one end, the real server on the other, nothing in between. */
-export async function openAgentIo(t: TestContext): Promise<Harness> {
-  const home = await mkdtemp(join(tmpdir(), 'observer-agent-io-'))
+export async function openAgentIo(t: TestContext, options: HarnessOptions = {}): Promise<Harness> {
+  const reused = options.home !== undefined
+  const home = options.home ?? (await mkdtemp(join(tmpdir(), 'observer-agent-io-')))
   const store = createStore({ home })
   const ingest = new FakeIngest()
   const transcript = new FakeTranscript()
@@ -210,7 +237,8 @@ export async function openAgentIo(t: TestContext): Promise<Harness> {
     await client.close()
     await server.close()
     await store.close()
-    await rm(home, { recursive: true, force: true })
+    // The home belongs to whoever made it: a second harness on the same one leaves it there.
+    if (!reused) await rm(home, { recursive: true, force: true })
   })
 
   const harness: Harness = {
@@ -251,8 +279,11 @@ export async function until(ready: () => boolean, label: string): Promise<void> 
 }
 
 /** `open`, plus the wait for the transcription run it started. */
-export async function openSession(harness: Harness): Promise<Session> {
-  const opened = await harness.call('open', { url: VIDEO_URL })
+export async function openSession(
+  harness: Harness,
+  input: Record<string, unknown> = {},
+): Promise<Session> {
+  const opened = await harness.call('open', { url: VIDEO_URL, ...input })
   const id = String(opened.body['sessionId'])
   await until(() => harness.store.get(id).phase !== 'transcribing', 'the transcript')
   return harness.store.get(id)
@@ -278,11 +309,17 @@ export const CONCEPT = {
   summary: 'One slot of the transform output.',
 }
 
-/** Drives a session all the way to `live`, the phase most of the tools work in. */
-export async function goLive(harness: Harness): Promise<Session> {
+/** A prepared session with the player unlocked, one call short of running. */
+export async function goReady(harness: Harness): Promise<Session> {
   const session = await openSession(harness)
   await harness.call('concepts', { concepts: [CONCEPT] })
   await harness.call('ready')
+  return harness.store.get(session.id)
+}
+
+/** Drives a session all the way to `live`, the phase most of the tools work in. */
+export async function goLive(harness: Harness): Promise<Session> {
+  const session = await goReady(harness)
   // The first wait is what starts the session; nothing has happened yet, so it returns idle.
   await harness.call('wait', { timeoutMs: 1 })
   return harness.store.get(session.id)

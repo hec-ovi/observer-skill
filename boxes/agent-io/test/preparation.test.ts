@@ -111,6 +111,19 @@ describe('transcript', () => {
     assert.equal(result.body['nextOffset'], undefined)
   })
 
+  it('still knows a human wrote the words after the server is respawned', async (t) => {
+    const harness = await openAgentIo(t)
+    const session = await openSession(harness)
+    assert.equal((await harness.call('transcript', { limit: 1 })).body['generated'], false)
+
+    // A respawned server reads the session back from disk and knows only what is on it.
+    const respawned = await openAgentIo(t, { home: harness.home })
+    const result = await respawned.call('transcript', { sessionId: session.id, limit: 1 })
+
+    assert.equal(result.isError, false)
+    assert.equal(result.body['generated'], false)
+  })
+
   it('refuses to read while the transcript is still being made', async (t) => {
     const harness = await openAgentIo(t)
     const session = await seed(harness, 'transcribing')

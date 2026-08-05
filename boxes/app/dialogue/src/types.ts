@@ -76,7 +76,7 @@ export interface AskBoxProps {
 }
 
 export interface AnswerLogProps {
-  /** In order, oldest first. A user entry with nothing after it is still being answered. */
+  /** In order, oldest first. Every question without an answer yet is still being answered. */
   entries: readonly LogEntry[]
   onShow(artifactId: string): void
   onReplay(entryId: string): void

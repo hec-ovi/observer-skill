@@ -153,6 +153,26 @@ describe('link', () => {
     assert.equal(harness.session().artifacts[0]?.startsAt, 100)
   })
 
+  it('refuses half a range instead of dropping the range already stored', async (t) => {
+    const harness = await openAgentIo(t)
+    await openSession(harness)
+    const written = await harness.call('concepts', { concepts: [CONCEPT] })
+    const conceptId = (written.body['written'] as { id: string }[])[0]?.id ?? ''
+    await harness.call('build', { ...CHART, conceptId, startsAt: 600, endsAt: 900 })
+
+    const result = await harness.call('link', { artifactId: 'bins', conceptId, startsAt: 700 })
+
+    assert.equal(result.isError, true)
+    assert.equal((result.body['error'] as { code: string }).code, 'INVALID_PATCH')
+    assert.equal(harness.session().artifacts[0]?.startsAt, 600)
+    assert.equal(harness.session().artifacts[0]?.endsAt, 900)
+
+    const built = await harness.call('build', { ...CHART, id: 'half', conceptId, endsAt: 700 })
+    assert.equal(built.isError, true)
+    assert.equal((built.body['error'] as { code: string }).code, 'INVALID_PATCH')
+    assert.equal(harness.session().artifacts.length, 1)
+  })
+
   it('refuses before anything has been built', async (t) => {
     const harness = await openAgentIo(t)
     const session = await seed(harness, 'researching')

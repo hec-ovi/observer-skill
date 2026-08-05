@@ -6,7 +6,7 @@
 
 import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
-import { goLive, openAgentIo } from '../fixtures.ts'
+import { goLive, goReady, openAgentIo } from '../fixtures.ts'
 
 describe('wait', () => {
   it('delivers a question that was asked while nobody was waiting', async (t) => {
@@ -60,6 +60,22 @@ describe('wait', () => {
     // The waiter left nothing behind: the next call takes the slot and answers.
     const after = await harness.call('wait', { timeoutMs: 1 })
     assert.equal(after.body['idle'], true)
+  })
+
+  it('starts the session once when two waits arrive together', async (t) => {
+    const harness = await openAgentIo(t)
+    const session = await goReady(harness)
+
+    const [first, second] = await Promise.all([
+      harness.call('wait', { timeoutMs: 1 }),
+      harness.call('wait', { timeoutMs: 1 }),
+    ])
+
+    assert.equal(first.isError, false, JSON.stringify(first.body))
+    assert.equal(second.isError, false, JSON.stringify(second.body))
+    assert.equal(first.body['idle'], true)
+    assert.equal(second.body['idle'], true)
+    assert.equal(harness.store.get(session.id).phase, 'live')
   })
 
   it('holds one waiter per session, and the newer call takes the slot', async (t) => {

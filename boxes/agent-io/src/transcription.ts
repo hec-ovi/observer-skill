@@ -13,8 +13,6 @@ export class Transcriptions {
   readonly #store: SessionStore
   readonly #transcript: TranscriptPort
   readonly #config: AgentIoConfig
-  /** Whether the words were machine-made, which only the fetch result knows. */
-  readonly #generated = new Map<string, boolean>()
   #closed = false
 
   constructor(store: SessionStore, transcript: TranscriptPort, config: AgentIoConfig) {
@@ -32,11 +30,6 @@ export class Transcriptions {
         if (!this.#closed) report('transcript', failure)
       })
     })
-  }
-
-  /** True when the words are machine captions or speech recognition, so approximate. */
-  generated(sessionId: string): boolean {
-    return this.#generated.get(sessionId) ?? true
   }
 
   /**
@@ -61,15 +54,18 @@ export class Transcriptions {
     })
     if (this.#closed) return
 
-    this.#generated.set(session.id, ref.generated)
     await this.#store.patch(session.id, {
       transcript: {
         provider: ref.provider,
         language: ref.language,
         segmentCount: ref.segmentCount,
         duration: ref.duration,
+        generated: ref.generated,
       },
     })
-    await this.#store.advance(session.id, afterTranscribing(session.settings))
+    // The user can flip a switch in the page while the words are on their way, so where the
+    // session goes next is read from the record now, not from the record `open` created.
+    const settings = this.#store.get(session.id).settings
+    await this.#store.advance(session.id, afterTranscribing(settings))
   }
 }

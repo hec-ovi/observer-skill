@@ -1,0 +1,40 @@
+{
+  "task": "transcribe",
+  "language": "english",
+  "duration": 12.0,
+  "text": " Ready to begin now the second part.",
+  "segments": [
+    {
+      "id": 0,
+      "seek": 0,
+      "start": 0.0,
+      "end": 4.0,
+      "text": " Ready to begin now",
+      "tokens": [50364, 8942],
+      "temperature": 0.0,
+      "avg_logprob": -0.21,
+      "no_speech_prob": 0.01
+    },
+    {
+      "id": 1,
+      "seek": 0,
+      "start": 6.2,
+      "end": 9.0,
+      "text": " the second part.",
+      "tokens": [50554, 264],
+      "temperature": 0.0,
+      "avg_logprob": -0.19,
+      "no_speech_prob": 0.01
+    }
+  ],
+  "words": [
+    { "word": "Ready", "start": 0.4, "end": 0.9 },
+    { "word": "to", "start": 0.9, "end": 1.2 },
+    { "word": "begin", "start": 1.2, "end": 1.9 },
+    { "word": "now", "start": 4.0, "end": 4.4 },
+    { "word": "the", "start": 6.2, "end": 6.4 },
+    { "word": "second", "start": 6.4, "end": 7.0 },
+    { "word": "part.", "start": 7.0, "end": 9.0 }
+  ],
+  "usage": { "type": "duration", "seconds": 12 }
+}

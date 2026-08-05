@@ -8,6 +8,13 @@
  *   2. cues become a flat word stream with a time on every word;
  *   3. words become sentences, flushed on terminal punctuation, on a pause, or on length.
  *
+ * A sound cue cuts the run: speech before it and speech after it are separate sentences, so
+ * no sentence carries words from both sides of a music break.
+ *
+ * Per-word times are used only when they spell out the cue's own text. A server that hands
+ * back token pieces (`sec`, `ond`) or a word list that lost a word at a segment edge is not
+ * a word list; those cues are spread over the cue's own span instead.
+ *
  * `dedupeOverlap` belongs to the VTT path alone. YouTube's rolling VTT restates the previous
  * line in every cue; json3 does not, so running it there deletes words the speaker really
  * said twice.
@@ -80,9 +87,20 @@ function overlapLen(have: Timed[], incoming: Timed[], max = 12): number {
   return 0
 }
 
+function keys(words: string[]): string[] {
+  return words.map(wordKey).filter((key) => key.length > 0)
+}
+
+/** True when the per-word list is the cue's own text, word for word. */
+function spellsOut(words: Word[], text: string): boolean {
+  const given = keys(words.map((word) => word.w))
+  const said = keys(text.split(/\s+/))
+  return given.length === said.length && given.every((key, i) => key === said[i])
+}
+
 function cueWords(cue: Cue): Timed[] {
   const end = cue.end ?? cue.start
-  const raw: Word[] = cue.words.length
+  const raw: Word[] = spellsOut(cue.words, cue.text)
     ? cue.words
     : cue.text.split(/\s+/).map((w, i, all) => ({
         t: cue.start + ((end - cue.start) * i) / Math.max(1, all.length),
@@ -150,41 +168,46 @@ function wordsToSentences(words: Timed[], options: NormalizeOptions = {}): Segme
 }
 
 /** Consecutive identical sound cues are one marker, not a stutter. */
-function markerSegments(cues: Cue[]): Segment[] {
-  const out: Segment[] = []
-  for (const cue of cues) {
-    const previous = out[out.length - 1]
-    if (previous && previous.text === cue.text && cue.start - previous.end <= 0.5) {
-      previous.end = seconds(Math.max(previous.end, cue.end ?? cue.start))
-      continue
-    }
-    out.push({
-      i: 0,
-      start: seconds(cue.start),
-      end: seconds(cue.end ?? cue.start),
-      text: cue.text,
-    })
+function pushMarker(out: Segment[], cue: Cue): void {
+  const previous = out[out.length - 1]
+  if (previous && previous.text === cue.text && cue.start - previous.end <= 0.5) {
+    previous.end = seconds(Math.max(previous.end, cue.end ?? cue.start))
+    return
   }
-  return out
+  out.push({ i: 0, start: seconds(cue.start), end: seconds(cue.end ?? cue.start), text: cue.text })
 }
 
 /**
- * The whole normalizer. Sound cues keep their own segments so the agent can see the silence;
- * everything else is re-cut into sentences.
+ * The whole normalizer. Sound cues keep their own segments so the agent can see the silence,
+ * and they end the sentence they interrupt; everything else is re-cut into sentences.
  */
 export function cuesToSegments(cues: Cue[], options: NormalizeOptions = {}): Segment[] {
   const closed = closeCues(cues.filter((cue) => cue.text.length > 0))
-  const speech = closed.filter((cue) => !isMarker(cue))
-  const merged = [
-    ...wordsToSentences(cuesToWords(speech, options), options),
-    ...markerSegments(closed.filter(isMarker)),
-  ].sort((a, b) => a.start - b.start || a.end - b.end)
+  const out: Segment[] = []
+  let speech: Cue[] = []
 
-  for (const [i, segment] of merged.entries()) {
+  const flushSpeech = (): void => {
+    if (speech.length === 0) return
+    out.push(...wordsToSentences(cuesToWords(speech, options), options))
+    speech = []
+  }
+
+  for (const cue of closed) {
+    if (!isMarker(cue)) {
+      speech.push(cue)
+      continue
+    }
+    flushSpeech()
+    pushMarker(out, cue)
+  }
+  flushSpeech()
+
+  out.sort((a, b) => a.start - b.start || a.end - b.end)
+  for (const [i, segment] of out.entries()) {
     segment.i = i
-    const next = merged[i + 1]
+    const next = out[i + 1]
     if (next && segment.end > next.start) segment.end = next.start
     if (segment.end < segment.start) segment.end = segment.start
   }
-  return merged
+  return out
 }

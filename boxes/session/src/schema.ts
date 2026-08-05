@@ -131,6 +131,8 @@ export const transcriptRefSchema = z.object({
   language: z.string().min(1),
   segmentCount: z.number().int().min(0),
   duration: z.number().min(0),
+  /** True for machine captions and speech recognition, so the words are approximate. */
+  generated: z.boolean().default(true),
 })
 export type TranscriptRef = z.infer<typeof transcriptRefSchema>
 

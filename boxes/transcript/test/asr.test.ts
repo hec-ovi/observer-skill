@@ -2,6 +2,9 @@
  * Speech recognition, with the downloader, ffmpeg, and the transcription route all faked at
  * their own boundary. The point of the test is the seam: chunk two's times must land on the
  * video's timeline, at the offset ffmpeg actually cut, not the one that was asked for.
+ *
+ * The other point is what a server sends back. Word lists differ per server, and only a list
+ * that spells out the segment's own text may be trusted with the times.
  */
 
 import assert from 'node:assert/strict'
