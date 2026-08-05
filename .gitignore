@@ -16,3 +16,6 @@ docs/private/
 .capture-tmp*
 *.probe.mts
 probe.mts
+
+# Temp output of the published-CLI test
+.dist-test-*/
