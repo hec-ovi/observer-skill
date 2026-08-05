@@ -49,7 +49,9 @@ export const build = defineTool({
   description:
     'Compile one visual, run it in the open page, and return either line-accurate errors or ' +
     'the snapshot to look at. Rebuilding the same `id` replaces it.',
-  phases: ['building', 'ready', 'live'],
+  // The first build is what opens the visual pass, the way the first `wait` starts the
+  // session: nothing else moves a session out of the reading pass.
+  phases: ['researching', 'building', 'ready', 'live'],
   input: z.object({
     sessionId: sessionIdInput,
     id: z.string().min(1).describe('Stable across rebuilds, so fixing one replaces it.'),
@@ -78,6 +80,7 @@ export const build = defineTool({
     const { store, artifact, host, knowledge, config } = call.runtime.deps
 
     if (session.phase === 'live') requireAnswered(session, input.afterEntryId)
+    if (session.phase === 'researching') await store.advance(session.id, 'building')
 
     // Verification runs in the user's own page. Without one there is nowhere to check the
     // module, and an unchecked module is never stored.

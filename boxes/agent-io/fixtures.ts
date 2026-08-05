@@ -241,35 +241,61 @@ export async function openAgentIo(t: TestContext): Promise<Harness> {
   return harness
 }
 
-/** A session sitting in the phase a test needs, with the transcript already in. */
-export async function openSession(harness: Harness): Promise<Session> {
-  const opened = await harness.call('open', { url: VIDEO_URL })
-  const sessionId = String(opened.body['sessionId'])
-  await settle()
-  return harness.store.get(sessionId)
+/** Waits for something the background transcription run is about to do. */
+export async function until(ready: () => boolean, label: string): Promise<void> {
+  for (let attempt = 0; attempt < 400; attempt += 1) {
+    if (ready()) return
+    await new Promise((resolve) => setTimeout(resolve, 5))
+  }
+  throw new Error(`timed out waiting for ${label}`)
 }
 
-/** Lets the transcription run behind `open` finish before the test reads the phase. */
-export async function settle(): Promise<void> {
-  for (let i = 0; i < 20; i += 1) await new Promise((resolve) => setImmediate(resolve))
+/** `open`, plus the wait for the transcription run it started. */
+export async function openSession(harness: Harness): Promise<Session> {
+  const opened = await harness.call('open', { url: VIDEO_URL })
+  const id = String(opened.body['sessionId'])
+  await until(() => harness.store.get(id).phase !== 'transcribing', 'the transcript')
+  return harness.store.get(id)
+}
+
+const CHAIN = ['transcribing', 'researching', 'building', 'ready', 'live'] as const
+
+/** A session parked in one phase, for the calls that are not legal there. */
+export async function seed(harness: Harness, phase: Session['phase']): Promise<Session> {
+  let session = await harness.store.create({ source: SOURCE, settings: {} })
+  for (const step of CHAIN) {
+    if (session.phase === phase) break
+    session = await harness.store.advance(session.id, step)
+  }
+  return session
+}
+
+export const CONCEPT = {
+  label: 'frequency bin',
+  kind: 'jargon',
+  startsAt: 0,
+  endsAt: DURATION,
+  summary: 'One slot of the transform output.',
 }
 
 /** Drives a session all the way to `live`, the phase most of the tools work in. */
 export async function goLive(harness: Harness): Promise<Session> {
   const session = await openSession(harness)
-  await harness.call('concepts', {
-    concepts: [
-      {
-        label: 'frequency bin',
-        kind: 'jargon',
-        startsAt: 0,
-        endsAt: DURATION,
-        summary: 'One slot of the transform output.',
-      },
-    ],
-  })
+  await harness.call('concepts', { concepts: [CONCEPT] })
   await harness.call('ready')
   // The first wait is what starts the session; nothing has happened yet, so it returns idle.
   await harness.call('wait', { timeoutMs: 1 })
   return harness.store.get(session.id)
+}
+
+/** A verified visual on the record, as `build` leaves one. */
+export async function putBuiltArtifact(harness: Harness, id: string): Promise<Session> {
+  const session = harness.session()
+  return harness.store.putArtifact(session.id, {
+    id,
+    title: `Visual ${id}`,
+    kind: 'chart',
+    status: 'built',
+    bundlePath: `sessions/${session.id}/artifacts/${id}.js`,
+  })
 }
