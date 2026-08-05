@@ -2,6 +2,7 @@ import * as z from 'zod/v4'
 import { fail } from '#errors'
 import { sessionSchema } from '#session'
 import { openInBrowser } from '../browser.ts'
+import { pageUrlFor } from '../runtime.ts'
 import { defineTool } from '../tool.ts'
 
 export const open = defineTool({
@@ -50,7 +51,7 @@ export const open = defineTool({
     await store.touchAgent(created.id)
 
     const { url } = await host.start()
-    const pageUrl = `${url}/s/${created.id}`
+    const pageUrl = pageUrlFor(url, created.id)
     const session = await store.advance(created.id, 'transcribing')
 
     if (config.openBrowser) openInBrowser(pageUrl)

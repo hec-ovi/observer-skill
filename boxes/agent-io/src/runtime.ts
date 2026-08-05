@@ -9,6 +9,11 @@ import type { AgentIoDeps } from './ports.ts'
 import { Transcriptions } from './transcription.ts'
 import { Waiters } from './waiters.ts'
 
+/** Where a session lives on the listener. One shape, so the two callers cannot disagree. */
+export function pageUrlFor(base: string, sessionId: string): string {
+  return `${base}/s/${sessionId}`
+}
+
 export class Runtime {
   readonly deps: AgentIoDeps
   readonly waiters = new Waiters()
@@ -36,7 +41,7 @@ export class Runtime {
   /** The page for a session, once the listener is up. */
   pageUrl(sessionId: string): string | null {
     const base = this.deps.host.url
-    return base === null ? null : `${base}/s/${sessionId}`
+    return base === null ? null : pageUrlFor(base, sessionId)
   }
 
   close(): void {
