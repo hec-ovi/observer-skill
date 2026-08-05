@@ -27,7 +27,13 @@ export interface Details {
 
 let client: Promise<Innertube> | null = null
 
-/** One session per process. It is generated locally, so creating it touches no network. */
+/**
+ * One session per process, generated locally so creating it costs no round trip.
+ *
+ * `retrieve_player` is on because the player response is what carries the caption list and
+ * the playability verdict. Without it every client answers UNPLAYABLE with no tracks, which
+ * reads exactly like a video that has no captions.
+ */
 function innertube(): Promise<Innertube> {
   client ??= (async () => {
     const { Innertube } = await import('youtubei.js')
@@ -36,7 +42,7 @@ function innertube(): Promise<Innertube> {
       lang: 'en',
       generate_session_locally: true,
       retrieve_innertube_config: false,
-      retrieve_player: false,
+      retrieve_player: true,
       enable_session_cache: false,
     })
   })().catch((error: unknown) => {

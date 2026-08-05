@@ -1,9 +1,12 @@
 /**
  * Replays recorded lookups. Every fixture under `fixtures/` was captured from the live
- * endpoints on 2026-08-05; the innertube captures keep only the branches this box reads.
- * The exception is `innertube-refused.json`: a bot challenge arrives on YouTube's schedule,
- * so it is written out in the shape and wording the player endpoint uses for one.
- * Nothing here reaches the network.
+ * endpoints by `scripts/capture-fixtures.ts` and trimmed to the branches this box reads.
+ *
+ * Two are derived rather than captured, because the condition cannot be recorded on demand:
+ * `innertube-refused.json` is a bot challenge, which arrives on YouTube's schedule, and
+ * `innertube-not-embeddable.json` is the normal recording with `playableInEmbed` flipped,
+ * because a video the owner blocked is refused at the embed check and never reaches the
+ * player at all. Everything else is verbatim. Nothing here reaches the network.
  */
 
 import { readFileSync } from 'node:fs'
@@ -63,9 +66,15 @@ export function replay(plan: Plan): () => void {
 
     if (calls === null) throw new Error('offline')
 
+    // The player script is fetched for a signature timestamp, and a recording of two and a
+    // half megabytes of it would prove nothing. The lookup only needs it to exist.
+    if (url.includes('base.js')) return new Response('var stub=1;', { status: 200 })
+
     const endpoint = new URL(url).pathname
     const call = calls.find((c) => new URL(c.url).pathname === endpoint)
     if (!call) throw new Error(`no recording for ${endpoint}`)
+    // The loader script is javascript, not json, and the player id is read out of it.
+    if (typeof call.body === 'string') return new Response(call.body, { status: 200 })
     return Response.json(call.body)
   }
 

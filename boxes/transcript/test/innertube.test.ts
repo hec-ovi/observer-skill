@@ -1,42 +1,28 @@
 /**
- * The transcript panel route, with the platform's own JSON recorded and served from disk.
- * Panel windows are caption sized, so the proof here is that they come out as sentences,
- * labelled with the track the panel served rather than the one the caller asked for.
+ * The in-process caption route, replayed from the platform's own recorded responses.
+ *
+ * The route reads the caption track the player response points at, which serves the same
+ * `json3` the fetcher binary asks for. What is proven here is the choosing: a video that
+ * publishes thirty translations must come back in the language it is spoken in, not the one
+ * that sorts first.
+ *
+ * Recordings come from `scripts/capture-fixtures.ts`, trimmed to the branches this box
+ * reads. The player script is not among them: it is fetched for a signature timestamp a
+ * replay never uses, so it is answered with a stub.
  */
 
 import assert from 'node:assert/strict'
-import { readFileSync } from 'node:fs'
-import { join } from 'node:path'
 import { after, before, describe, test } from 'node:test'
 
 import { fetch as fetchTranscript, read } from '#transcript'
 
-import { FAKE_YTDLP, FIXTURES, fixture, pool, source, stubFetch } from '../fixtures.ts'
-
-const panel = (name: string): string => readFileSync(join(FIXTURES, 'innertube', name), 'utf8')
-
-/** The same recording, with the panel saying it answered from the machine track. */
-const autoMenu = (): string =>
-  panel('get_transcript.json').replace('"title": "English"', '"title": "English (auto-generated)"')
-
-/** The three calls the panel route makes, answered from the recording unless overridden. */
-function serve(over: { player?: string; next?: string; transcript?: string } = {}): () => void {
-  return stubFetch((url) => {
-    const body = url.includes('/player')
-      ? (over.player ?? panel('player.json'))
-      : url.includes('/next')
-        ? (over.next ?? panel('next.json'))
-        : url.includes('/get_transcript')
-          ? (over.transcript ?? panel('get_transcript.json'))
-          : '{}'
-    return Promise.resolve(
-      new Response(body, { status: 200, headers: { 'content-type': 'application/json' } }),
-    )
-  })
-}
+import { caught, pool, replayInnertube as replay, source } from '../fixtures.ts'
 
 describe('innertube', () => {
   const boxes = pool()
+  after(() => boxes.done())
+  let n = 0
+  const SESSION = (): string => `s${(n += 1)}`
 
   before(() => {
     delete process.env['FAKE_YTDLP_MANUAL']
@@ -44,122 +30,72 @@ describe('innertube', () => {
     delete process.env['OBSERVER_ASR_URL']
   })
 
-  after(async () => {
-    await boxes.done()
+  test('reads the track the video publishes, not the one that sorts first', async () => {
+    // This video ships thirty-one tracks, alphabetical, so the first one is Arabic.
+    after(replay('normal'))
+    const box = await boxes.open(SESSION())
+
+    const ref = await fetchTranscript(source({ videoId: 'aircAruvnKk' }), {
+      home: box.home,
+      sessionId: box.sessionId,
+      provider: 'innertube',
+      onProgress: () => {},
+    })
+
+    assert.equal(ref.provider, 'innertube')
+    assert.equal(ref.language, 'en')
+    assert.equal(ref.generated, false)
+    assert.ok(ref.segmentCount > 100, `only ${ref.segmentCount} segments`)
+    assert.match(read(box.sessionId, { limit: 1 }).segments[0]?.text ?? '', /^This is a 3/)
   })
 
-  test('the panel becomes sentences, not the windows it was written in', async () => {
-    const box = await boxes.open('panel')
-    const restore = serve()
-    try {
-      const ref = await fetchTranscript(source(), {
+  test('takes the language the caller asked for when the video has it', async () => {
+    after(replay('normal'))
+    const box = await boxes.open(SESSION())
+
+    const ref = await fetchTranscript(source({ videoId: 'aircAruvnKk' }), {
+      home: box.home,
+      sessionId: box.sessionId,
+      provider: 'innertube',
+      language: 'de',
+      onProgress: () => {},
+    })
+
+    assert.equal(ref.language, 'de')
+  })
+
+  test('a video that publishes no caption track is nothing to read, not a failure', async () => {
+    after(replay('no-captions'))
+    const box = await boxes.open(SESSION())
+
+    const error = await caught(() =>
+      fetchTranscript(source({ videoId: 'HZW4cEBWl58' }), {
         home: box.home,
         sessionId: box.sessionId,
         provider: 'innertube',
-        onProgress: box.onProgress,
-      })
-      assert.equal(ref.provider, 'innertube')
-      assert.equal(ref.generated, true)
-      assert.equal(ref.language, 'en')
-    } finally {
-      restore()
-    }
-
-    const page = read(box.sessionId)
-    assert.deepEqual(
-      page.segments.map((segment) => segment.text),
-      [
-        'In a single minute your body produces 120 million red blood cells.',
-        'Each one carries oxygen from the lungs to every tissue that needs it.',
-        '[Music]',
-        'The whole trip takes about twenty seconds.',
-      ],
+        onProgress: () => {},
+      }),
     )
-    assert.equal(page.segments[0]?.start, 0)
-    assert.equal(page.segments[0]?.end, 6.4)
+
+    assert.equal(error.code, 'NO_TRANSCRIPT')
+    assert.match(error.hint, /caption track/)
   })
 
-  test('auto walks past the caption binary when it finds nothing published', async () => {
-    const box = await boxes.open('auto-panel')
-    const restore = serve()
-    try {
-      const ref = await fetchTranscript(source(), {
+  test('says so when the caption endpoint is rate limiting this machine', async () => {
+    // A 429 is the address being throttled, not anything wrong with the video, and it clears
+    // on its own. "Could not produce text" would send someone hunting for a bug.
+    after(replay('normal', (url) => (url.includes('/api/timedtext') ? new Response('', { status: 429 }) : null)))
+    const box = await boxes.open(SESSION())
+
+    const error = await caught(() =>
+      fetchTranscript(source({ videoId: 'aircAruvnKk' }), {
         home: box.home,
         sessionId: box.sessionId,
-        ytdlpBin: FAKE_YTDLP,
-        onProgress: box.onProgress,
-      })
-      assert.equal(ref.provider, 'innertube')
-    } finally {
-      restore()
-    }
-  })
-
-  test('the track the panel served says the language and who wrote it', async () => {
-    const human = await boxes.open('panel-human')
-    let restore = serve({ player: panel('player-tracks.json') })
-    try {
-      const ref = await fetchTranscript(source(), {
-        home: human.home,
-        sessionId: human.sessionId,
         provider: 'innertube',
-        language: 'de',
-        onProgress: human.onProgress,
-      })
-      assert.equal(ref.generated, false)
-      assert.equal(ref.language, 'en')
-    } finally {
-      restore()
-    }
+        onProgress: () => {},
+      }),
+    )
 
-    const machine = await boxes.open('panel-machine')
-    restore = serve({ player: panel('player-tracks.json'), transcript: autoMenu() })
-    try {
-      const ref = await fetchTranscript(source(), {
-        home: machine.home,
-        sessionId: machine.sessionId,
-        provider: 'innertube',
-        onProgress: machine.onProgress,
-      })
-      assert.equal(ref.generated, true)
-      assert.equal(ref.language, 'en')
-    } finally {
-      restore()
-    }
-  })
-
-  test('a panel shape the platform changed does not end the walk', async () => {
-    const box = await boxes.open('panel-shape')
-    const restore = serve({ transcript: panel('get_transcript-no-node.json') })
-    try {
-      const ref = await fetchTranscript(source(), {
-        home: box.home,
-        sessionId: box.sessionId,
-        file: fixture('talk.srt'),
-        ytdlpBin: FAKE_YTDLP,
-        onProgress: box.onProgress,
-      })
-      assert.equal(ref.provider, 'file')
-    } finally {
-      restore()
-    }
-  })
-
-  test('a video with no panel is not a failure, it is nothing to read', async () => {
-    const box = await boxes.open('no-panel')
-    const restore = serve({ next: '{}' })
-    try {
-      await assert.rejects(
-        fetchTranscript(source(), {
-          home: box.home,
-          sessionId: box.sessionId,
-          provider: 'innertube',
-          onProgress: box.onProgress,
-        }),
-        { code: 'NO_TRANSCRIPT' },
-      )
-    } finally {
-      restore()
-    }
+    assert.match(error.hint, /rate limiting/)
   })
 })

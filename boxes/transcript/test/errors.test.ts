@@ -10,7 +10,7 @@ import { after, before, describe, test } from 'node:test'
 
 import { fetch as fetchTranscript } from '#transcript'
 
-import { FAKE_YTDLP, caught, fixture, pool, source, stubFetch } from '../fixtures.ts'
+import { FAKE_YTDLP, caught, fixture, pool, source, stubFetch, replayInnertube } from '../fixtures.ts'
 
 describe('errors', () => {
   const boxes = pool()
@@ -65,7 +65,9 @@ describe('errors', () => {
 
   test('nothing published anywhere is no transcript, and says how to get one', async () => {
     const box = await boxes.open('nothing')
-    const restore = stubFetch(() => Promise.resolve(new Response('{}', { status: 200 })))
+    // A real recording of a video that publishes no caption track, so this proves the
+    // "nothing to read" path rather than the "the server answered garbage" one.
+    const restore = replayInnertube('no-captions')
 
     let error
     try {

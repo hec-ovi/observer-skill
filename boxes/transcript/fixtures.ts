@@ -3,6 +3,7 @@
  * under a directory called `test` as a test file.
  */
 
+import { readFileSync } from 'node:fs'
 import { mkdtemp, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -71,6 +72,40 @@ export function pool(): Pool {
       for (const home of opened) await rm(home, { recursive: true, force: true })
     },
   }
+}
+
+interface RecordedCall {
+  url: string
+  status: number
+  body: unknown
+}
+
+/**
+ * Answers from a recording under `test/fixtures/innertube/`, matched on the path, with an
+ * override for one url. The player script is answered with a stub: it is fetched for a
+ * signature timestamp a replay never uses, and recording it would add megabytes.
+ */
+export function replayInnertube(
+  name: string,
+  over: (url: string) => Response | null = () => null,
+): () => void {
+  const calls = JSON.parse(
+    readFileSync(join(FIXTURES, 'innertube', `${name}.json`), 'utf8'),
+  ) as RecordedCall[]
+
+  return stubFetch((url) => {
+    const overridden = over(url)
+    if (overridden) return Promise.resolve(overridden)
+    if (url.includes('base.js')) return Promise.resolve(new Response('var stub=1;', { status: 200 }))
+
+    const path = new URL(url).pathname
+    const call = calls.find((candidate) => new URL(candidate.url).pathname === path)
+    if (!call) return Promise.resolve(new Response('{}', { status: 404 }))
+    const body = typeof call.body === 'string' ? call.body : JSON.stringify(call.body)
+    return Promise.resolve(
+      new Response(body, { status: call.status, headers: { 'content-type': 'application/json' } }),
+    )
+  })
 }
 
 /** Replaces `globalThis.fetch` for the duration of one test. */

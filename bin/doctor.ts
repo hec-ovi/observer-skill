@@ -127,13 +127,13 @@ function portFree(port: number, bind: string): Promise<boolean> {
 
 async function checkPort(config: Config): Promise<Check> {
   const free = await portFree(config.port, config.bind)
-  if (free) {
-    return { name: 'port', level: 'ok', detail: `${config.bind}:${config.port} is free` }
-  }
+  const where = `${config.bind}:${config.port}`
+  // A taken port is not a problem to fix: the host moves up until it finds a free one. It is
+  // reported so the url in the log is not a surprise.
   return {
     name: 'port',
-    level: 'gap',
-    detail: `${config.bind}:${config.port} is taken, so the page will open on the next free port`,
+    level: 'ok',
+    detail: free ? `${where} is free` : `${where} is taken, so the page opens on the next one up`,
   }
 }
 
