@@ -19,12 +19,13 @@ const BASE = 'http://127.0.0.1:9999'
 /** The second chunk the fake ffmpeg always cuts, when only the first one carries speech. */
 const SILENT = '{"task":"transcribe","language":"english","duration":0,"text":"","segments":[]}'
 
-/** Answers the first chunk from a fixture and the second with silence. */
-function serve(name: string): () => void {
+/** Answers each chunk in turn from a fixture; a chunk past the list gets silence. */
+function serve(...names: string[]): () => void {
   let call = 0
   return stubFetch(() => {
-    const body = call === 0 ? readFileSync(fixture(name), 'utf8') : SILENT
+    const name = names[call]
     call += 1
+    const body = name === undefined ? SILENT : readFileSync(fixture(name), 'utf8')
     return Promise.resolve(
       new Response(body, { status: 200, headers: { 'content-type': 'application/json' } }),
     )
@@ -98,14 +99,7 @@ describe('endpoint-asr', () => {
 
   test('progress counts the chunks, which is what takes the time', async () => {
     const box = await boxes.open('asr-progress')
-    const restore = stubFetch(() =>
-      Promise.resolve(
-        new Response(readFileSync(fixture('asr-chunk-0.json'), 'utf8'), {
-          status: 200,
-          headers: { 'content-type': 'application/json' },
-        }),
-      ),
-    )
+    const restore = serve('asr-chunk-0.json', 'asr-chunk-0.json')
     try {
       await fetchTranscript(source({ duration: 905 }), {
         home: box.home,

@@ -73,7 +73,11 @@ installing the fetcher binary raises the hit rate.
 - Segments are sentences where the text allows it, not caption frames. A sentence that
   spans three caption frames is one segment with the first frame's start and the last
   frame's end.
+- A sound cue keeps its own segment and ends the sentence it interrupts, so no segment
+  carries words from both sides of a music break.
 - Times are seconds as floats, relative to the video, and match what the player reports.
+  Per-word times from a provider are used only when those words spell out the cue's own
+  text; a list of token pieces or one missing a word is spread over the cue's span instead.
 - `at` is O(log n) and does no I/O beyond the one cached file.
 - Nothing here labels ads, concepts, or importance. It produces text and times.
 - A long video streams to disk as it is produced; the whole transcript is never held twice
@@ -86,9 +90,11 @@ installing the fetcher binary raises the hit rate.
 ## How to modify this box safely
 
 Every provider produces `Segment[]` and nothing else, so a new one is a file plus a
-registry line. The normalizer is pure and tested against recorded fixtures: a human caption
-track, a rolling machine track with the classic duplication, a track with music and
-applause markers, a track with a fifteen-minute gap, a rolling VTT, an SRT, a transcript
-panel payload, and a two-chunk speech-recognition stitch. Add a fixture before touching it.
-The binaries and the network are faked at their own boundary, so the tests never leave the
-machine.
+registry line. A provider that throws instead of answering is treated as one that failed,
+so `auto` walks on. The normalizer is pure and tested against recorded fixtures: a human
+caption track, a rolling machine track with the classic duplication, a track with music and
+applause markers, a track whose speech run is two words long next to a marker, a track with
+a fifteen-minute gap, a rolling VTT, an SRT, a transcript panel payload, and three
+speech-recognition payloads (a two-chunk stitch, token pieces, a word timed outside its own
+segment). Add a fixture before touching it. The binaries and the network are faked at their
+own boundary, so the tests never leave the machine.

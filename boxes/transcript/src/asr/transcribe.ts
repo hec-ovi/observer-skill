@@ -2,8 +2,9 @@
  * One chunk of audio to an OpenAI-compatible transcription route.
  *
  * `verbose_json` with word and segment granularity is the only shape that comes back with
- * times, which is the entire point here. Word times are used when the server sends them,
- * segment times otherwise; either way the chunk's offset is added before the caller sees it.
+ * times, which is the entire point here. Word times are passed on when the server sends
+ * them, and the normalizer decides whether they are trustworthy enough to use; either way
+ * the chunk's offset is added before the caller sees it.
  */
 
 import { readFile } from 'node:fs/promises'
