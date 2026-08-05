@@ -1,0 +1,47 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.hec-ovi/observer",
+  "title": "Observer",
+  "description": "Turns a video or podcast into a study session: timed transcript, concepts prepared before playback, and charts the agent builds and verifies. Serves the session page and answers about the exact second the viewer paused on.",
+  "repository": {
+    "url": "https://github.com/hec-ovi/observer-skill",
+    "source": "github"
+  },
+  "websiteUrl": "https://github.com/hec-ovi/observer-skill",
+  "version": "0.1.0",
+  "packages": [
+    {
+      "registryType": "npm",
+      "registryBaseUrl": "https://registry.npmjs.org",
+      "identifier": "observer-skill",
+      "version": "0.1.0",
+      "runtimeHint": "npx",
+      "transport": { "type": "stdio" },
+      "packageArguments": [
+        {
+          "type": "positional",
+          "value": "mcp",
+          "valueHint": "subcommand",
+          "description": "Speak MCP on stdio and serve the session page"
+        }
+      ],
+      "environmentVariables": [
+        {
+          "name": "OBSERVER_PORT",
+          "description": "First port to try for the session page. Defaults to 4830.",
+          "isRequired": false
+        },
+        {
+          "name": "OBSERVER_HOME",
+          "description": "Where sessions, transcripts, and artifacts are stored. Defaults to $XDG_DATA_HOME/observer.",
+          "isRequired": false
+        },
+        {
+          "name": "OBSERVER_ASR_URL",
+          "description": "OpenAI-compatible transcription endpoint, used when a video has no captions.",
+          "isRequired": false
+        }
+      ]
+    }
+  ]
+}

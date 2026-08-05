@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "observer": {
+      "command": "npx",
+      "args": ["-y", "observer-skill", "mcp"]
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "observer",
+  "displayName": "Observer",
+  "version": "0.1.0",
+  "description": "Turn a video or podcast into a study session: transcript, prepared concepts, and charts the agent builds and verifies. Pause anywhere and ask; the agent knows the second you are on. Ships the observer skill and its MCP server.",
+  "author": { "name": "Hector Oviedo", "url": "https://github.com/hec-ovi" },
+  "homepage": "https://github.com/hec-ovi/observer-skill",
+  "repository": "https://github.com/hec-ovi/observer-skill",
+  "license": "MIT",
+  "keywords": ["video", "transcript", "learning", "mcp", "agent-skills", "data-visualization"]
+}

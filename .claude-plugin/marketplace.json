@@ -1,0 +1,24 @@
+{
+  "name": "observer-skill",
+  "owner": {
+    "name": "Hector Oviedo",
+    "url": "https://github.com/hec-ovi"
+  },
+  "description": "Observer: a video or podcast becomes a study session with a live transcript, prepared concepts, and charts built on demand.",
+  "version": "0.1.0",
+  "plugins": [
+    {
+      "name": "observer",
+      "displayName": "Observer",
+      "source": "./plugins/observer",
+      "description": "Feed a video, get a transcript-aware study session in the browser. Pause anywhere and ask; the agent answers with the timestamp in context and can build a chart or interactive visual for the concept.",
+      "version": "0.1.0",
+      "author": { "name": "Hector Oviedo" },
+      "homepage": "https://github.com/hec-ovi/observer-skill",
+      "repository": "https://github.com/hec-ovi/observer-skill",
+      "license": "MIT",
+      "category": "productivity",
+      "keywords": ["video", "transcript", "learning", "mcp", "agent-skills", "data-visualization"]
+    }
+  ]
+}

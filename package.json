@@ -1,5 +1,6 @@
 {
   "name": "observer-skill",
+  "mcpName": "io.github.hec-ovi/observer",
   "version": "0.1.0",
   "description": "Study a video or podcast with a coding agent: transcript, prepared concepts, verified charts, and answers at the second you paused.",
   "keywords": [

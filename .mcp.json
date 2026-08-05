@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "observer": {
+      "command": "node",
+      "args": ["${CLAUDE_PROJECT_DIR}/bin/observer.ts", "mcp"]
+    }
+  }
+}
