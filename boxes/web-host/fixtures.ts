@@ -7,6 +7,8 @@ import { fail } from '#errors'
 import type {
   Artifact,
   InboxEventInput,
+  Phase,
+  Progress,
   Session,
   SessionDiff,
   SessionPatch,
@@ -130,6 +132,11 @@ export class FakeStore implements SessionPort {
     this.get(id)
     this.inbox.push(event)
     return this.inbox.length
+  }
+
+  /** The one subscriber message a patch cannot carry: the store sends it when a phase moves. */
+  movePhase(id: string, phase: Phase, progress: Progress): void {
+    this.#emit(id, { type: 'phase', phase, progress })
   }
 
   #emit(id: string, message: Parameters<Subscriber>[0]): void {

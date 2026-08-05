@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { after, test } from 'node:test'
 import { isObserverError } from '#errors'
-import { openSse, postJson, startHost } from '../fixtures.ts'
+import { FakeStore, makeSession, openSse, postJson, startHost } from '../fixtures.ts'
 
 const running = await startHost()
 after(() => running.stop())

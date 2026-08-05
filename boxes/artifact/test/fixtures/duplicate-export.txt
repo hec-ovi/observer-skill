@@ -1,0 +1,14 @@
+export const meta = {
+  title: 'Declared twice',
+  kind: 'chart',
+}
+
+export const meta = {
+  title: 'Declared twice',
+  kind: 'dataviz',
+}
+
+export function mount(el, ctx) {
+  el.textContent = 'nothing'
+  return () => {}
+}

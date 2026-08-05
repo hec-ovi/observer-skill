@@ -1,0 +1,12 @@
+import * as echarts from 'echarts'
+
+export const meta = {
+  title: 'Repeated radius',
+  kind: 'chart',
+}
+
+export function mount(el, ctx) {
+  const chart = echarts.init(el)
+  chart.setOption({ series: [{ type: 'bar', itemStyle: { borderRadius: 0 }, label: { borderRadius: 8 } }] })
+  return () => chart.dispose()
+}

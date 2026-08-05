@@ -4,7 +4,20 @@ import { join } from 'node:path'
 import { after, test } from 'node:test'
 import { FakeStore, makeArtifact, makeSession, startHost } from '../fixtures.ts'
 
-const store = new FakeStore([makeSession({ artifacts: [makeArtifact()] })])
+/** One pixel, so the snapshot route serves real image bytes. */
+const PNG = Buffer.from(
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==',
+  'base64',
+)
+
+const store = new FakeStore([
+  makeSession({
+    artifacts: [
+      makeArtifact(),
+      makeArtifact({ id: 'a2', snapshotPath: 'sessions/s1/artifacts/a2.png' }),
+    ],
+  }),
+])
 const running = await startHost({ store, version: '1.2.3' })
 after(() => running.stop())
 
@@ -67,6 +80,23 @@ test('an artifact whose path climbs out of the session is refused', async () => 
   }
 })
 
+test('the snapshot the agent looked at is served as a PNG', async () => {
+  await writeFile(join(running.home, 'sessions', 's1', 'artifacts', 'a2.png'), PNG)
+
+  const answer = await fetch(`${running.base}/api/snapshot/s1/a2`)
+  assert.equal(answer.status, 200)
+  assert.match(answer.headers.get('content-type') ?? '', /image\/png/)
+  assert.deepEqual(Buffer.from(await answer.arrayBuffer()), PNG)
+})
+
+test('an artifact with no snapshot says so instead of serving nothing', async () => {
+  const answer = await fetch(`${running.base}/api/snapshot/s1/a1`)
+  assert.equal(answer.status, 404)
+  const body = (await answer.json()) as { code: string; hint: string }
+  assert.equal(body.code, 'UNKNOWN_ARTIFACT')
+  assert.ok(body.hint.length > 0)
+})
+
 test('the verify frame is served under its own policy', async () => {
   const answer = await fetch(`${running.base}/sandbox/frame`)
   assert.equal(answer.status, 200)
@@ -86,8 +116,26 @@ test('the verify frame is served under its own policy', async () => {
   assert.match(await answer.text(), /<script type="module"/)
 })
 
+test('the verify document has no second address that skips the policy', async () => {
+  const answer = await fetch(`${running.base}/sandbox.html`)
+  assert.equal(answer.status, 404)
+  assert.equal(((await answer.json()) as { code: string }).code, 'UNKNOWN_ARTIFACT')
+})
+
 test('the registry modules are served with the CORS header a module fetch needs', async () => {
   const answer = await fetch(`${running.base}/sandbox/vendor/echarts.js`)
   assert.equal(answer.status, 200)
   assert.equal(answer.headers.get('access-control-allow-origin'), '*')
+})
+
+test('a 404 from a static layer names no path on this disk', async () => {
+  for (const path of ['/assets/app-deadbeef.js', '/sandbox/vendor/nope.js']) {
+    const answer = await fetch(`${running.base}${path}`)
+    assert.equal(answer.status, 404)
+    const body = (await answer.json()) as { code: string; message: string; hint: string }
+    assert.equal(body.code, 'UNKNOWN_ARTIFACT')
+    assert.doesNotMatch(body.message, /ENOENT/)
+    assert.ok(!body.message.includes(running.appDir), `${path} leaked ${running.appDir}`)
+    assert.ok(body.hint.length > 0)
+  }
 })

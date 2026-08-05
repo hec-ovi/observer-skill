@@ -15,6 +15,53 @@ test('a patch reaches an open stream, with an id', async () => {
   client.vanish()
 })
 
+test('a phase move reaches the stream as its own event', async () => {
+  const client = await openSse(`${running.base}/live/s1`)
+  running.store.movePhase('s1', 'building', {
+    step: 'artifact',
+    done: 1,
+    total: 3,
+    message: 'drawing the chart',
+  })
+
+  const event = await client.waitFor('phase')
+  assert.deepEqual(event.data, {
+    phase: 'building',
+    progress: { step: 'artifact', done: 1, total: 3, message: 'drawing the chart' },
+  })
+  client.vanish()
+})
+
+test('a say signal reaches the stream with the line and how to read it', async () => {
+  const client = await openSse(`${running.base}/live/s1`)
+  running.store.signal('s1', {
+    type: 'say',
+    entryId: 'e1',
+    text: 'watch the dip here',
+    speak: true,
+    artifactId: 'a1',
+  })
+
+  const event = await client.waitFor('say')
+  assert.deepEqual(event.data, {
+    entryId: 'e1',
+    text: 'watch the dip here',
+    speak: true,
+    artifactId: 'a1',
+  })
+  client.vanish()
+})
+
+test('show names the artifact and hide carries nothing', async () => {
+  const client = await openSse(`${running.base}/live/s1`)
+  running.store.signal('s1', { type: 'show', artifactId: 'a1' })
+  running.store.signal('s1', { type: 'hide' })
+
+  assert.deepEqual((await client.waitFor('show')).data, { artifactId: 'a1' })
+  assert.deepEqual((await client.waitFor('hide')).data, {})
+  client.vanish()
+})
+
 test('the stream announces itself as an unbuffered event stream', async () => {
   const client = await openSse(`${running.base}/live/s1`)
   assert.equal(client.headers['content-type'], 'text/event-stream; charset=utf-8')
@@ -68,6 +115,22 @@ test('a position updates the record and is not queued', async () => {
   assert.equal(answer.status, 202)
   assert.deepEqual(running.store.patches.at(-1), { position: { time: 90, state: 'playing' } })
   assert.equal(running.store.inbox.length, queued)
+})
+
+test('a settings change lands on the record and in the inbox', async () => {
+  const answer = await postJson(`${running.base}/live/s1/event`, {
+    type: 'settings',
+    at: 30,
+    settings: { theme: 'dark' },
+  })
+
+  assert.equal(answer.status, 202)
+  assert.deepEqual(running.store.patches.at(-1), { settings: { theme: 'dark' } })
+  assert.deepEqual(running.store.inbox.at(-1), {
+    kind: 'settings',
+    at: 30,
+    settings: { theme: 'dark' },
+  })
 })
 
 test('a body that is not a live event is refused with the shared error shape', async () => {

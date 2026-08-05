@@ -110,7 +110,12 @@ export const YT_STATE = {
   CUED: 5,
 } as const
 
-/** What the IFrame API installs as `window.YT.Player`. */
+/**
+ * What the IFrame API installs as `window.YT.Player`.
+ *
+ * `duration` and `title` are what the video turns out to be, and the getters answer with
+ * them only once playback has started: the real player has neither at `onReady`.
+ */
 export class FakeYTPlayer {
   static instances: FakeYTPlayer[] = []
 
@@ -119,9 +124,11 @@ export class FakeYTPlayer {
   state: number = YT_STATE.UNSTARTED
   time = 0
   duration = 300
+  title = 'Fake video'
   volume = 100
   muted = false
   destroyed = false
+  #started = false
 
   constructor(host: string | HTMLElement, config: YT.PlayerOptions) {
     this.host = host
@@ -147,7 +154,14 @@ export class FakeYTPlayer {
     return this.time
   }
   getDuration(): number {
-    return this.duration
+    return this.#started ? this.duration : 0
+  }
+  getVideoData(): YT.VideoData {
+    return {
+      video_id: String(this.config.videoId ?? ''),
+      author: '',
+      title: this.#started ? this.title : '',
+    }
   }
   getPlayerState(): number {
     return this.state
@@ -176,6 +190,7 @@ export class FakeYTPlayer {
   /** test-side: the player moved, and everyone watching hears about it. */
   setState(state: number): void {
     this.state = state
+    if (state === YT_STATE.PLAYING) this.#started = true
     this.config.events?.onStateChange?.({ target: this.#asPlayer(), data: state })
   }
 
