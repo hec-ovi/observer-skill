@@ -16,15 +16,20 @@ export class StubListener implements Listener {
   utterance: string | null = 'What is a tensor?'
   /** test-side: the microphone is refused when the next hold opens. */
   refuse = false
+  /** test-side: the transcription waits for `finishes()`, the way a server one does. */
+  slow = false
   disposed = false
 
   readonly #handlers: HoldHandlers
+  #transcribing: (() => void) | null = null
 
   constructor(handlers: HoldHandlers) {
     this.#handlers = handlers
   }
 
   async start(): Promise<void> {
+    // A press while the previous hold is still transcribing opens nothing, as in `voice-in`.
+    if (this.state !== 'idle') return
     if (this.refuse) {
       this.#settle('denied', 'MIC_DENIED')
       return
@@ -35,6 +40,11 @@ export class StubListener implements Listener {
   async stop(): Promise<void> {
     if (this.state !== 'listening') return
     this.#settle('working', null)
+    if (this.slow) {
+      await new Promise<void>((resolve) => {
+        this.#transcribing = resolve
+      })
+    }
     if (this.utterance !== null) this.#handlers.onUtterance(this.utterance)
     this.#settle('idle', null)
   }
@@ -48,6 +58,14 @@ export class StubListener implements Listener {
   /** test-side: what the engine has heard so far in this hold. */
   hears(text: string): void {
     this.#handlers.onPartial(text)
+  }
+
+  /** test-side: the transcription of a slow hold came back. */
+  finishes(): void {
+    const done = this.#transcribing
+    if (!done) throw new Error('No transcription is in flight')
+    this.#transcribing = null
+    done()
   }
 
   #settle(state: ListenState, reason: string | null): void {

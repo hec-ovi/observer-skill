@@ -51,17 +51,20 @@ export function AskBox({ at, listener, disabled = false, onAsk, onOpenSettings }
     send()
   }
 
+  /** The second is stamped only by a press that opened, so it stays the one that was spoken. */
+  function beginHold(): void {
+    if (hold.press()) holdAt.current = at()
+  }
+
   function onTalkDown(event: PointerEvent<HTMLButtonElement>): void {
     event.currentTarget.setPointerCapture(event.pointerId)
-    holdAt.current = at()
-    hold.press()
+    beginHold()
   }
 
   function onTalkKeyDown(event: KeyboardEvent<HTMLButtonElement>): void {
     if (!TALK_KEYS.has(event.key) || event.repeat) return
     event.preventDefault()
-    holdAt.current = at()
-    hold.press()
+    beginHold()
   }
 
   function onTalkKeyUp(event: KeyboardEvent<HTMLButtonElement>): void {

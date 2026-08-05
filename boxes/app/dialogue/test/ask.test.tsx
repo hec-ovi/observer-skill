@@ -53,6 +53,51 @@ describe('AskBox', () => {
     expect(talk).toHaveAttribute('aria-pressed', 'false')
   })
 
+  it('keeps the second of the hold that spoke when a press lands mid-transcription', async () => {
+    const user = userEvent.setup()
+    const onAsk = vi.fn()
+    const { source, listener } = stubListening()
+    let second = 300
+    render(<AskBox at={() => second} listener={source} onAsk={onAsk} onOpenSettings={vi.fn()} />)
+    const talk = screen.getByRole('button', { name: 'Hold to talk' })
+    listener().slow = true
+
+    await user.pointer({ keys: '[MouseLeft>]', target: talk })
+    await user.pointer({ keys: '[/MouseLeft]' })
+    await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('Transcribing.'))
+
+    // The video played on and the user presses again while the words are still out. That
+    // press opens nothing, so the button does not go down on a hold that is not happening.
+    second = 340
+    await user.pointer({ keys: '[MouseLeft>]', target: talk })
+    expect(talk).toHaveAttribute('aria-pressed', 'false')
+    await user.pointer({ keys: '[/MouseLeft]' })
+
+    await act(async () => listener().finishes())
+
+    expect(onAsk).toHaveBeenCalledWith({ text: 'What is a tensor?', at: 300, via: 'voice' })
+  })
+
+  it('closes a keyboard hold when the talk button loses focus', async () => {
+    const user = userEvent.setup()
+    const onAsk = vi.fn()
+    const { source } = stubListening()
+    render(<AskBox at={() => 300} listener={source} onAsk={onAsk} onOpenSettings={vi.fn()} />)
+    const talk = screen.getByRole('button', { name: 'Hold to talk' })
+
+    talk.focus()
+    // The window goes away mid-hold, so the keyup that would end it is delivered elsewhere.
+    await user.keyboard('{Enter>}')
+    expect(talk).toHaveAttribute('aria-pressed', 'true')
+
+    await user.tab()
+
+    await waitFor(() =>
+      expect(onAsk).toHaveBeenCalledWith({ text: 'What is a tensor?', at: 300, via: 'voice' }),
+    )
+    expect(talk).toHaveAttribute('aria-pressed', 'false')
+  })
+
   it('says so when a hold produced nothing', async () => {
     const user = userEvent.setup()
     const onAsk = vi.fn()

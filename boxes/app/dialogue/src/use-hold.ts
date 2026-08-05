@@ -23,7 +23,8 @@ export interface HoldControls {
   partial: string
   /** Why the last hold produced nothing, or null. */
   problem: string | null
-  press(): void
+  /** True when the hold opened. A press lands on nothing while the last one is still out. */
+  press(): boolean
   release(): void
 }
 
@@ -35,6 +36,8 @@ export function useHold({ listener, onUtterance }: HoldOptions): HoldControls {
 
   const instance = useRef<Listener | null>(null)
   const open = useRef(false)
+  /** A hold that is not finished: still held, or released and still being transcribed. */
+  const unsettled = useRef(false)
   const heard = useRef(false)
   const started = useRef<Promise<void>>(Promise.resolve())
   const deliver = useRef(onUtterance)
@@ -59,15 +62,22 @@ export function useHold({ listener, onUtterance }: HoldOptions): HoldControls {
     }
   }, [listener])
 
-  const press = useCallback((): void => {
+  /**
+   * A press while the last hold is still being transcribed opens nothing: the engine ignores
+   * it anyway, and taking it would hand the words still in flight the wrong moment. The
+   * status line already says the transcription is out, so the user is not left guessing.
+   */
+  const press = useCallback((): boolean => {
     const listening = instance.current
-    if (!listening || open.current) return
+    if (!listening || unsettled.current) return false
     open.current = true
+    unsettled.current = true
     heard.current = false
     setPartial('')
     setProblem(null)
     setHolding(true)
     started.current = listening.start()
+    return true
   }, [])
 
   const release = useCallback((): void => {
@@ -80,6 +90,7 @@ export function useHold({ listener, onUtterance }: HoldOptions): HoldControls {
     void started.current
       .then(() => listening.stop())
       .then(() => {
+        unsettled.current = false
         setPartial('')
         if (heard.current) return
         setProblem(holdProblem(listening.state, listening.reason))
