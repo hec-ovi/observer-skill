@@ -42,13 +42,20 @@ function requireUrl(baseUrl: string | undefined): void {
       'Set the speech endpoint URL in settings, or pick another voice provider.',
     )
   }
-  try {
-    new URL(baseUrl)
-  } catch {
+  if (!isHttpUrl(baseUrl)) {
     throw new VoiceOutError(
       'INVALID_VOICE_CONFIG',
-      `${baseUrl} is not a URL`,
+      `${baseUrl} is not an http URL`,
       'Give the endpoint as an absolute URL, for example http://127.0.0.1:8880.',
     )
+  }
+}
+
+function isHttpUrl(baseUrl: string): boolean {
+  try {
+    const { protocol } = new URL(baseUrl)
+    return protocol === 'http:' || protocol === 'https:'
+  } catch {
+    return false
   }
 }

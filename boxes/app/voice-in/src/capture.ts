@@ -88,6 +88,7 @@ export class MicCapture {
 
   async #teardown(): Promise<Recording> {
     const { stream, context, source, node, sink } = this.#graph
+    const rate = context.sampleRate
     node.port.onmessage = null
     source.disconnect()
     node.disconnect()
@@ -97,7 +98,7 @@ export class MicCapture {
 
     const captured = join(this.#chunks)
     this.#chunks = []
-    const pcm = await toRate(captured, context.sampleRate, TARGET_RATE)
+    const pcm = await toRate(captured, rate, TARGET_RATE)
 
     return {
       pcm,

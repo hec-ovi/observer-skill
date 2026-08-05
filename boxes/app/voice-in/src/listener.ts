@@ -91,21 +91,24 @@ class HoldListener implements Listener {
     this.#hold = null
     this.#capture = null
 
-    const recording = await capture.close()
-    this.#emitDiagnostic(recording)
-
-    if (recording.seconds < this.#config.minSeconds || recording.peak < this.#config.minPeak) {
-      hold.cancel()
-      this.#setState('idle')
-      return
-    }
-
-    this.#setState('working')
+    let recording: Recording | null = null
     try {
+      recording = await capture.close()
+      this.#emitDiagnostic(recording)
+
+      if (recording.seconds < this.#config.minSeconds || recording.peak < this.#config.minPeak) {
+        hold.cancel()
+        this.#setState('idle')
+        return
+      }
+
+      this.#setState('working')
       const text = await hold.finish(recording)
       this.#emitUtterance(text)
       this.#setState('idle')
     } catch (error) {
+      if (!recording) this.#emitDiagnostic(null)
+      hold.cancel()
       this.#emitUtterance('')
       this.#fail(error)
     }
@@ -121,7 +124,8 @@ class HoldListener implements Listener {
     this.#hold = null
     const capture = this.#capture
     this.#capture = null
-    void capture?.close()
+    // Nobody is waiting on this recording; the point of it is to release the device.
+    capture?.close().catch(() => undefined)
   }
 
   /**
@@ -143,7 +147,7 @@ class HoldListener implements Listener {
     } catch (error) {
       hold.cancel()
       this.#hold = null
-      if (!this.#disposed) this.#onDiagnostic({ device: 'none', seconds: 0, peak: 0 })
+      this.#emitDiagnostic(null)
       this.#fail(error)
     }
   }
@@ -163,12 +167,13 @@ class HoldListener implements Listener {
     this.#setState('idle')
   }
 
-  #emitDiagnostic(recording: Recording): void {
+  /** Once per hold, whether or not the microphone got as far as recording anything. */
+  #emitDiagnostic(recording: Recording | null): void {
     if (this.#disposed) return
     this.#onDiagnostic({
-      device: recording.device,
-      seconds: recording.seconds,
-      peak: recording.peak,
+      device: recording?.device ?? 'none',
+      seconds: recording?.seconds ?? 0,
+      peak: recording?.peak ?? 0,
     })
   }
 

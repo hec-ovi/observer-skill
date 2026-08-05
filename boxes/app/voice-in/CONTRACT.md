@@ -28,6 +28,10 @@ createListener({ config, language, onPartial, onUtterance, onState, onDiagnostic
 | `whisper-web` | A small ASR model in a worker, WebGPU when present | a one-time model download |
 | `endpoint` | `POST {baseUrl}/v1/audio/transcriptions`, multipart | a reachable endpoint |
 
+`auto` takes the first one that can run: `endpoint` when a base URL is configured, then
+`web-speech` when the browser has it, then `whisper-web`. A named provider that cannot run
+here leaves the listener `unavailable` rather than quietly becoming another one.
+
 ## Outputs
 
 - `onPartial(text)` while the sentence firms up, where the engine gives partials. Never
@@ -47,8 +51,9 @@ invented question is worse than a missed one.
 
 ## Errors
 
-`INVALID_LISTENING_CONFIG`, `MIC_DENIED`. Nothing else throws; engine failures settle into
-a state and a `reason`.
+`INVALID_LISTENING_CONFIG` is thrown by `createListener`. `MIC_DENIED` settles the listener
+into `denied` and is the `reason` there. Nothing else throws; engine failures settle into a
+state and a `reason` carrying the engine's own message.
 
 ## Dependencies
 
@@ -65,7 +70,17 @@ None.
 
 ## How to modify this box safely
 
-Providers are one file each, `{ id, available(), listen(opts) }`, plus a registry line. The
-tests fake `getUserMedia`, `MediaRecorder`, `AudioContext`, and `SpeechRecognition`, and
-assert: one utterance per hold, the gate dropping a short hold, a denied microphone
-settling into `denied`, and a failing endpoint delivering an empty utterance.
+Providers are one file each, `{ id, available(config), listen(opts) }`, plus a registry line.
+A hold is opened on press, so an engine that transcribes live hears all of it, and finished
+on release with the recording the gate already accepted.
+
+The capture is shared: one `getUserMedia` session per hold through an AudioWorklet, kept as
+16 kHz mono samples. The model takes them as they are, the endpoint takes a WAV built from
+them, and the gate's peak comes with them. `web-speech` cannot be fed audio, so it runs on
+its own microphone and uses this capture only for the gate and the diagnostic.
+
+The tests fake `getUserMedia`, `AudioContext`, the worklet port, `SpeechRecognition`, and
+`fetch`, and assert: one utterance per hold, the gate dropping a short hold and a silent
+one, a denied microphone settling into `denied` and never asking again, a failing endpoint
+delivering an empty utterance, and a recognition session that ends by itself reopening at
+most twice.

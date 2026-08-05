@@ -7,13 +7,41 @@ from the page. The agent talks to `agent-io` over stdio and never comes through 
 
 ## Inputs
 
+Schema: [`src/schema.ts`](src/schema.ts) → `UpstreamEvent`, `CreateSessionInput`,
+`TranscriptQuery`
+
 ```ts
-createHost({ store, appDir, port, bind }): Promise<Host>
+createHost({ store, appDir, home, port, bind, version, heartbeatMs,
+             createSession, readTranscript }): Promise<Host>
 ```
 
-`Host` is `{ url, port, close() }`. The listener is started on demand, the first time a
+- `store`: anything satisfying `SessionPort`, the part of the `session` contract used here.
+- `appDir`: the built app. `index.html`, `assets/`, and `sandbox/runner.js`.
+- `home`: where sessions live. Bundles and snapshots resolve inside the session's folder.
+- `port` (4830), `bind` (`127.0.0.1`), `version` (`0.0.0`), `heartbeatMs` (15000) are
+  defaults. `port: 0` asks the kernel for a free one.
+- `createSession` and `readTranscript` are the two things this box cannot do itself: it
+  knows no providers and does not read transcripts. Without them those two routes answer
+  `PROVIDER_UNAVAILABLE`.
+
+```ts
+Host = {
+  url: string | null            // null until the listener starts
+  port: number | null
+  start(): Promise<{ url, port }>
+  verify({ sessionId, artifactId, timeoutMs? }): Promise<VerifyResult>
+  close(): Promise<void>
+}
+```
+
+`createHost` does not listen. `start()` does, and the caller calls it the first time a
 session exists, so a CLI session that never opens a video costs nothing. If `port` is taken
-the host moves up one at a time and reports the port it got.
+the host moves up one at a time, up to twenty, and reports the port it got.
+
+`verify` shows one artifact to the open page's sandbox and resolves with what the page
+reports. It rejects with `PAGE_NOT_OPEN` when nothing is listening to that session, and one
+artifact has one verification at a time: asking again supersedes the older request. A page
+that never answers resolves as a failed verification, never as a hang.
 
 ## HTTP surface
 
@@ -29,38 +57,49 @@ the host moves up one at a time and reports the port it got.
 | `/live/:id` | GET | Server-sent events for this session |
 | `/live/:id/event` | POST | One upstream event from the page |
 | `/sandbox/:sessionId/:artifactId` | GET | The isolated document that verification runs a module in |
+| `/sandbox/*` | GET | The stage's runner and whatever ships beside it, from `appDir/sandbox` |
 | `/healthz` | GET | Liveness, and the version |
+
+The sandbox document is served from a route, not a `srcdoc` or a blob, because only an HTTP
+response carries its own content policy: it runs with `default-src 'none'`,
+`connect-src 'none'` and `sandbox allow-scripts`, and it loads `/sandbox/runner.js`. That
+runner, and the postMessage protocol it speaks, belong to `app/stage`. Both script routes
+send `Access-Control-Allow-Origin: *`, because a module script is always a CORS fetch and
+the sandbox has an opaque origin.
 
 ## The live channel
 
-Downstream, as SSE, each with an id so a reconnect can resume:
+Downstream, as SSE, each with an id so the page can order what it receives:
 
 | Event | Data |
 |---|---|
 | `patch` | A partial session record |
 | `phase` | `{ phase, progress }` |
-| `say` | `{ entryId, text, speak, artifactId? }` |
+| `say` | `{ entryId, text, speak, artifactId }` |
 | `show` / `hide` | `{ artifactId }` / `{}` |
 | `verify` | `{ requestId, url, timeoutMs }` |
 | `ping` | Heartbeat, so proxies and sleeping tabs do not drop the connection |
 
-Upstream, as JSON posts:
+Upstream, as JSON posts, answered with `202` and `{ ok: true }`:
 
 | Event | Data |
 |---|---|
 | `position` | `{ time, state }` |
 | `ask` | `{ text, at, via }` |
-| `settings` | A settings patch |
-| `verify-result` | `{ requestId, ok, errors[], size, snapshot? }` |
+| `settings` | `{ at, settings }` |
+| `verify-result` | `{ requestId, ok, errors[], size, snapshot }` |
 
 `ask` goes into the session inbox and is answered by the agent. `position` updates the
-record and is not queued. `verify-result` resolves the pending verification.
+record and is not queued. `settings` does both: the record keeps it, and the inbox carries
+it, because the agent waits on a settings change. `verify-result` resolves the pending
+verification.
 
 ## Errors
 
-HTTP status plus a body of `{ code, message, hint }` using the shared error set. A route
-that fails does not take the process down, and a failing SSE subscriber is dropped without
-disturbing the others.
+HTTP status plus a body of `{ code, message, hint }` using the shared error set. A body or
+query that does not fit its schema is `INVALID_PATCH` with the field named; a path this
+server has nothing at is `UNKNOWN_ARTIFACT`. A route that fails does not take the process
+down, and a failing SSE subscriber is dropped without disturbing the others.
 
 ## Dependencies
 
@@ -82,10 +121,19 @@ disturbing the others.
 - Artifact bundles are served with a content type that lets a module load, and from a path
   that cannot escape the session's own directory.
 - The port in use is reported as a clear message naming the port, not a stack trace.
+- `close()` returns while a page is still attached: the streams are ended and the sockets
+  behind them are reaped rather than waited out.
 
 ## How to modify this box safely
 
-Routes are thin: they validate, call `session` or the handler they were given, and
-serialize. Nothing here decides anything. Tests drive the real server on an ephemeral port
-with a fake store: a subscriber receives a patch within a tick of a write, an upstream
-event reaches the bus, a heartbeat arrives, and a dropped socket unsubscribes.
+Routes are thin: they validate, call `store` or one of the two handlers they were given,
+and serialize. Nothing here decides anything. Route order is the design, and it lives in
+one file, [`src/app.ts`](src/app.ts): what this server owns, then the app build, then the
+shell, which is why an API call can never be answered with HTML.
+
+Tests drive the real server on an ephemeral port with a fake store: a subscriber receives a
+patch within a tick of a write, an upstream event reaches the bus, a heartbeat arrives, a
+dropped socket unsubscribes, and a verification with no page open is refused. Fixtures sit
+in `fixtures.ts` at the box root, outside `test/`, because the runner counts every file
+under a `test/` directory as a test. Run them with
+`node --test "boxes/web-host/test/*.test.ts"`.
