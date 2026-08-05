@@ -49,7 +49,6 @@
     "dev": "node --watch bin/observer.ts serve",
     "dev:app": "vite",
     "build": "node scripts/build.ts",
-    "prepare": "node scripts/build.ts",
     "test": "node --test && vitest run",
     "test:server": "node --test",
     "test:app": "vitest run",
@@ -57,7 +56,6 @@
     "typecheck": "tsc --noEmit && tsc --noEmit -p boxes/app/tsconfig.json"
   },
   "dependencies": {
-    "@huggingface/transformers": "4.2.0",
     "@modelcontextprotocol/server": "2.0.0",
     "acorn": "8.18.0",
     "acorn-walk": "8.3.5",
@@ -67,6 +65,7 @@
     "esbuild": "0.28.1",
     "express": "5.2.1",
     "katex": "0.18.1",
+    "modern-screenshot": "^4.7.0",
     "onnxruntime-web": "1.27.0",
     "react": "19.2.8",
     "react-dom": "19.2.8",
