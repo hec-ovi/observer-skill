@@ -7,6 +7,7 @@
  */
 
 import { useEffect } from 'react'
+import { X } from 'lucide-react'
 import { Switch } from '../parts/Switch.tsx'
 import type { Settings, SettingsPatch } from '../session/record.ts'
 import type { Speaker } from '../session/use-speaker.ts'
@@ -32,11 +33,11 @@ export function SettingsPanel({ settings, speaker, onChange, onClose }: Settings
   }, [onClose])
 
   return (
-    <div className="panel" role="dialog" aria-label="Settings">
+    <div className="panel glass rise" role="dialog" aria-label="Settings">
       <header className="panel-head">
         <h2 className="panel-title">Settings</h2>
-        <button type="button" onClick={onClose}>
-          Close
+        <button type="button" className="button-ghost" aria-label="Close" onClick={onClose}>
+          <X aria-hidden="true" />
         </button>
       </header>
 

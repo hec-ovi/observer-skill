@@ -24,18 +24,22 @@
   border: 0;
 }
 
-/* The lock is the server's phase made physical: the frame is there and cannot be touched. */
+/*
+ * The lock is the server's phase made physical: the frame is there, dimmed and drained of
+ * colour, and cannot be touched until the session is ready.
+ */
 .video-lock {
   position: absolute;
   inset: 0;
-  background: var(--surface);
-  opacity: 0.35;
+  background: var(--background);
+  opacity: 0.55;
+  backdrop-filter: saturate(0.5);
 }
 
+/* A strip along the bottom of the frame, over the player rather than under it. */
 .video-failure {
   position: absolute;
   inset-inline: 0;
   inset-block-end: 0;
-  padding: var(--space-3);
-  background: var(--surface);
+  padding: var(--space-4);
 }

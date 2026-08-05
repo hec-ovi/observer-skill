@@ -1,5 +1,5 @@
 /**
- * Check 5: the module is the shape the stage mounts. Read statically, because a module
+ * Check 4: the module is the shape the stage mounts. Read statically, because a module
  * missing either export is a blank stage and the source must never be executed to find out.
  */
 

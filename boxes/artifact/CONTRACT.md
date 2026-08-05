@@ -67,7 +67,6 @@ Also exported: `ARTIFACT_KINDS`, `ARTIFACT_REGISTRY`, and the types above.
 |---|---|
 | Only `echarts`, `d3`, `katex` are imported, and only as ES imports | Everything else is unavailable at runtime, and an unknown import (or a `require`) is a silent blank screen |
 | No `fetch`, `XMLHttpRequest`, `WebSocket`, or dynamic `import()` | A visual is drawn from data it was given, not from the network |
-| No `border-radius` other than `0` | The design has no rounded corners, and this is where that is enforced |
 | No heading element whose text repeats `meta.title` | The stage renders the title; repeating it is the exact bloat we refuse |
 | `meta` and `mount` are both exported, with the right shapes | A module missing either is a blank stage |
 

@@ -7,6 +7,7 @@
  * a session that was never going to play.
  */
 
+import { ArrowRight } from 'lucide-react'
 import { useState } from 'react'
 import { createSession, failureOf } from '../session/api.ts'
 import type { Failure, Session } from '../session/record.ts'
@@ -56,45 +57,56 @@ export function Feed({ onOpened }: FeedProps) {
   }
 
   return (
-    <form
-      className="feed"
-      onSubmit={(event) => {
-        event.preventDefault()
-        void open()
-      }}
-    >
-      <h1 className="feed-title">Observer</h1>
+    <main className="feed">
+      <form
+        className="feed-card glass rise"
+        onSubmit={(event) => {
+          event.preventDefault()
+          void open()
+        }}
+      >
+        <h1 className="feed-title">Observer</h1>
 
-      <input
-        className="feed-url"
-        type="url"
-        name="url"
-        required
-        value={url}
-        placeholder="Video link"
-        aria-label="Video link"
-        onChange={(event) => setUrl(event.target.value)}
-      />
-      {failure ? <FailureLine failure={failure} /> : null}
+        <input
+          className="field feed-url"
+          type="url"
+          name="url"
+          required
+          value={url}
+          placeholder="Video link"
+          aria-label="Video link"
+          onChange={(event) => setUrl(event.target.value)}
+        />
+        {failure ? <FailureLine failure={failure} /> : null}
 
-      <div className="feed-switches">
-        <Switch label="This video has ads" checked={hasAds} onChange={setHasAds} />
-        <Switch label="Use extra knowledge" checked={extraKnowledge} onChange={setExtraKnowledge} />
-        <Switch label="Build visuals" checked={toolkit} onChange={setToolkit} />
-      </div>
+        <div className="feed-switches">
+          <Switch label="This video has ads" checked={hasAds} onChange={setHasAds} />
+          <Switch
+            label="Use extra knowledge"
+            checked={extraKnowledge}
+            onChange={setExtraKnowledge}
+          />
+          <Switch label="Build visuals" checked={toolkit} onChange={setToolkit} />
+        </div>
 
-      <input
-        className="feed-want"
-        type="text"
-        value={want}
-        placeholder="What do you want from this video"
-        aria-label="What do you want from this video"
-        onChange={(event) => setWant(event.target.value)}
-      />
+        <input
+          className="field feed-want"
+          type="text"
+          value={want}
+          placeholder="What do you want from this video"
+          aria-label="What do you want from this video"
+          onChange={(event) => setWant(event.target.value)}
+        />
 
-      <button className="feed-open" type="submit" disabled={opening || url.trim() === ''}>
-        {opening ? 'Opening' : 'Open'}
-      </button>
-    </form>
+        <button
+          className={`button-accent feed-open${opening ? ' breathe' : ''}`}
+          type="submit"
+          disabled={opening || url.trim() === ''}
+        >
+          {opening ? 'Opening' : 'Open'}
+          <ArrowRight className="feed-open-mark" aria-hidden="true" />
+        </button>
+      </form>
+    </main>
   )
 }

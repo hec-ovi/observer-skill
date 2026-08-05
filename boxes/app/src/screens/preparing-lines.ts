@@ -45,6 +45,15 @@ export function phaseCount(
   return ''
 }
 
+/**
+ * How full the bar is, as a percentage, or null when the step reports no total. A step that
+ * cannot know a duration gets a bar that only moves; nothing here is estimated.
+ */
+export function phaseFill(progress: Progress): number | null {
+  if (progress.total <= 0) return null
+  return Math.min(100, Math.max(0, (progress.done / progress.total) * 100))
+}
+
 function built(artifacts: readonly ArtifactRecord[]): readonly ArtifactRecord[] {
   return artifacts.filter((artifact) => artifact.status === 'built')
 }

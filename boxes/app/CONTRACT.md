@@ -51,16 +51,22 @@ mounted chart without rebuilding it, and how the player's surround follows.
 
 ## Design language
 
-- `--radius: 0`. Sharp rectangles everywhere. Nothing is rounded, including buttons,
-  panels, inputs, and chart geometry.
+Rebel Forge's, ported to plain custom properties in `src/tokens.css`. Nothing outside that
+file holds a colour, a size, a radius, or a duration.
+
+- **Surfaces layer, they do not rule.** `--background` is the page, `--surface` a panel on
+  it, `--surface-raised` a control inside that panel. A border is a hairline that separates,
+  never a box that contains; depth comes from `--shadow-1..3` and the `.glass` panel.
+- **One accent per screen**, on the thing the user is meant to press, and it glows.
+- **Corners are soft**, on the `--radius-sm` to `--radius-xl` scale.
+- **Motion arrives.** `.rise` blurs and lifts a thing into place, `.breathe` marks something
+  working, `.shimmer` marks a wait with no known total. Nothing bounces, and the tokens zero
+  all of it under `prefers-reduced-motion`.
+- **Type is 15px** with a scale from `--text-xs` to `--text-2xl`. Nothing invents a size.
 - One title per thing. The stage renders an artifact's title; the artifact does not. The
   page does not repeat the video's name in three places.
 - Nothing on screen that is not carrying signal: no captions restating a label, no helper
   text explaining an obvious control, no empty states with an illustration.
-- Motion is short and purposeful: 180 ms, opacity plus a small translate, and none of it
-  when `prefers-reduced-motion` is set.
-- Density over decoration. Type scale is small and tight; whitespace does the separating,
-  not borders.
 
 ## Errors
 

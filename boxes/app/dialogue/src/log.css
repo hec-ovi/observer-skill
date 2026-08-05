@@ -1,13 +1,15 @@
-/* The log: a question, what it was asked at, and the answer under it. */
+/*
+ * The log: a conversation, not a stack of bubbles. The question is quiet and carries the
+ * second it was asked at; the answer is at full contrast and arrives with the page's motion.
+ */
 
 .log {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: var(--space-2);
   margin: 0;
   padding: 0;
   list-style: none;
-  background: var(--surface);
   color: var(--text);
   font-family: var(--font-sans);
 }
@@ -17,8 +19,13 @@
   gap: var(--space-1);
 }
 
+/* A question after an answer starts a new exchange, and gets the air that shows it. */
+.log-entry[data-role='agent'] + .log-entry[data-role='user'] {
+  margin-block-start: var(--space-5);
+}
+
 .log-clock {
-  color: var(--text-dim);
+  color: var(--text-faint);
   font-family: var(--font-mono);
   font-size: var(--text-xs);
   font-variant-numeric: tabular-nums;
@@ -37,31 +44,26 @@
 
 .log-actions {
   display: flex;
-  gap: var(--space-3);
-  margin: 0;
+  gap: var(--space-1);
+  /* Pulled back by the ghost button's own padding, so the words line up with the answer. */
+  margin: 0 0 0 calc(var(--space-2) * -1);
 }
 
-.log-actions button {
-  padding: 0;
-  border: 0;
-  border-radius: var(--radius);
-  background: none;
-  color: var(--accent);
-  font: inherit;
-  font-size: var(--text-sm);
-  cursor: pointer;
+.log-actions svg {
+  inline-size: var(--space-4);
+  block-size: var(--space-4);
 }
 
 .log-working {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
   margin: 0;
   color: var(--text-dim);
   font-size: var(--text-sm);
-  /* Derived from the one motion token, so reduced motion leaves it still and readable. */
-  animation: log-working calc(var(--motion) * 6) var(--ease) infinite;
 }
 
-@keyframes log-working {
-  50% {
-    opacity: 0.4;
-  }
+.log-working .dot {
+  flex: none;
+  background: var(--accent);
 }

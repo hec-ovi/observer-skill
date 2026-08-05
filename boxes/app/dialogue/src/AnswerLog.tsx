@@ -7,6 +7,7 @@
  */
 
 import { useMemo } from 'react'
+import { Image, Volume2 } from 'lucide-react'
 import { logLines } from './log-lines.ts'
 import type { AnswerLogProps } from './types.ts'
 import './log.css'
@@ -19,19 +20,29 @@ export function AnswerLog({ entries, onShow, onReplay }: AnswerLogProps) {
       {lines.map(({ entry, stamp, waiting }) => {
         const artifactId = entry.artifactId ?? null
         return (
-          <li key={entry.id} className="log-entry" data-role={entry.role}>
+          <li
+            key={entry.id}
+            className={entry.role === 'agent' ? 'log-entry rise' : 'log-entry'}
+            data-role={entry.role}
+          >
             {stamp ? <span className="log-clock">{stamp}</span> : null}
             <p className="log-text">{entry.text}</p>
 
             {artifactId || entry.spoken ? (
               <p className="log-actions">
                 {artifactId ? (
-                  <button type="button" onClick={() => onShow(artifactId)}>
+                  <button type="button" className="button-ghost" onClick={() => onShow(artifactId)}>
+                    <Image aria-hidden="true" />
                     Show visual
                   </button>
                 ) : null}
                 {entry.spoken ? (
-                  <button type="button" onClick={() => onReplay(entry.id)}>
+                  <button
+                    type="button"
+                    className="button-ghost"
+                    onClick={() => onReplay(entry.id)}
+                  >
+                    <Volume2 aria-hidden="true" />
                     Replay
                   </button>
                 ) : null}
@@ -39,7 +50,8 @@ export function AnswerLog({ entries, onShow, onReplay }: AnswerLogProps) {
             ) : null}
 
             {waiting ? (
-              <p className="log-working" role="status">
+              <p className="log-working breathe" role="status">
+                <span className="dot" />
                 Working
               </p>
             ) : null}

@@ -18,5 +18,5 @@ the CLI spawns it and there is nothing to start by hand.
 - Artifact pipeline: static lint, esbuild bundle, and verification inside the open page under a
   content policy derived from that document. The agent gets a snapshot back to look at.
 - Voice out and voice in as ports with three providers each, browser first.
-- Light, dark and system reaching the charts, sharp rectangles throughout.
+- Light, dark and system reaching the charts, layered surfaces and soft corners throughout.
 - `observer mcp`, `observer serve`, `observer doctor`.

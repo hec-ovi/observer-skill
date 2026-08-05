@@ -1,16 +1,29 @@
-/* The rail on top, the dialogue under it, both scrolling inside their own space. */
+/*
+ * The rail on top, the dialogue under it, each on its own panel and each scrolling inside its
+ * own space. This file decides where things sit; what they look like belongs to them.
+ */
 
 .session {
   display: grid;
-  grid-template-rows: minmax(6rem, 1fr) auto;
+  grid-template-rows: minmax(8rem, 1fr) auto;
   gap: var(--space-4);
   min-block-size: 0;
-  padding: var(--space-4);
 }
 
-.session-rail {
+.session-rail,
+.session-dialogue {
   min-block-size: 0;
-  margin-inline: calc(var(--space-3) * -1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+  box-shadow: var(--shadow-1);
+}
+
+/* A grid, so the rail inside is sized to the padded box and scrolls within it. */
+.session-rail {
+  display: grid;
+  overflow: hidden;
+  padding-block: var(--space-2);
 }
 
 .session-dialogue {
@@ -19,4 +32,5 @@
   max-block-size: 45vh;
   overflow-y: auto;
   overscroll-behavior: contain;
+  padding: var(--space-4);
 }

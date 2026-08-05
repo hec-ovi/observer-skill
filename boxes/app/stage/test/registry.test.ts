@@ -35,6 +35,11 @@ function radii(value: unknown): number[] {
   )
 }
 
+/** A custom property as the document resolves it right now. */
+function token(name: string): string {
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim()
+}
+
 describe('the registry', () => {
   it.each(DOCUMENTS)('is the one import map %s carries', (name) => {
     const maps = importMaps(sourceOf(name))
@@ -57,10 +62,15 @@ describe('the registry', () => {
     expect(themes.dark.darkMode).toBe(true)
   })
 
-  it('rounds nothing', () => {
-    const themes = buildThemes()
-    expect(radii(themes.light)).not.toHaveLength(0)
-    expect(radii(themes.light).every((radius) => radius === 0)).toBe(true)
-    expect(radii(themes.dark).every((radius) => radius === 0)).toBe(true)
+  it('takes its corners from --radius and its axis from the readable hairline', () => {
+    document.documentElement.setAttribute('data-theme', 'light')
+    const { light } = buildThemes()
+    const axis = light.valueAxis as { axisLine: { lineStyle: { color: string } } }
+    const grid = light.valueAxis as { splitLine: { lineStyle: { color: string } } }
+
+    expect(radii(light)).not.toHaveLength(0)
+    expect(radii(light).every((radius) => radius > 0)).toBe(true)
+    expect(axis.axisLine.lineStyle.color).toBe(token('--border-strong'))
+    expect(grid.splitLine.lineStyle.color).toBe(token('--border'))
   })
 })

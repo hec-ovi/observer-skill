@@ -3,6 +3,7 @@
  * there is one. There is no global toast anywhere in this page.
  */
 
+import { CircleAlert } from 'lucide-react'
 import type { ReactNode } from 'react'
 import type { Failure } from '../session/record.ts'
 import './failure.css'
@@ -15,10 +16,11 @@ export interface FailureLineProps {
 
 export function FailureLine({ failure, action }: FailureLineProps) {
   return (
-    <p className="failure" role="alert">
-      <span className="failure-message">{failure.message}</span>
-      {failure.hint ? <span className="failure-hint">{failure.hint}</span> : null}
-      {action}
-    </p>
+    <div className="failure" role="alert">
+      <CircleAlert className="failure-mark" aria-hidden="true" />
+      <p className="failure-message">{failure.message}</p>
+      {failure.hint ? <p className="failure-hint">{failure.hint}</p> : null}
+      {action ? <div className="failure-action">{action}</div> : null}
+    </div>
   )
 }

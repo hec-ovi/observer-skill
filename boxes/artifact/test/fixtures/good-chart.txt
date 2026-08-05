@@ -16,7 +16,10 @@ export const meta = {
   caption: 'Two months, one bar each.',
 }
 
-export function mount(el: HTMLElement, ctx: { theme: { text: string } }): () => void {
+export function mount(
+  el: HTMLElement,
+  ctx: { theme: { text: string; radius: number } },
+): () => void {
   const chart = echarts.init(el)
   chart.setOption({
     textStyle: { color: ctx.theme.text },
@@ -26,7 +29,7 @@ export function mount(el: HTMLElement, ctx: { theme: { text: string } }): () => 
       {
         type: 'bar',
         data: data.map((point) => point.value),
-        itemStyle: { borderRadius: 0 },
+        itemStyle: { borderRadius: ctx.theme.radius },
       },
     ],
   })

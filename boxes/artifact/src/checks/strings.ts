@@ -1,7 +1,7 @@
 /**
- * Every string the module carries as a literal. Two checks read text the agent embedded
- * (CSS, markup); this is the one place that isolates it, so neither ever runs a regex over
- * the raw source.
+ * Every string the module carries as a literal. The heading check reads markup the agent
+ * embedded; this is the one place that isolates it, so no check ever runs a regex over the
+ * raw source.
  */
 
 import type { AnyNode, Program } from 'acorn'

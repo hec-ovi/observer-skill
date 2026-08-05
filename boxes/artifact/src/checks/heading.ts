@@ -1,5 +1,5 @@
 /**
- * Check 4: no heading that says what the stage already says. The stage draws `meta.title`
+ * Check 3: no heading that says what the stage already says. The stage draws `meta.title`
  * above the artifact, so a repeated heading is the exact bloat this design refuses.
  *
  * It reads headings written as markup and headings built with createElement. Text assembled

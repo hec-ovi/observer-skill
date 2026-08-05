@@ -1,64 +1,69 @@
-/* The feed: one column, wide enough for a link and narrow enough to read in one glance. */
+/*
+ * The feed: one card, centred on the page, holding the only job this screen has.
+ *
+ * The selectors that resize a shared control are scoped to the card, because `app.css` is
+ * loaded after this file and `.field` and `.button-accent` would otherwise win the tie.
+ */
 
 .feed {
   display: grid;
-  gap: var(--space-4);
-  inline-size: min(34rem, 100%);
-  margin: 0 auto;
+  place-items: center;
+  min-block-size: 100dvh;
   padding: var(--space-8) var(--space-4);
 }
 
+.feed-card {
+  display: grid;
+  gap: var(--space-5);
+  inline-size: min(30rem, 100%);
+  padding: var(--space-8);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-3);
+}
+
 .feed-title {
-  margin: 0;
-  font-size: var(--text-xl);
-  font-weight: 600;
-  line-height: var(--leading-tight);
-  letter-spacing: var(--tracking-tight);
+  font-size: var(--text-2xl);
 }
 
-.feed-url,
-.feed-want {
-  inline-size: 100%;
-  padding: var(--space-2) var(--space-3);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--surface-raised);
-  color: var(--text);
-  font: inherit;
-  font-size: var(--text-md);
+/* The field the whole screen is about: large, and it takes the accent when you reach for it. */
+.feed-card .feed-url {
+  padding: var(--space-4) var(--space-5);
+  border-radius: var(--radius-lg);
+  font-size: var(--text-lg);
 }
 
-.feed-url::placeholder,
-.feed-want::placeholder {
-  color: var(--text-dim);
-}
-
-.feed-url:focus-visible,
-.feed-want:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: -2px;
-}
-
+/* Three choices, set apart by a pair of hairlines rather than boxed in. */
 .feed-switches {
   display: grid;
-  gap: var(--space-2);
+  gap: var(--space-4);
+  padding-block: var(--space-5);
+  border-block: 1px solid var(--border);
 }
 
-.feed-open {
-  justify-self: start;
-  padding: var(--space-2) var(--space-6);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--accent);
-  color: var(--surface);
-  font: inherit;
+/* Optional, and it reads that way: the line is there, the panel behind it is not. */
+.feed-card .feed-want {
+  background: none;
+  font-size: var(--text-sm);
+}
+
+.feed-card .feed-open {
+  justify-content: center;
+  padding: var(--space-3) var(--space-5);
   font-size: var(--text-md);
-  cursor: pointer;
-  transition: opacity var(--motion) var(--ease);
 }
 
-.feed-open:disabled {
-  background: var(--surface-raised);
-  color: var(--text-dim);
-  cursor: default;
+.feed-open-mark {
+  inline-size: var(--space-4);
+  block-size: var(--space-4);
+  transition: transform var(--motion) var(--ease);
+}
+
+.feed-card .feed-open:hover .feed-open-mark {
+  transform: translateX(var(--space-1));
+}
+
+@media (max-width: 30rem) {
+  .feed-card {
+    padding: var(--space-5);
+  }
 }

@@ -97,9 +97,10 @@ voice is a setting and not a rewrite.
 
 ## Design
 
-Sharp rectangles, radius zero, one title per thing, and nothing on screen that is not carrying
-signal. Light, dark and system reach the charts too: the theme travels into every visual, so
-switching restyles them in place without rebuilding. Transitions between the video and a
+Layered surfaces, soft corners, one accent on the thing you are meant to press, one title per
+thing, and nothing on screen that is not carrying signal. Light, dark and system reach the
+charts too: the theme travels into every visual, so switching restyles them in place without
+rebuilding. Transitions between the video and a
 visual are short and respect reduced motion.
 
 ## Configuration

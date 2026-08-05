@@ -30,6 +30,19 @@ describe('AskBox', () => {
     expect(draftBox()).toHaveValue('')
   })
 
+  it('sends what was typed when the send action is pressed', async () => {
+    const user = userEvent.setup()
+    const onAsk = vi.fn()
+    const { source } = stubListening()
+    render(<AskBox at={() => 88} listener={source} onAsk={onAsk} onOpenSettings={vi.fn()} />)
+
+    await user.type(draftBox(), 'what is a rank')
+    await user.click(screen.getByRole('button', { name: 'Send' }))
+
+    expect(onAsk).toHaveBeenCalledWith({ text: 'what is a rank', at: 88, via: 'text' })
+    expect(draftBox()).toHaveValue('')
+  })
+
   it('asks what it heard when the talk button is released', async () => {
     const user = userEvent.setup()
     const onAsk = vi.fn()

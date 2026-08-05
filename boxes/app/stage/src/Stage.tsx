@@ -6,6 +6,7 @@
  * and its teardown runs on every path out, including a failure and a page unload.
  */
 
+import { X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { theme } from '@app/theme.ts'
 import { StageError, stageErrorLine, type StageErrorCode } from './errors.ts'
@@ -148,15 +149,15 @@ export function Stage({ active, artifact, time = 0, onDismiss }: StageProps) {
   if (!shown) return null
 
   return (
-    <section className="stage" data-phase={entered ? 'in' : 'out'}>
+    <section className={entered ? 'stage rise' : 'stage'} data-phase={entered ? 'in' : 'out'}>
       <header className="stage-head">
         <div>
           <h2 className="stage-title">{shown.title}</h2>
           {shown.caption ? <p className="stage-caption">{shown.caption}</p> : null}
         </div>
         {failure ? null : (
-          <button type="button" className="stage-close" onClick={onDismiss}>
-            Close
+          <button type="button" className="button-ghost" aria-label="Close" onClick={onDismiss}>
+            <X aria-hidden="true" />
           </button>
         )}
       </header>
@@ -164,12 +165,12 @@ export function Stage({ active, artifact, time = 0, onDismiss }: StageProps) {
       <div className="stage-canvas" ref={hostRef} />
 
       {failure ? (
-        <p className="stage-failure" role="alert">
-          {stageErrorLine(failure)}
-          <button type="button" onClick={onDismiss}>
+        <div className="stage-failure rise" role="alert">
+          <p>{stageErrorLine(failure)}</p>
+          <button type="button" className="button" onClick={onDismiss}>
             Back to the video
           </button>
-        </p>
+        </div>
       ) : null}
     </section>
   )

@@ -141,29 +141,6 @@ test('a source with CRLF line endings reports the same position as with LF', asy
   assert.ok(error.snippet?.includes('fetch('))
 })
 
-test('a repeated key on one line points at the offending occurrence', async () => {
-  const { source, result } = await buildFixture('repeated-radius')
-  const errors = errorsOf(result)
-  assert.equal(errors.length, 1)
-
-  const error = errors[0]
-  assert.ok(error)
-  assertPointsAt(source, error, 'borderRadius: 8')
-})
-
-test('a non-zero border-radius fails, in CSS text and in chart options', async () => {
-  const { source, result } = await buildFixture('rounded-corner')
-  const errors = errorsOf(result)
-  assert.equal(errors.length, 2)
-
-  const [css, option] = errors
-  assert.ok(css && option)
-  assertPointsAt(source, css, 'border-radius: 4px')
-  assert.match(css.fix ?? '', /border-radius: 0/)
-  assertPointsAt(source, option, 'borderRadius')
-  assert.match(option.fix ?? '', /Set borderRadius to 0/)
-})
-
 test('a heading repeating meta.title fails', async () => {
   const { source, result } = await buildFixture('repeats-title')
   const errors = errorsOf(result)

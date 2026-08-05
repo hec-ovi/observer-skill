@@ -12,11 +12,25 @@ export interface VizTokens {
   text: string
   textDim: string
   surface: string
+  /** The hairline that separates: quiet, for grid lines behind the data. */
   border: string
+  /** The same hairline with enough contrast to read as an axis or an edge. */
+  borderStrong: string
+  /** `--radius` in CSS pixels, because chart options take numbers. */
+  radius: number
+  /** `--shadow-2`, for the tooltip, which is a DOM element and takes CSS. */
+  shadow: string
   series: string[]
 }
 
 const SERIES_COUNT = 8
+
+/** A length token in CSS pixels. The scale is written in rem; ECharts wants a number. */
+function pixels(value: string, rootFontSize: string): number {
+  const length = Number.parseFloat(value)
+  if (!Number.isFinite(length)) return 0
+  return value.endsWith('rem') ? length * (Number.parseFloat(rootFontSize) || 0) : length
+}
 
 function readCurrent(): Omit<VizTokens, 'dark'> {
   const style = getComputedStyle(document.documentElement)
@@ -34,6 +48,9 @@ function readCurrent(): Omit<VizTokens, 'dark'> {
     textDim: value('--text-dim'),
     surface: value('--surface'),
     border: value('--border'),
+    borderStrong: value('--border-strong'),
+    radius: pixels(value('--radius'), style.fontSize),
+    shadow: value('--shadow-2'),
     series,
   }
 }

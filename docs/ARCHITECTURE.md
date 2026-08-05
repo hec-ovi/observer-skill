@@ -177,9 +177,8 @@ export function mount(el: HTMLElement, ctx: { theme, data, time, on }): () => vo
 light and dark. The returned function unmounts. Imports resolve against the registry
 (`echarts`, `d3`, `katex`) and nothing else; any other import fails the build.
 
-Static checks before bundling: the import allowlist, no `border-radius` other than `0`,
-and no heading that repeats `meta.title` (the stage renders the title, the artifact does
-not). Verification then mounts the bundle in a sandboxed iframe inside the open page,
+Static checks before bundling: the import allowlist, no network, and no heading that
+repeats `meta.title` (the stage renders the title, the artifact does not). Verification then mounts the bundle in a sandboxed iframe inside the open page,
 which is the environment it will actually run in, and reports mount errors, console
 errors, rendered size, and a PNG snapshot when a canvas is present. The agent reads that
 snapshot and iterates until the visual is right.
@@ -201,10 +200,12 @@ session, so a browser default today and a cloud voice tomorrow is a settings cha
 Tokens live in one stylesheet and reach charts through `ctx.theme`, so light, dark, and
 system look deliberate everywhere.
 
-- `--radius: 0`. Sharp rectangles, enforced by the artifact lint.
+- Surfaces layer instead of ruling: the page, a panel on it, a control inside the panel. A
+  border is a hairline that separates. Corners are soft, from `--radius`, which artifacts
+  read off `ctx.theme` like every other token.
 - One title per thing, rendered by the stage. Artifacts draw data, not headings.
-- Transitions between the video and the stage are opacity and a short translate, 180 ms,
-  and they respect `prefers-reduced-motion`.
+- Transitions between the video and the stage are opacity, a small lift, and a blur, and
+  they respect `prefers-reduced-motion`.
 - The transcript rail follows the player and is the only always-visible text; everything
   else appears when it has something to say.
 
@@ -254,7 +255,7 @@ into code.
 ## Tests
 
 Each box proves its own contract through its real entry point. `transcript` parses
-recorded caption fixtures. `artifact` proves that a bad import, a rounded corner, and a
+recorded caption fixtures. `artifact` proves that a bad import, a network call, and a
 duplicated title all fail, and that a good module bundles. `agent-io` calls every tool
 through an in-process MCP client, including one wrong-phase call each. `app` boxes run on
 a simulated DOM with Testing Library and user-event, with the player, both voice ports,

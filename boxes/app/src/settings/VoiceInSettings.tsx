@@ -7,6 +7,7 @@
 
 import { useMemo } from 'react'
 import type { KeyboardEvent, PointerEvent } from 'react'
+import { Mic } from 'lucide-react'
 import type { Settings, SettingsPatch, VoiceInProvider } from '../session/record.ts'
 import { listenConfig } from '../session/voice.ts'
 import { diagnosticLine } from './mic-lines.ts'
@@ -72,6 +73,7 @@ export function VoiceInSettings({ voiceIn, language, onChange }: VoiceInSettings
 
       <button
         type="button"
+        className="button"
         aria-pressed={mic.state === 'listening'}
         onPointerDown={onDown}
         onPointerUp={mic.release}
@@ -79,6 +81,7 @@ export function VoiceInSettings({ voiceIn, language, onChange }: VoiceInSettings
         onKeyDown={onKeyDown}
         onKeyUp={onKeyUp}
       >
+        <Mic className={mic.state === 'listening' ? 'breathe' : undefined} aria-hidden="true" />
         Hold to test
       </button>
 

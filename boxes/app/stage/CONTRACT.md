@@ -50,9 +50,10 @@ npx vite build && npx vite build --config boxes/app/stage/vendor/vite.config.ts
 
 ## Theme
 
-The stage resolves the current tokens, passes them into `mount`, and calls the module's
-`onTheme` subscriber when the user switches light and dark. A chart restyles in place. No
-artifact is rebuilt, reloaded, or remounted for a theme change.
+The stage resolves the current tokens, passes them into `mount` (colours, fonts, the corner
+radius, and the motion length), and calls the module's `onTheme` subscriber when the user
+switches light and dark. A chart restyles in place. No artifact is rebuilt, reloaded, or
+remounted for a theme change.
 
 ## Transitions
 
@@ -88,7 +89,9 @@ registry's specifiers. Everything else that will not load is `ARTIFACT_LOAD_FAIL
 
 ## Dependencies
 
-None. It is handed a url and a theme; it does not know what a session or a concept is.
+The page's design tokens, and its `.button` and `.button-ghost` classes for the two controls
+the frame owns. Nothing else: it is handed a url and a theme, and it does not know what a
+session or a concept is.
 
 ## Invariants
 

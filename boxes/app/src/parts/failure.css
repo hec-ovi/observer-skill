@@ -1,29 +1,46 @@
-/* A failure reads as one line: what happened, then what to do. */
+/*
+ * A failure reads as one line, with its hint under it. The danger colour is a mark and an
+ * edge, never a filled red panel: something did not work, the page did not crash.
+ */
 
 .failure {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: var(--space-2) var(--space-3);
-  margin: 0;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--space-1) var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--surface-raised);
+  box-shadow: inset 2px 0 0 0 var(--danger);
   color: var(--text);
   font-size: var(--text-md);
   line-height: var(--leading);
 }
 
+/* Centred on the first line of the message rather than on the block it belongs to. */
+.failure-mark {
+  align-self: start;
+  inline-size: var(--space-4);
+  block-size: var(--space-4);
+  margin-block-start: calc((var(--text-md) * var(--leading) - var(--space-4)) / 2);
+  color: var(--danger);
+}
+
+.failure-message,
 .failure-hint,
-.failure button {
+.failure-action {
+  grid-column: 2;
+  margin: 0;
+}
+
+.failure-message {
+  font-weight: 500;
+}
+
+.failure-hint {
   color: var(--text-dim);
   font-size: var(--text-sm);
 }
 
-.failure button {
-  padding: 0;
-  border: 0;
-  border-radius: var(--radius);
-  background: none;
-  color: var(--accent);
-  font: inherit;
-  font-size: var(--text-sm);
-  cursor: pointer;
+.failure-action {
+  margin-block-start: var(--space-2);
 }

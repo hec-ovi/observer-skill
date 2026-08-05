@@ -4,20 +4,13 @@
  */
 
 import type { BuildError } from '../schema.ts'
-import { checkBorderRadius } from './border-radius.ts'
 import type { Check, CheckContext } from './context.ts'
 import { checkExports } from './exports.ts'
 import { checkHeading } from './heading.ts'
 import { checkImports } from './imports.ts'
 import { checkNetwork } from './network.ts'
 
-export const CHECKS: readonly Check[] = [
-  checkExports,
-  checkImports,
-  checkNetwork,
-  checkBorderRadius,
-  checkHeading,
-]
+export const CHECKS: readonly Check[] = [checkExports, checkImports, checkNetwork, checkHeading]
 
 export function runChecks(context: CheckContext): BuildError[] {
   return CHECKS.flatMap((check) => check(context)).sort(

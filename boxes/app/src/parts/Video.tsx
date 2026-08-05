@@ -87,7 +87,7 @@ export function Video({ source, locked, covered, startAt, onPosition, ref }: Vid
       <div className="video-host" ref={host} />
       {locked ? <div className="video-lock" aria-hidden="true" /> : null}
       {failure ? (
-        <div className="video-failure">
+        <div className="video-failure glass">
           <FailureLine failure={failure} />
         </div>
       ) : null}

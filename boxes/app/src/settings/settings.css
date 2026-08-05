@@ -1,33 +1,32 @@
-/* The panel sits over the page. Sections are separated by space, not by rules. */
+/*
+ * A sheet of glass over the page, in four groups: theme, voice, microphone, preparation.
+ * The groups are separated by space, not by rules.
+ */
 
 .panel {
   position: fixed;
-  inset-block: 0;
-  inset-inline-end: 0;
-  z-index: 2;
+  inset-block: var(--space-4);
+  inset-inline-end: var(--space-4);
+  /* Above the header, which floats over the page it is opened from. */
+  z-index: 20;
   display: grid;
   align-content: start;
   gap: var(--space-6);
-  inline-size: min(22rem, 100%);
+  inline-size: min(22rem, calc(100% - var(--space-8)));
   overflow-y: auto;
-  padding: var(--space-4);
-  border-inline-start: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--surface);
+  padding: var(--space-5);
+  border-radius: var(--radius-xl);
   color: var(--text);
-  animation: panel-in var(--motion) var(--ease);
+  font-family: var(--font-sans);
 }
 
-@keyframes panel-in {
-  from {
-    opacity: 0;
-    transform: translateX(var(--motion-shift));
-  }
+.panel.glass {
+  box-shadow: var(--shadow-3);
 }
 
 .panel-head {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
   gap: var(--space-4);
 }
@@ -39,22 +38,16 @@
   letter-spacing: var(--tracking-tight);
 }
 
-.panel-head button,
-.setting button {
-  justify-self: start;
-  padding: 0;
-  border: 0;
-  border-radius: var(--radius);
-  background: none;
-  color: var(--accent);
-  font: inherit;
-  font-size: var(--text-sm);
-  cursor: pointer;
+.panel svg {
+  inline-size: var(--space-4);
+  block-size: var(--space-4);
 }
+
+/* ---------------------------------------------------------------- a group */
 
 .setting {
   display: grid;
-  gap: var(--space-2);
+  gap: var(--space-3);
   margin: 0;
   padding: 0;
   border: 0;
@@ -62,68 +55,139 @@
 
 .setting-title {
   padding: 0;
-  color: var(--text-dim);
+  color: var(--text-faint);
   font-size: var(--text-xs);
+  font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
-.setting-choices {
-  display: flex;
-  gap: var(--space-4);
+.setting .button {
+  justify-self: start;
 }
 
-.setting-choice,
+/* Held, the test button is the accent, the same as the talk button it is testing. */
+.setting .button[aria-pressed='true'] {
+  border-color: transparent;
+  background: var(--accent);
+  color: var(--accent-text);
+  box-shadow:
+    0 0 0 1px var(--accent-muted),
+    0 0 var(--space-6) var(--accent-glow);
+}
+
+/* ---------------------------------------------------------------- theme */
+
+.setting-choices {
+  display: flex;
+  gap: var(--space-1);
+  padding: var(--space-1);
+  border-radius: var(--radius-lg);
+  background: var(--surface-raised);
+}
+
+.setting-choice {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius);
+  color: var(--text-dim);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background-color var(--motion) var(--ease),
+    color var(--motion) var(--ease);
+}
+
+/* The radio stays in the accessibility tree and takes the keyboard; the label is the button. */
+.setting-choice input {
+  appearance: none;
+  inline-size: 0;
+  block-size: 0;
+  margin: 0;
+}
+
+.setting-choice:has(input:checked) {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow-1);
+}
+
+.setting-choice:has(input:focus-visible) {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+/* ---------------------------------------------------------------- a named choice */
+
 .setting-row {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
-  color: var(--text);
-  font-size: var(--text-md);
+  gap: var(--space-3);
+  color: var(--text-dim);
+  font-size: var(--text-sm);
   cursor: pointer;
 }
 
 .setting-row select {
   flex: 1;
   min-inline-size: 0;
-  padding: var(--space-1) var(--space-2);
+  padding: var(--space-2) var(--space-3);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: var(--surface-raised);
   color: var(--text);
   font: inherit;
   font-size: var(--text-sm);
+  cursor: pointer;
+  transition:
+    border-color var(--motion) var(--ease),
+    box-shadow var(--motion) var(--ease);
 }
 
-.setting-choice input {
-  accent-color: var(--accent);
+.setting-row select:focus-visible {
+  border-color: var(--accent);
+  outline: none;
+  box-shadow: 0 0 0 3px var(--accent-muted);
 }
+
+/* ---------------------------------------------------------------- a voice arriving */
 
 .setting-loading {
   display: grid;
-  gap: var(--space-1);
+  gap: var(--space-2);
 }
 
 .setting-bar {
   inline-size: 100%;
-  block-size: var(--space-1);
+  block-size: var(--space-2);
   appearance: none;
+  overflow: hidden;
   border: 0;
+  border-radius: var(--radius-full);
   background: var(--surface-raised);
   color: var(--accent);
 }
 
 .setting-bar::-webkit-progress-bar {
+  border-radius: var(--radius-full);
   background: var(--surface-raised);
 }
 
 .setting-bar::-webkit-progress-value {
+  border-radius: var(--radius-full);
   background: var(--accent);
 }
 
 .setting-bar::-moz-progress-bar {
+  border-radius: var(--radius-full);
   background: var(--accent);
 }
+
+/* ---------------------------------------------------------------- what it says */
 
 .setting-note,
 .setting-problem {
@@ -137,5 +201,5 @@
 }
 
 .setting-problem {
-  color: var(--text);
+  color: var(--danger);
 }

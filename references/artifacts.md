@@ -32,6 +32,7 @@ observer or interval outlives the artifact.
     surface, surfaceRaised, text, textDim, border, accent,   // colour strings
     series: string[],        // categorical ramp, eight colours, legible in both modes
     font, fontMono,          // font stacks, for canvas and SVG text
+    radius: number,          // corner radius in px, the same one the page rounds with
     motionMs: number,        // 0 when the user asked for reduced motion
   },
   onTheme(cb),               // cb(theme) when the user switches light and dark
@@ -41,8 +42,8 @@ observer or interval outlives the artifact.
 }
 ```
 
-Never hardcode a colour, a font, or a duration. Everything visible comes from `ctx.theme`,
-which is why one build serves both themes.
+Never hardcode a colour, a font, a corner radius, or a duration. Everything visible comes
+from `ctx.theme`, which is why one build serves both themes.
 
 ## What you can import
 
@@ -78,9 +79,9 @@ ctx.onResize(() => chart.resize())
 return () => chart.dispose()
 ```
 
-Both themes are registered by the page and carry the tokens, so a chart that uses no
-explicit colours already looks right in both. Reach into `ctx.theme.series` only when you
-need to control which series gets which colour.
+Both themes are registered by the page and carry the tokens, so a chart that sets no colours
+and no radii already looks right in both. Reach into `ctx.theme.series` only when you need to
+control which series gets which colour.
 
 ## D3
 
@@ -100,8 +101,6 @@ red text instead of a failed mount.
 
 ## Style rules, enforced by the build
 
-- **No rounded corners.** `border-radius` other than `0` fails the build, including ECharts
-  `borderRadius` on bars and items. The design is sharp rectangles.
 - **No title inside the artifact.** The stage draws `meta.title`. A heading repeating it
   fails the build.
 - **No network.** `fetch`, `XMLHttpRequest`, `WebSocket`, and dynamic `import()` fail the
@@ -110,6 +109,8 @@ red text instead of a failed mount.
 ## Style rules, on you
 
 - Fill the space you are given, in both dimensions, and redraw on resize.
+- Corners are soft. A box you draw yourself rounds with `ctx.theme.radius`, the same as every
+  other token: never a number you picked.
 - Label axes with units. A number with no unit teaches nothing.
 - One idea per artifact. If you need a second sentence to say what it proves, it is two
   artifacts.
@@ -144,7 +145,6 @@ chart of made-up data is the worst thing you can put on that screen.
 | Error | Fix |
 |---|---|
 | `import "X" is not available` | Only `echarts`, `d3`, `katex` exist. Write it yourself or drop it. |
-| `border-radius must be 0` | Remove the rounding. This is a design rule, not a preference. |
 | `heading repeats meta.title` | Delete the heading. The stage draws the title. |
 | `network access is not allowed` | Embed the data in the module. |
 | `mount must be exported as a function` | Export `mount(el, ctx)` and `meta`. |

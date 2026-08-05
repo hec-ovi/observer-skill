@@ -24,6 +24,8 @@ export interface ThemeTokens {
   /** Font stacks, for canvas and SVG text that cannot inherit CSS. */
   font: string
   fontMono: string
+  /** Corner radius in CSS pixels, for anything an artifact draws its own box for. */
+  radius: number
   /** Transition length in milliseconds; 0 under `prefers-reduced-motion`. */
   motionMs: number
 }
@@ -36,6 +38,13 @@ const SERIES_COUNT = 8
 
 function isMode(value: unknown): value is ThemeMode {
   return value === 'light' || value === 'dark' || value === 'system'
+}
+
+/** A length token in CSS pixels. The scale is written in rem; canvas and SVG want a number. */
+function pixels(value: string, rootFontSize: string): number {
+  const length = Number.parseFloat(value)
+  if (!Number.isFinite(length)) return 0
+  return value.endsWith('rem') ? length * (Number.parseFloat(rootFontSize) || 0) : length
 }
 
 function storedMode(): ThemeMode {
@@ -116,6 +125,7 @@ class ThemeController {
       series,
       font: read('--font-sans'),
       fontMono: read('--font-mono'),
+      radius: pixels(read('--radius'), style.fontSize),
       motionMs: Number.parseFloat(read('--motion')) || 0,
     }
   }
@@ -127,7 +137,14 @@ class ThemeController {
 
   #apply(): void {
     const next = this.#resolve()
-    document.documentElement.setAttribute('data-theme', next)
+    const root = document.documentElement
+    // The class eases colours across the switch. It is taken off again so it never slows an
+    // ordinary hover, and it is skipped entirely under reduced motion.
+    if (next !== this.#resolved && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      root.classList.add('theming')
+      setTimeout(() => root.classList.remove('theming'), 300)
+    }
+    root.setAttribute('data-theme', next)
     if (next === this.#resolved) return
     this.#resolved = next
     for (const listener of this.#listeners) listener(next)

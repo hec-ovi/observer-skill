@@ -4,6 +4,7 @@
  */
 
 import { useEffect, useState } from 'react'
+import { Volume2 } from 'lucide-react'
 import { PROVIDER_IDS } from '@voice-out/index.ts'
 import type { Voice } from '@voice-out/index.ts'
 import type { Settings, SettingsPatch, VoiceOutProvider } from '../session/record.ts'
@@ -86,7 +87,8 @@ export function VoiceOutSettings({ settings, speaker, onChange }: VoiceOutSettin
 
       {attribution ? <p className="setting-note">{attribution}</p> : null}
 
-      <button type="button" onClick={() => speaker.say(TEST_LINE, settings)}>
+      <button type="button" className="button" onClick={() => speaker.say(TEST_LINE, settings)}>
+        <Volume2 aria-hidden="true" />
         Speak a test line
       </button>
 

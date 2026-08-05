@@ -39,10 +39,10 @@ Types: [`src/types.ts`](src/types.ts)
 user scrolls it by hand, until they press play again. The current line is marked, not
 enlarged. Clicking a line seeks there.
 
-**Asking** works three ways and they produce the same event: typing and pressing enter,
-holding the talk button and releasing, or the user typing in their terminal instead. The
-hold button shows what it heard as it hears it, and a hold that produced nothing says so
-in place rather than silently doing nothing. A hold ends on release or when the button
+**Asking** works three ways and they produce the same event: typing and sending it with
+enter or the send action, holding the talk button and releasing, or the user typing in
+their terminal instead. The hold button shows what it heard as it hears it, and a hold
+that produced nothing says so in place rather than silently doing nothing. A hold ends on release or when the button
 loses focus, and a press that lands while the last hold is still being transcribed opens
 nothing rather than taking the moment away from the words already on their way.
 

@@ -1,10 +1,11 @@
 /**
- * How a question is asked: typed and sent with enter, or spoken while the talk button is
- * held. Both carry the second the user started asking, because that is the second the
- * question is about.
+ * How a question is asked: typed and sent with enter or the send action, or spoken while the
+ * talk button is held. Both carry the second the user started asking, because that is the
+ * second the question is about.
  */
 
 import { type KeyboardEvent, type PointerEvent, useRef, useState } from 'react'
+import { ArrowUp, Mic } from 'lucide-react'
 import { isBlocked } from './hold-lines.ts'
 import type { AskBoxProps } from './types.ts'
 import { type HoldControls, useHold } from './use-hold.ts'
@@ -75,32 +76,47 @@ export function AskBox({ at, listener, disabled = false, onAsk, onOpenSettings }
   const status = holdStatus(hold)
   return (
     <div className="ask">
-      <textarea
-        className="ask-draft"
-        value={draft}
-        rows={2}
-        placeholder="Ask about this moment"
-        aria-label="Ask about this moment"
-        onChange={(event) => edit(event.target.value)}
-        onKeyDown={onDraftKeyDown}
-      />
+      <div className="ask-shell">
+        <textarea
+          className="ask-draft"
+          value={draft}
+          rows={2}
+          placeholder="Ask about this moment"
+          aria-label="Ask about this moment"
+          onChange={(event) => edit(event.target.value)}
+          onKeyDown={onDraftKeyDown}
+        />
 
-      <button
-        type="button"
-        className="ask-talk"
-        aria-pressed={hold.holding}
-        disabled={disabled}
-        onPointerDown={onTalkDown}
-        onPointerUp={hold.release}
-        onPointerCancel={hold.release}
-        onKeyDown={onTalkKeyDown}
-        onKeyUp={onTalkKeyUp}
-        // A keyboard hold ends here too: the keyup of a window that went away is delivered
-        // somewhere else, and the microphone would stay open until it came back.
-        onBlur={hold.release}
-      >
-        Hold to talk
-      </button>
+        <div className="ask-tools">
+          <button
+            type="button"
+            className="button ask-talk"
+            aria-pressed={hold.holding}
+            disabled={disabled}
+            onPointerDown={onTalkDown}
+            onPointerUp={hold.release}
+            onPointerCancel={hold.release}
+            onKeyDown={onTalkKeyDown}
+            onKeyUp={onTalkKeyUp}
+            // A keyboard hold ends here too: the keyup of a window that went away is delivered
+            // somewhere else, and the microphone would stay open until it came back.
+            onBlur={hold.release}
+          >
+            <Mic className={hold.holding ? 'breathe' : undefined} aria-hidden="true" />
+            Hold to talk
+          </button>
+
+          <button
+            type="button"
+            className="button-accent ask-send"
+            aria-label="Send"
+            disabled={disabled || draft.trim().length === 0}
+            onClick={send}
+          >
+            <ArrowUp aria-hidden="true" />
+          </button>
+        </div>
+      </div>
 
       {disabled ? <p className="ask-note">No agent attached. Your question waits here.</p> : null}
 

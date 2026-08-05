@@ -78,8 +78,8 @@ the bundler rejects any other import.
 
 ## Artifact verification: esbuild, then the real page
 
-`esbuild` bundles the artifact and static checks run first (import allowlist, no
-`border-radius` other than 0, no top-level title element). Then the bundle is mounted in a
+`esbuild` bundles the artifact and static checks run first (import allowlist, no network,
+no top-level title element). Then the bundle is mounted in a
 hidden sandboxed iframe inside the page that is already open, which is the exact
 environment it will run in, and the page reports mount errors, console errors, rendered
 size, and a canvas snapshot when the artifact draws to canvas. The agent reads the
