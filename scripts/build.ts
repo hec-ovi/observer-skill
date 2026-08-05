@@ -44,6 +44,13 @@ async function buildServer(): Promise<void> {
 
 async function buildApp(): Promise<void> {
   await run('npx', ['vite', 'build'], { cwd: ROOT, encoding: 'utf8', timeout: 300_000 })
+  // The three libraries an artifact may import are built after the app, into its output,
+  // so the page and the verify frame resolve the same modules through one import map.
+  await run(
+    'npx',
+    ['vite', 'build', '--config', 'boxes/app/stage/vendor/vite.config.ts'],
+    { cwd: ROOT, encoding: 'utf8', timeout: 300_000 },
+  )
 }
 
 await rm(DIST, { recursive: true, force: true })

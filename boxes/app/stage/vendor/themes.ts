@@ -40,7 +40,8 @@ export function makeTheme(t: VizTokens): VizTheme {
     timeAxis: axis,
     logAxis: axis,
 
-    grid: { left: 48, right: 16, top: 24, bottom: 32, containLabel: true, borderWidth: 0 },
+    // v6 keeps labels and axis names inside the grid by itself; `containLabel` is legacy.
+    grid: { left: 48, right: 16, top: 24, bottom: 32, borderWidth: 0 },
 
     title: {
       textStyle: { color: t.text, fontFamily: t.font, fontWeight: 600, fontSize: 14 },
