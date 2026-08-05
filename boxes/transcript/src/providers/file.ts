@@ -9,7 +9,7 @@ import { extname } from 'node:path'
 import { parseSubtitles } from '../formats/subtitles.ts'
 import { cuesToSegments } from '../normalize.ts'
 import type { Availability, Provider, ProviderContext, ProviderOutcome } from '../provider.ts'
-import { nothing, produced } from '../provider.ts'
+import { broke, nothing, produced } from '../provider.ts'
 
 const ACCEPTED = new Set(['.srt', '.vtt'])
 
@@ -40,7 +40,7 @@ export const file: Provider = {
     if (context.file === undefined) return nothing('no subtitle file was supplied')
     const extension = extname(context.file).toLowerCase()
     if (!ACCEPTED.has(extension)) {
-      return nothing(`${extension || 'that file'} is not an SRT or VTT`)
+      return broke(`${extension || 'that file'} is not an SRT or VTT`)
     }
 
     context.report({ step: 'file', done: 0, total: 1, message: `reading ${extension.slice(1)}` })
@@ -48,7 +48,7 @@ export const file: Provider = {
     const segments = cuesToSegments(parsed.cues, { dedupeOverlap: parsed.rolling })
     context.report({ step: 'file', done: 1, total: 1, message: `read ${segments.length} segments` })
 
-    if (segments.length === 0) return nothing('the subtitle file holds no cues')
+    if (segments.length === 0) return broke('the subtitle file holds no cues')
     return produced(
       { segments, language: context.language ?? 'unknown', generated: false },
       `${segments.length} segments from ${context.file}`,

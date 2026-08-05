@@ -13,7 +13,7 @@ import type { Source } from '#ingest'
 import type { Cue } from '../normalize.ts'
 import { cuesToSegments } from '../normalize.ts'
 import type { Availability, Provider, ProviderContext, ProviderOutcome } from '../provider.ts'
-import { nothing, produced } from '../provider.ts'
+import { broke, nothing, produced } from '../provider.ts'
 import { tidy } from '../text.ts'
 
 interface PanelSegment {
@@ -68,7 +68,8 @@ export const innertube: Provider = {
       panel = await info.getTranscript()
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error)
-      return nothing(NO_PANEL.includes(message) ? 'this video has no transcript panel' : message)
+      if (NO_PANEL.includes(message)) return nothing('this video has no transcript panel')
+      return broke(message)
     }
 
     const raw = (panel.transcript.content?.body?.initial_segments ?? []) as PanelSegment[]

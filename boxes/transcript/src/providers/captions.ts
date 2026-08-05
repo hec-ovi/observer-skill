@@ -16,7 +16,7 @@ import { json3ToCues } from '../formats/json3.ts'
 import { parseSubtitles } from '../formats/subtitles.ts'
 import { cuesToSegments } from '../normalize.ts'
 import type { Availability, Provider, ProviderContext, ProviderOutcome } from '../provider.ts'
-import { nothing, produced } from '../provider.ts'
+import { broke, nothing, produced } from '../provider.ts'
 import type { Segment } from '../schema.ts'
 import { YTDLP_INSTALL, reason, ytdlp, ytdlpPresent } from '../ytdlp.ts'
 
@@ -114,7 +114,7 @@ export const captions: Provider = {
         message: automatic ? 'reading machine captions' : 'reading published captions',
       })
       if (outcome === null) continue
-      if ('error' in outcome) return nothing(outcome.error)
+      if ('error' in outcome) return broke(outcome.error)
       if (outcome.segments.length === 0) continue
       return produced(
         { segments: outcome.segments, language: outcome.language, generated: automatic },

@@ -23,10 +23,15 @@ export interface ProviderResult {
   generated: boolean
 }
 
-/** Null means "nothing here, try the next one", and `note` says why. */
+/**
+ * Null means "no text from me", and `note` says why. `broke` separates a provider that ran
+ * and failed from one that simply found nothing published, which the caller reports
+ * differently.
+ */
 export interface ProviderOutcome {
   result: ProviderResult | null
   note: string
+  broke: boolean
 }
 
 export interface Provider {
@@ -35,10 +40,16 @@ export interface Provider {
   fetch(source: Source, context: ProviderContext): Promise<ProviderOutcome>
 }
 
+/** There was nothing to read here. */
 export function nothing(note: string): ProviderOutcome {
-  return { result: null, note }
+  return { result: null, note, broke: false }
+}
+
+/** There was something to read here and it went wrong. */
+export function broke(note: string): ProviderOutcome {
+  return { result: null, note, broke: true }
 }
 
 export function produced(result: ProviderResult, note: string): ProviderOutcome {
-  return { result, note }
+  return { result, note, broke: false }
 }

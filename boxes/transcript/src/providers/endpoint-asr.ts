@@ -15,7 +15,7 @@ import { transcribeChunk } from '../asr/transcribe.ts'
 import type { Cue } from '../normalize.ts'
 import { cuesToSegments } from '../normalize.ts'
 import type { Availability, Provider, ProviderContext, ProviderOutcome } from '../provider.ts'
-import { nothing, produced } from '../provider.ts'
+import { broke, nothing, produced } from '../provider.ts'
 import { YTDLP_INSTALL, ytdlpPresent } from '../ytdlp.ts'
 
 /** Ten minutes keeps a 16 kHz mono chunk under the size limits these routes publish. */
@@ -48,11 +48,11 @@ export const endpointAsr: Provider = {
 
     context.report({ step: 'audio', done: 0, total: 1, message: 'downloading audio' })
     const audio = await downloadAudio(source.url, context.scratch, context.report)
-    if (typeof audio !== 'string') return nothing(audio.error)
+    if (typeof audio !== 'string') return broke(audio.error)
 
     context.report({ step: 'chunks', done: 0, total: 1, message: 'preparing audio' })
     const chunks = await splitAudio(audio, context.scratch, CHUNK_SECONDS)
-    if (!Array.isArray(chunks)) return nothing(chunks.error)
+    if (!Array.isArray(chunks)) return broke(chunks.error)
     context.report({ step: 'chunks', done: 1, total: 1, message: `${chunks.length} chunks to transcribe` })
 
     const cues: Cue[] = []
@@ -73,7 +73,7 @@ export const endpointAsr: Provider = {
         language: context.language,
         prompt,
       })
-      if ('error' in answer) return nothing(answer.error)
+      if ('error' in answer) return broke(answer.error)
       cues.push(...answer.cues)
       language ??= answer.language
       prompt = answer.cues
@@ -91,7 +91,7 @@ export const endpointAsr: Provider = {
 
     cues.sort((a, b) => a.start - b.start)
     const segments = cuesToSegments(cues)
-    if (segments.length === 0) return nothing('the transcription endpoint returned no text')
+    if (segments.length === 0) return broke('the transcription endpoint returned no text')
 
     return produced(
       { segments, language: language ?? 'unknown', generated: true },
