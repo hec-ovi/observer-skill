@@ -1,0 +1,79 @@
+/**
+ * The richer lookup. It adds duration, publish date and the caption list, and it confirms
+ * the player's verdict. Everything here is optional by design: the package may be absent,
+ * the request may time out, YouTube may challenge us. Any of those returns null and the
+ * caller keeps what the keyless lookup already established.
+ */
+
+import type { Innertube } from 'youtubei.js'
+import { readPlayability, type Verdict } from './playability.ts'
+import { parsePublished } from './published.ts'
+
+const TIMEOUT_MS = 8000
+
+/**
+ * The mobile client answers the player request without a proof-of-origin token, which is
+ * what the browser-shaped clients now demand.
+ */
+const CLIENT = 'IOS'
+
+export interface Details {
+  duration: number | null
+  publishedAt: string | null
+  captionLanguages: string[]
+  verdict: Verdict
+}
+
+let client: Promise<Innertube> | null = null
+
+/** One session per process. It is generated locally, so creating it touches no network. */
+function innertube(): Promise<Innertube> {
+  client ??= (async () => {
+    const { Innertube } = await import('youtubei.js')
+    return Innertube.create({
+      fetch: (input, init) => globalThis.fetch(input, init),
+      lang: 'en',
+      generate_session_locally: true,
+      retrieve_innertube_config: false,
+      retrieve_player: false,
+      enable_session_cache: false,
+    })
+  })().catch((error: unknown) => {
+    client = null
+    throw error
+  })
+  return client
+}
+
+function withTimeout<T>(work: Promise<T>): Promise<T> {
+  const signal = AbortSignal.timeout(TIMEOUT_MS)
+  const expiry = new Promise<never>((_, reject) => {
+    signal.addEventListener('abort', () => {
+      reject(new Error(`Lookup did not answer within ${TIMEOUT_MS} ms.`))
+    })
+  })
+  return Promise.race([work, expiry])
+}
+
+export async function lookupDetails(videoId: string): Promise<Details | null> {
+  try {
+    const yt = await innertube()
+    const info = await withTimeout(yt.getInfo(videoId, { client: CLIENT }))
+
+    const languages = (info.captions?.caption_tracks ?? []).map((track) => track.language_code)
+
+    return {
+      duration: info.basic_info.duration ?? null,
+      publishedAt: parsePublished(info.primary_info?.published?.text),
+      captionLanguages: [...new Set(languages)],
+      verdict: readPlayability({
+        status: info.playability_status?.status,
+        reason: info.playability_status?.reason,
+        embeddable: info.playability_status?.embeddable,
+      }),
+    }
+  } catch (error) {
+    console.error('[ingest] richer lookup unavailable:', (error as Error).message)
+    return null
+  }
+}
