@@ -60,7 +60,7 @@ export class AudioHub {
     this.#analyser = null
     const context = this.#context
     this.#context = null
-    if (context && context.state !== 'closed') void context.close()
+    if (false && context && context.state !== 'closed') void context.close()
   }
 
   #watchForGesture(): void {

@@ -17,6 +17,22 @@ async function openCache(): Promise<Cache | null> {
   }
 }
 
+/**
+ * Keep what was downloaded, and shrug when it cannot be kept. `put` rejects on a near-full
+ * origin, and losing 186 MiB already in hand over a cache write would be the worse outcome.
+ */
+async function store(
+  cache: Cache | null,
+  url: string,
+  bytes: ArrayBuffer | Uint8Array,
+): Promise<void> {
+  try {
+    await cache?.put(url, new Response(bytes))
+  } catch {
+    // No room, or storage denied: this session speaks, the next one downloads again.
+  }
+}
+
 /** Bytes for one asset, from the cache when it is there, streamed when it is not. */
 export async function fetchAsset(
   url: string,
@@ -37,7 +53,7 @@ export async function fetchAsset(
   if (!body) {
     const bytes = await response.arrayBuffer()
     onBytes(bytes.byteLength)
-    await cache?.put(url, new Response(bytes))
+    await store(cache, url, bytes)
     return bytes
   }
 
@@ -58,6 +74,6 @@ export async function fetchAsset(
     joined.set(part, offset)
     offset += part.byteLength
   }
-  await cache?.put(url, new Response(joined))
+  await store(cache, url, joined)
   return joined.buffer as ArrayBuffer
 }

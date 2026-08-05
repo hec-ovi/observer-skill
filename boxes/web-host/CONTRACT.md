@@ -40,8 +40,9 @@ the host moves up one at a time, up to twenty, and reports the port it got.
 
 `verify` shows one artifact to the open page's sandbox and resolves with what the page
 reports. It rejects with `PAGE_NOT_OPEN` when nothing is listening to that session, and one
-artifact has one verification at a time: asking again supersedes the older request. A page
-that never answers resolves as a failed verification, never as a hang.
+artifact of one session has one verification at a time: asking again supersedes the older
+request, and the same artifact id in another session is a separate run. A page that never
+answers resolves as a failed verification, never as a hang.
 
 ## HTTP surface
 
@@ -65,9 +66,10 @@ response carries its own content policy: it runs with `default-src 'none'`,
 `connect-src 'none'` and `sandbox allow-scripts`. The document itself is the app build's
 own `sandbox.html`, so it runs the same loader the visible stage does; that document and the
 protocol it speaks belong to `app/stage`, and which module to run reaches it over a port
-rather than through the URL. Every script route sends `Access-Control-Allow-Origin: *`,
-because a module script is always a CORS fetch and a sandboxed document has an opaque
-origin.
+rather than through the URL. It has one address only: the build's own `/sandbox.html` is a
+404, so the document cannot be framed without the policy on it. Every script route sends
+`Access-Control-Allow-Origin: *`, because a module script is always a CORS fetch and a
+sandboxed document has an opaque origin.
 
 ## The live channel
 
@@ -100,8 +102,10 @@ verification.
 
 HTTP status plus a body of `{ code, message, hint }` using the shared error set. A body or
 query that does not fit its schema is `INVALID_PATCH` with the field named; a path this
-server has nothing at is `UNKNOWN_ARTIFACT`. A route that fails does not take the process
-down, and a failing SSE subscriber is dropped without disturbing the others.
+server has nothing at is `UNKNOWN_ARTIFACT`. When the framework decided the status (a static
+file that is not there, a body over the limit) the body is written here, and the framework's
+own text, which names a path on this disk, goes to stderr. A route that fails does not take
+the process down, and a failing SSE subscriber is dropped without disturbing the others.
 
 ## Dependencies
 
@@ -124,7 +128,8 @@ down, and a failing SSE subscriber is dropped without disturbing the others.
   that cannot escape the session's own directory.
 - The port in use is reported as a clear message naming the port, not a stack trace.
 - `close()` returns while a page is still attached: the streams are ended and the sockets
-  behind them are reaped rather than waited out.
+  behind them are reaped rather than waited out. A `close()` that lands while `start()` is
+  still binding waits for that bind and takes the listener down with it.
 
 ## How to modify this box safely
 

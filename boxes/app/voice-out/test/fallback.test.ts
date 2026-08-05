@@ -9,7 +9,7 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { fakeSpeechSynthesis } from '../../testing/fakes.ts'
-import { VoiceOutError, dispose, providerInfo, speak, warm } from '../src/index.ts'
+import { VoiceOutError, dispose, providerInfo, speak, voices, warm } from '../src/index.ts'
 import type { SpeakEnd, VoiceOutConfig } from '../src/index.ts'
 
 const pocket: VoiceOutConfig = { provider: 'pocket', voice: 'alba' }
@@ -82,6 +82,24 @@ describe('a config that is wrong before any line starts', () => {
     expect(() =>
       speak(LINE, { config: { provider: 'endpoint', baseUrl: 'localhost:8880' } }),
     ).toThrow(/is not an http URL/)
+  })
+})
+
+describe('the voices the panel offers', () => {
+  it('offers the six permissively licensed pocket voices and no others', async () => {
+    const listed = await voices(pocket)
+
+    expect(listed.map((voice) => voice.id)).toEqual([
+      'alba',
+      'azelma',
+      'eponine',
+      'fantine',
+      'javert',
+      'marius',
+    ])
+    // The bundle also carries these two, whose source recordings are CC BY-NC.
+    expect(listed.map((voice) => voice.id)).not.toContain('cosette')
+    expect(listed.map((voice) => voice.id)).not.toContain('jean')
   })
 })
 

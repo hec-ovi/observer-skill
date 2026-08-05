@@ -92,8 +92,10 @@ test('the snapshot the agent looked at is served as a PNG', async () => {
 test('an artifact with no snapshot says so instead of serving nothing', async () => {
   const answer = await fetch(`${running.base}/api/snapshot/s1/a1`)
   assert.equal(answer.status, 404)
-  const body = (await answer.json()) as { code: string; hint: string }
+  const body = (await answer.json()) as { code: string; message: string; hint: string }
   assert.equal(body.code, 'UNKNOWN_ARTIFACT')
+  // Not the catch-all 404: the route names the artifact and what is missing from it.
+  assert.match(body.message, /a1 has no snapshot/)
   assert.ok(body.hint.length > 0)
 })
 

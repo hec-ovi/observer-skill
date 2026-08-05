@@ -71,8 +71,7 @@ class PcmProcessor extends AudioWorkletProcessor {
       this.port.postMessage({ type: 'started' })
     }
 
-    const written = this.#drain(channel, false)
-    if (written < channel.length && !this.#ended) this.port.postMessage({ type: 'underrun' })
+    this.#drain(channel, false)
 
     if (this.#ended && this.#buffered === 0) {
       this.#playing = false
@@ -82,7 +81,7 @@ class PcmProcessor extends AudioWorkletProcessor {
     return true
   }
 
-  #drain(channel: Float32Array, fading: boolean): number {
+  #drain(channel: Float32Array, fading: boolean): void {
     const wanted = channel.length
     let written = 0
 
@@ -106,7 +105,6 @@ class PcmProcessor extends AudioWorkletProcessor {
     }
 
     if (fading && (this.#fadeOut <= 0 || this.#buffered === 0)) this.#clear()
-    return written
   }
 
   #receive(message: { type: string; pcm?: Float32Array }): void {

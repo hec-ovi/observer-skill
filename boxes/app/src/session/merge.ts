@@ -11,7 +11,7 @@ function isObject(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
 }
 
-export function mergePatch<T>(base: T, patch: DeepPartial<T>): T {
+export function mergePatch<T>(base: T, patch: NoInfer<DeepPartial<T>>): T {
   if (!isObject(base) || !isObject(patch)) return patch as T
 
   const merged: Record<string, unknown> = { ...base }

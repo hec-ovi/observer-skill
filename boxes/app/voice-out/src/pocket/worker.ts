@@ -30,7 +30,11 @@ function load(request: LoadRequest): Promise<PocketEngine> {
   options = request
   engine ??= PocketEngine.load(request, (progress) =>
     scope.postMessage({ type: 'progress', ...progress }),
-  )
+  ).catch((error: unknown) => {
+    // Only a load that worked is worth keeping: a dropped connection must be retryable.
+    engine = null
+    throw error
+  })
   return engine
 }
 

@@ -167,7 +167,7 @@ class HoldListener implements Listener {
 
   /**
    * The hold stays reachable for as long as the engine is working on it, so disposing during
-   * a transcription cancels the request instead of leaving it to run for nobody.
+   * a transcription reaches the request in flight rather than leaving it to run for nobody.
    */
   async #transcribe(hold: Hold, recording: Recording): Promise<string> {
     this.#working = hold

@@ -5,6 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="light dark" />
     <title>Observer</title>
+    <!-- The registry. Import maps are per document, so this is the same string the verify
+         frame carries, and it must come before any module that resolves a bare specifier. -->
+    <script type="importmap">
+      {
+        "imports": {
+          "echarts": "/sandbox/vendor/echarts.js",
+          "d3": "/sandbox/vendor/d3.js",
+          "katex": "/sandbox/vendor/katex.js"
+        }
+      }
+    </script>
     <script>
       // Blocking on purpose: the resolved theme is on the root before the first paint.
       try {

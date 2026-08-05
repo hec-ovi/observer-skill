@@ -100,6 +100,20 @@ describe('endpoint', () => {
     expect(FakeAudioContext.instances).toHaveLength(1)
   })
 
+  it('gives the audio device back on dispose, and stops listening for gestures', async () => {
+    const ends: SpeakEnd[] = []
+    speak(LINE, { config, onEnd: (event) => ends.push(event) })
+    await vi.waitFor(() => expect(sources).toHaveLength(1))
+
+    dispose()
+
+    expect(ends).toHaveLength(1)
+    expect(FakeAudioContext.live()).toHaveLength(0)
+    // A gesture listener left behind would open a second context on the next click.
+    dispatchEvent(new Event('pointerdown'))
+    expect(FakeAudioContext.instances).toHaveLength(1)
+  })
+
   it('cuts the line it is playing when the next one starts', async () => {
     const ends: SpeakEnd[] = []
     speak('first', { config, onEnd: (event) => ends.push(event) })
