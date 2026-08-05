@@ -99,7 +99,7 @@ describe('endpoint-asr', () => {
     assert.equal(page.segments[3]?.end, 610.616)
   })
 
-  test('progress counts the chunks, which is what takes the time', async () => {
+  test('progress counts the media seconds transcribed, out of the audio it cut', async () => {
     const box = await boxes.open('asr-progress')
     const restore = serve('asr-chunk-0.json', 'asr-chunk-0.json')
     try {
@@ -117,9 +117,12 @@ describe('endpoint-asr', () => {
     const steps = box.progress.filter((entry) => entry.step === 'transcribe')
     assert.deepEqual(
       steps.map((entry) => `${entry.done}/${entry.total}`),
-      ['0/2', '1/2', '2/2'],
+      ['0/905.4', '600.016/905.4', '905.4/905.4'],
     )
-    assert.ok(box.progress.some((entry) => entry.step === 'audio' && entry.total > 0))
+
+    const download = box.progress.filter((entry) => entry.step === 'audio')
+    assert.ok(download.every((entry) => entry.done === 0 && entry.total === 0))
+    assert.equal(download.at(-1)?.message, 'downloading audio, 100%')
   })
 
   test('a server that times token pieces still stores whole words', async () => {

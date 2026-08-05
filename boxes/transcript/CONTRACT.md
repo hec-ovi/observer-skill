@@ -20,7 +20,12 @@ fetch(source, { home, sessionId, provider?, language?, file?,
 - `ytdlpBin` (`yt-dlp`) and `ffmpegBin` (`ffmpeg`): the binaries to run. Named by the
   caller, because which ones this machine has is the process's business, not this box's.
 - `onProgress({ step, done, total, message })` fires often enough for a loader to move on a
-  three-hour podcast, and the totals are real, not invented.
+  three-hour podcast. `done` and `total` are seconds of the media: how much of the video is
+  through, out of how long it is. A step that cannot know a duration sends both as zero and
+  carries what it is doing in `message`, so nothing is invented. Speech recognition counts
+  the seconds it has transcribed out of the audio's length; the transcript write counts the
+  whole video once the words are on disk; the caption passes, the transcript panel, the
+  subtitle file, and the audio download send zeros.
 
 ```ts
 read(sessionId, { from?, to?, offset?, limit? }): TranscriptPage

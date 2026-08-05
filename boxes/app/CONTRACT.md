@@ -27,9 +27,10 @@ created, so a video that cannot be embedded is refused here, under the field, ra
 eight seconds into a session that was never going to play.
 
 **Preparing.** The loader: the phase, what is happening, and a real count. Transcribing
-shows minutes done of minutes total. Researching and building show concepts and visuals as
-they land, named, so the wait is legible instead of a spinner. The player is visible and
-locked.
+shows minutes done of minutes total while a step reports media seconds, and the step's
+message alone while one cannot know them, rather than a count stuck at zero. Researching
+and building show concepts and visuals as they land, named, so the wait is legible instead
+of a spinner. The player is visible and locked.
 
 **Session.** Player, transcript rail, dialogue. The stage takes over the player's space
 when a visual is shown and gives it back when it is dismissed.

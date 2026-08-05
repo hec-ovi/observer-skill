@@ -14,8 +14,8 @@ bundle anyway.
 
 The CLI spawns `observer mcp`. That one process speaks MCP on stdio and listens on a local
 port for the browser, which is what makes it a single unified service with nothing to start
-by hand. An HTTP MCP endpoint is mounted on the same port as well, for a second client that
-wants to attach to a running session.
+by hand. The port serves the page and its live channel only; the agent's whole surface is
+the stdio stream.
 
 Stdio is the default because an HTTP-only entry assumes something is already listening: the
 CLI connects to its MCP servers when the session begins, and a server that only starts
@@ -45,11 +45,13 @@ Sources: [yt-dlp subtitles](https://github.com/yt-dlp/yt-dlp),
 ## Voice out: Pocket TTS in the browser
 
 Kyutai Pocket TTS is 100M parameters, ~200 ms to first audio, real-time on two CPU cores,
-and KevinAHM's ONNX export runs it in the browser through onnxruntime-web: an inference
-worker, a SentencePiece tokenizer, and an AudioWorklet playing PCM as frames arrive. No
-server dependency and no install, which is why it is the default provider. The same port
-also drives `speechSynthesis` and any OpenAI-compatible `/v1/audio/speech` endpoint, so
-moving the voice to the cloud is a settings change.
+and KevinAHM's ONNX export runs it in the browser through onnxruntime-web on the wasm
+execution provider: an inference worker, a SentencePiece tokenizer, and an AudioWorklet
+playing PCM as frames arrive. No server dependency and no install, at the price of one
+195 MB download kept in the Cache API. A session starts on `speechSynthesis`, which loads
+nothing; Pocket is the upgrade the settings panel offers, with the size on the option and a
+bar while the bytes arrive. The same port also drives any OpenAI-compatible
+`/v1/audio/speech` endpoint, so moving the voice to the cloud is a settings change.
 
 Sources: [Pocket TTS](https://kyutai-labs.github.io/pocket-tts/),
 [pocket-tts-web space](https://huggingface.co/spaces/KevinAHM/pocket-tts-web).

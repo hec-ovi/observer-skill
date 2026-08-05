@@ -191,14 +191,18 @@ describe('captions', () => {
     assert.match(page.segments[0]?.text ?? '', /^In a single minute/)
   })
 
-  test('progress reports the step it is on with a real total', async () => {
+  test('a caption pass reports its message with no seconds to claim', async () => {
     const box = await boxes.open('progress')
-    await transcribe(box, { manual: 'human.json3' })
+    const ref = await transcribe(box, { manual: 'human.json3' })
 
-    assert.ok(box.progress.some((entry) => entry.step === 'captions' && entry.total === 2))
+    const passes = box.progress.filter((entry) => entry.step === 'captions')
+    assert.ok(passes.length > 0)
+    assert.ok(passes.every((entry) => entry.done === 0 && entry.total === 0))
+    assert.ok(passes.every((entry) => entry.message.length > 0))
+
     const last = box.progress[box.progress.length - 1]
     assert.equal(last?.step, 'transcript')
-    assert.equal(last?.done, 4)
-    assert.equal(last?.total, 4)
+    assert.equal(last?.done, ref.duration)
+    assert.equal(last?.total, ref.duration)
   })
 })

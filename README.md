@@ -89,10 +89,11 @@ visual that has not passed cannot be shown.
 ## Voice
 
 Speaking defaults to the browser's own voice, which costs nothing to load. Kyutai Pocket TTS
-runs entirely in the browser through ONNX Runtime Web for a better one, and the settings panel
-states the one-time download before you agree to it. Listening is hold to talk. Both sit
-behind a port with three providers each (browser, local model, OpenAI-compatible endpoint), so
-moving either to a cloud voice is a setting and not a rewrite.
+runs entirely in the browser through ONNX Runtime Web for a better one: the settings panel
+states the one-time download before you agree to it, shows it arriving, and credits Kyutai
+while it is the chosen voice. Listening is hold to talk. Both sit behind a port with three
+providers each (browser, local model, OpenAI-compatible endpoint), so moving either to a cloud
+voice is a setting and not a rewrite.
 
 ## Design
 

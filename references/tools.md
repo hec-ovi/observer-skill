@@ -14,9 +14,11 @@ browser, and starts transcription without waiting for it. `source` carries `titl
 against today when looking for what has moved since.
 
 **`status`** `{ sessionId? }`
-→ `{ phase, progress, error?, counts, missing, settings, source, pageUrl, pageOpen }`
+→ `{ phase, progress, error?, counts, missing, settings, source, userPrompt, pageUrl, pageOpen }`
 Poll this during transcription. `missing` lists what is still owed before `ready`, in order.
-`pageOpen` tells you whether `build` can verify.
+`pageOpen` tells you whether `build` can verify. `userPrompt` is what the user wants from
+the video in their own words, or null; when the session was opened from the page rather than
+by you, this is the only place you will see it, so read it before planning anything.
 
 **`transcript`** `{ from?, to?, offset?, limit? }`
 → `{ segments, offset, total, nextOffset?, generated }`
@@ -34,10 +36,13 @@ merges: the range widens, the summary is replaced, notes and links survive.
 `kind` is `background` or `current`. `current` is for something that changed after the video
 was recorded; those get surfaced as a one-line update after an answer.
 
-**`build`** `{ id, title, kind, source, caption?, conceptId?, startsAt?, endsAt?, afterEntryId? }`
+**`build`** `{ id, title, kind, source, caption?, narration?, conceptId?, startsAt?, endsAt?,
+afterEntryId? }`
 → `{ ok, artifactId, size?, snapshotPath?, errors? }` plus the snapshot image itself when it
-succeeded. Compiles, verifies in the open page, stores. Same `id` replaces. See
-[artifacts.md](artifacts.md).
+succeeded. Compiles, verifies in the open page, stores. Same `id` replaces. `caption` is the
+line drawn under the title, which is where a chart whose values are illustrative says so.
+`narration` is a line or two spoken when the visual is shown, for a process the user has to
+be walked through. See [artifacts.md](artifacts.md).
 
 **`link`** `{ artifactId, conceptId, startsAt?, endsAt? }` → `{ artifactId, conceptId }`
 An artifact linked to nothing is never shown.
@@ -57,11 +62,14 @@ the call to make.
 The same context on demand, for a question typed in the terminal.
 
 **`say`** `{ text, speak?, artifactId? }` → `{ entryId }`
-The answer. `speak` reads it aloud. `artifactId` shows a visual in the same beat. The
-`entryId` is what `build` needs as `afterEntryId` if the user then asks to see something new.
+The answer. `speak` reads it aloud. `artifactId` shows a visual in the same beat, and its
+narration stays quiet: your answer is the spoken line. The `entryId` is what `build` needs as
+`afterEntryId` if the user then asks to see something new.
 
-**`show`** `{ artifactId }` / **`hide`** `{}` → `{ shown }`
-Move the stage without saying anything.
+**`show`** `{ artifactId }` → `{ shown, narration }` / **`hide`** `{}` → `{ shown }`
+Move the stage without saying anything. If the visual was built with narration, the page
+speaks it in the user's voice as it goes up, and `show` hands it back so you know what was
+said. Do not repeat it in a `say`.
 
 ## The one ordering rule
 

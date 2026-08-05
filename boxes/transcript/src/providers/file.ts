@@ -43,10 +43,10 @@ export const file: Provider = {
       return broke(`${extension || 'that file'} is not an SRT or VTT`)
     }
 
-    context.report({ step: 'file', done: 0, total: 1, message: `reading ${extension.slice(1)}` })
+    context.report({ step: 'file', done: 0, total: 0, message: `reading ${extension.slice(1)}` })
     const parsed = parseSubtitles(await readFile(context.file, 'utf8'))
     const segments = cuesToSegments(parsed.cues, { dedupeOverlap: parsed.rolling })
-    context.report({ step: 'file', done: 1, total: 1, message: `read ${segments.length} segments` })
+    context.report({ step: 'file', done: 0, total: 0, message: `read ${segments.length} segments` })
 
     if (segments.length === 0) return broke('the subtitle file holds no cues')
     return produced(

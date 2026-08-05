@@ -104,9 +104,12 @@ store.progress(id, { step?, done?, total?, message? }): Promise<Session>
 store.fail(id, { code, message, hint }): Promise<Session>
 ```
 
-`progress` merges over what is already there, so a provider can move `done` alone. `fail`
-records the error on the record and leaves the phase where it is, so the phase can be
-retried without inventing a dead state.
+`progress` merges over what is already there, so a provider can move `done` alone. `done`
+and `total` are seconds of the media the phase is working through, out of how long it is; a
+step that cannot know a duration sends both as zero and says what it is doing in `message`,
+which is what the loader shows instead of a count. `fail` records the error on the record
+and leaves the phase where it is, so the phase can be retried without inventing a dead
+state.
 
 ## Outputs
 
@@ -146,7 +149,7 @@ Concept  = { id, label, kind: 'definition'|'equation'|'system'|'jargon',
              startsAt, endsAt, summary, notes: Note[], artifactIds: string[] }
 Note     = { id, kind: 'background'|'current', text, source, addedAt }
 Artifact = { id, title, kind: 'chart'|'dataviz'|'diagram'|'simulation',
-             conceptId, startsAt, endsAt, status: 'built'|'failed',
+             caption, narration, conceptId, startsAt, endsAt, status: 'built'|'failed',
              bundlePath, snapshotPath, error }
 LogEntry = { id, role: 'user'|'agent', text, at, artifactId, spoken }
 ```

@@ -47,6 +47,24 @@ describe('build', () => {
     assert.equal(image['data'], SNAPSHOT_PNG)
   })
 
+  it('writes the caption and the narration onto the record, for the page to read', async (t) => {
+    const harness = await openAgentIo(t)
+    await openSession(harness)
+
+    await harness.call('build', {
+      ...CHART,
+      caption: 'Values are illustrative.',
+      narration: 'Watch the low bins fill first, then the tail.',
+    })
+    await harness.call('build', { ...CHART, id: 'plain' })
+
+    const [marked, plain] = harness.session().artifacts
+    assert.equal(marked?.caption, 'Values are illustrative.')
+    assert.equal(marked?.narration, 'Watch the low bins fill first, then the tail.')
+    assert.equal(plain?.caption, null)
+    assert.equal(plain?.narration, null)
+  })
+
   it('stores nothing when the module does not compile', async (t) => {
     const harness = await openAgentIo(t)
     await openSession(harness)

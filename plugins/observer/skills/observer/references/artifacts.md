@@ -10,7 +10,7 @@ picture is right, then `link` it to its concept.
 export const meta = {
   title: 'Attention is a weighted average',
   kind: 'diagram',           // chart | dataviz | diagram | simulation
-  caption: 'Values are illustrative',   // optional, one line, only when it earns its place
+  caption: 'Values are illustrative',   // optional, one line; pass the same line to `build`
 }
 
 export function mount(el, ctx) {
@@ -124,8 +124,9 @@ red text instead of a failed mount.
 
 Never invent numbers. Use what the video gave you or what your research found. If the shape
 is the point and the values do not exist, draw the shape, label the axes qualitatively, and
-put `caption: 'Values are illustrative'` on the meta. A plausible-looking chart of made-up
-data is the worst thing you can put on that screen.
+pass `caption: 'Values are illustrative'` to `build` and put the same line on the meta. The
+caption the stage draws under the title is the one `build` was given. A plausible-looking
+chart of made-up data is the worst thing you can put on that screen.
 
 ## The loop
 

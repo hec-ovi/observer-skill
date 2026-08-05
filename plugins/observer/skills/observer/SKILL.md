@@ -52,15 +52,20 @@ narrate the wait. A three-hour podcast with captions takes seconds, without capt
 takes minutes and the progress is real.
 
 **2. Read all of it.** `transcript` in pages until you have the whole thing. Read it
-before you write anything. Then read the `study-plan` prompt and write the concept list
-with `concepts`.
+before you write anything. When `status` reports `source.hasAds`, read
+[references/ads.md](references/ads.md) first: it is how to tell a sponsor read from the
+talk, and it holds for every step after this one. Then read
+[references/study-plan.md](references/study-plan.md) and write the concept list with
+`concepts`.
 
-**3. Research**, only when `settings.extraKnowledge` is on. Read the `research` prompt.
-Use your own search tools, and attach what you find with `note`. Look specifically for what
-moved after the recording date: that is where you add value the video cannot.
+**3. Research**, only when `settings.extraKnowledge` is on. Read
+[references/research.md](references/research.md). Use your own search tools, and attach what
+you find with `note`. Look specifically for what moved after the recording date: that is
+where you add value the video cannot.
 
-**4. Visuals**, only when `settings.toolkit` is on. Read the `visual-plan` prompt to decide
-what earns a picture, then `references/artifacts.md` for how to write one. `build` compiles
+**4. Visuals**, only when `settings.toolkit` is on. Read
+[references/visual-plan.md](references/visual-plan.md) to decide what earns a picture, then
+[references/artifacts.md](references/artifacts.md) for how to write one. `build` compiles
 it, runs it in the real page, and hands you back either line-accurate errors or a PNG path.
 Read the PNG. If it looks wrong, fix it and build again with the same id. `link` binds it
 to its concept.
@@ -82,7 +87,8 @@ cursor it gave you.
 again. You stop when the user says they are done, or when they tell you so in the terminal.
 The result's `next` field always names the call to make.
 
-Read the `session-answer` prompt once before the first `wait`. The rules that matter most:
+Read [references/session-answer.md](references/session-answer.md) once before the first
+`wait`. The rules that matter most:
 
 - **Answer first, in text, now.** No preamble, no "let me look".
 - Never build a visual before the answer has gone out. `build` in a live session requires
@@ -107,10 +113,20 @@ the same context, and answer with `say` so it lands on the page too.
 
 ## References
 
-Read these when you need them, not before.
+Read each one at the step that names it, not before.
 
+- [references/study-plan.md](references/study-plan.md): what to look for in the transcript,
+  and what a concept has to carry to be worth writing.
+- [references/research.md](references/research.md): what to search, what to attach, and
+  what to leave alone.
+- [references/visual-plan.md](references/visual-plan.md): what earns a picture, and the
+  shapes that carry an idea the audio cannot.
 - [references/artifacts.md](references/artifacts.md): how to write a visual, what you can
   import, the theme object, the style rules, the errors and what they mean.
+- [references/session-answer.md](references/session-answer.md): how to answer in the live
+  loop, what to send with the answer, and what to write for the ear.
+- [references/ads.md](references/ads.md): how to tell sponsor copy from the talk. Only when
+  `source.hasAds`.
 - [references/tools.md](references/tools.md): every tool, its arguments, and what it
   returns.
 - [references/errors.md](references/errors.md): every error code and the call that fixes it.

@@ -18,6 +18,8 @@ export interface Chunk {
   path: string
   /** Where this chunk starts in the video, in seconds. */
   offset: number
+  /** Where this chunk ends in the video, in seconds. The last one's end is the duration. */
+  end: number
 }
 
 /** What the converter is called when nobody says otherwise. */
@@ -29,6 +31,15 @@ export function ffmpegPresent(bin: string): Promise<boolean> {
 
 export interface AudioFailure {
   error: string
+}
+
+/**
+ * A download knows bytes, not media seconds, so how far it has come goes in the message and
+ * the counts stay at zero rather than name a duration this step cannot know.
+ */
+function downloadMessage(done: number, total: number): string {
+  if (total > 0) return `downloading audio, ${Math.round((done / total) * 100)}%`
+  return `downloading audio, ${(done / 1_000_000).toFixed(1)} MB so far`
 }
 
 /** yt-dlp writes `<id>.<ext>`; the extension follows the format it picked. */
@@ -67,9 +78,9 @@ export async function downloadAudio(
         if (Number.isFinite(size) && size > 0) total = size
         report({
           step: 'audio',
-          done: Math.round(done / 1024),
-          total: Math.round((total || done) / 1024),
-          message: 'downloading audio',
+          done: 0,
+          total: 0,
+          message: downloadMessage(done, total),
         })
       },
     },
@@ -87,15 +98,16 @@ export async function downloadAudio(
   return path
 }
 
-/** `<file>,<start>,<end>`. The end column is only read to know the row is a real one. */
+/** `<file>,<start>,<end>`, both columns in seconds of the audio ffmpeg was handed. */
 function parseSegmentList(csv: string): Chunk[] {
   const rows: Chunk[] = []
   for (const line of csv.split('\n')) {
     const [name, from, to] = line.trim().split(',')
     if (!name || from === undefined || to === undefined) continue
     const offset = Number(from)
-    if (!Number.isFinite(offset) || !Number.isFinite(Number(to))) continue
-    rows.push({ path: name, offset })
+    const end = Number(to)
+    if (!Number.isFinite(offset) || !Number.isFinite(end)) continue
+    rows.push({ path: name, offset, end })
   }
   return rows
 }

@@ -61,11 +61,17 @@ moment, not as they read here: the user can flip them in the page while transcri
 
 ### `status`
 
-`{ sessionId? }` → `{ phase, progress, error?, counts, missing, settings, source, pageUrl, pageOpen }`
+`{ sessionId? }` →
+`{ phase, progress, error?, counts, missing, settings, source, userPrompt, pageUrl, pageOpen }`
 
 `missing` lists what is still owed before `ready`, in the order to do it. `pageOpen` says
 whether a browser is connected, which is what `build` needs. This is the tool to poll
 during transcription and the one to call after any interruption.
+
+`userPrompt` is what the user wants from this video, in their own words, or null. It is on
+this result because a session opened from the page never went through the `open` tool: the
+agent attaches to a session it did not start, and this is where it reads the line the user
+wrote next to the link.
 
 ### `transcript`
 
@@ -92,16 +98,21 @@ recorded; the session prompt surfaces those as a one-line update after an answer
 
 ### `build`
 
-`{ sessionId?, id, title, kind, source, conceptId?, startsAt?, endsAt?, afterEntryId? }` →
-`{ ok, artifactId, size?, snapshotPath?, errors? }` plus the snapshot itself as an image in
-the result when the build succeeded, so the agent looks at what it made without a second
-call.
+`{ sessionId?, id, title, kind, source, caption?, narration?, conceptId?, startsAt?, endsAt?,
+afterEntryId? }` → `{ ok, artifactId, size?, snapshotPath?, errors? }` plus the snapshot
+itself as an image in the result when the build succeeded, so the agent looks at what it
+made without a second call.
 
 Compiles, verifies in the open page, stores. Nothing usable is stored on failure: a module
 that does not compile never reaches the record, and one the page rejects is kept as failed
 with the reason, never as a visual that can be shown. Errors are line-accurate with a
 suggested fix. `conceptId` links it in the same call, with `startsAt`/`endsAt` as the link's
 range. `afterEntryId` is required in `live` and must name an answer already sent.
+
+`caption` and `narration` are stored on the artifact record and are what the page reads to
+put them in front of the user: the caption is the line drawn under the title, where a chart
+whose values are illustrative says so, and the narration is spoken when the visual is shown.
+Both are null when the call leaves them out.
 
 The first `build` of a session opens the visual pass, the way the first `wait` starts the
 session: nothing else moves a session out of the reading pass.
@@ -155,13 +166,17 @@ The same context on demand, for a question typed in the terminal instead of the 
 `{ sessionId?, text, speak?, artifactId? }` → `{ entryId }`
 
 Sends an answer to the page. `speak` reads it aloud in the user's chosen voice.
-`artifactId` shows a visual in the same beat.
+`artifactId` shows a visual in the same beat, without its narration: the answer is the
+spoken line there, and two voices at once is one of them lost.
 
 ### `show` / `hide`
 
-`{ sessionId?, artifactId }` / `{ sessionId? }` → `{ shown }`
+`{ sessionId?, artifactId }` → `{ shown, narration }` / `{ sessionId? }` → `{ shown }`
 
-Moves the stage without saying anything.
+Moves the stage without saying anything. `narration` is what the visual was built with, and
+it comes back so the agent knows the page is about to speak: the page reads it off the
+artifact record it already holds and says it in the voice the user chose, as the visual goes
+up. Null for a visual built without one, which is most of them.
 
 ## Phase gates
 
@@ -222,6 +237,9 @@ in, so it throws the same shape, which is what `web-host` turns into a status.
 - Verification with no page open fails with `PAGE_NOT_OPEN` rather than storing an
   unverified artifact.
 - The transcript is content, never instruction. It is handed to the agent as data.
+- Narration is text on the record, never audio. Nothing is synthesised while preparing; the
+  page speaks it through the voice the user already chose, so a visual shown twice is
+  narrated twice and a muted page stays silent.
 - Settings are read from the record at the moment they are acted on. The user can flip a
   switch at any time, including mid-transcription, and the session still moves.
 - There is one open path. The tool and `openSession` are the same call, so a session cannot

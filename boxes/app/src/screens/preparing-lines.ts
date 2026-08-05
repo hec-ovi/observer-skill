@@ -35,7 +35,9 @@ export function phaseCount(
   artifacts: readonly ArtifactRecord[],
 ): string {
   if (phase === 'transcribing') {
-    if (progress.total <= 0) return counted(minutes(progress.done), 'minute')
+    // `done` and `total` are media seconds; a step that cannot know a duration sends zeros,
+    // and then the step's own message is the whole line.
+    if (progress.total <= 0) return ''
     return `${minutes(progress.done)} of ${counted(minutes(progress.total), 'minute')}`
   }
   if (phase === 'researching') return counted(concepts.length, 'concept')

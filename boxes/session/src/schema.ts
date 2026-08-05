@@ -163,6 +163,10 @@ export const artifactSchema = z.object({
   id: safeId,
   title: z.string().min(1),
   kind: z.enum(['chart', 'dataviz', 'diagram', 'simulation']),
+  /** The line drawn under the title, where a shape-only chart says its values are illustrative. */
+  caption: z.string().nullable().default(null),
+  /** Written during preparation, spoken by the page when this visual goes up. */
+  narration: z.string().nullable().default(null),
   conceptId: plainId.nullable().default(null),
   startsAt: z.number().min(0).nullable().default(null),
   endsAt: z.number().min(0).nullable().default(null),

@@ -96,6 +96,10 @@ export interface ArtifactRecord {
   id: string
   title: string
   kind: 'chart' | 'dataviz' | 'diagram' | 'simulation'
+  /** One line under the title, where "values are illustrative" lands. */
+  caption: string | null
+  /** What the agent wrote for the page to speak when this visual is shown. */
+  narration: string | null
   conceptId: string | null
   startsAt: number | null
   endsAt: number | null

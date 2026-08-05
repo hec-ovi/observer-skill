@@ -23,8 +23,9 @@ function missingFor(session: Session): string[] {
 export const status = defineTool({
   name: 'status',
   description:
-    'Where the session stands: phase, progress, counts, what is still missing, and whether ' +
-    'a page is connected. Poll this while transcription runs and after any interruption.',
+    'Where the session stands: phase, progress, counts, what is still missing, whether a ' +
+    "page is connected, and the user's own line about this video. Poll it while " +
+    'transcription runs and call it after any interruption.',
   phases: PHASES,
   input: z.object({ sessionId: sessionIdInput }),
   output: z.object({
@@ -35,6 +36,8 @@ export const status = defineTool({
     missing: z.array(z.string()),
     settings: sessionSchema.shape.settings,
     source: sessionSchema.shape.source,
+    /** What the user wants from the video, in their words. Null when they said nothing. */
+    userPrompt: sessionSchema.shape.userPrompt,
     pageUrl: z.string().nullable(),
     pageOpen: z.boolean(),
   }),
@@ -51,6 +54,7 @@ export const status = defineTool({
       missing: missingFor(session),
       settings: session.settings,
       source: session.source,
+      userPrompt: session.userPrompt,
       pageUrl: call.runtime.pageUrl(session.id),
       pageOpen: host.hasPage(session.id),
     }

@@ -58,6 +58,11 @@ export interface TranscriptWindow {
   text: string
 }
 
+/**
+ * `done` and `total` are seconds of the media itself, so a loader can say how much of the
+ * video is through. A step that cannot know a duration (a caption round trip, an audio
+ * download) sends both as zero and says what it is doing in `message`.
+ */
 export interface Progress {
   step: string
   done: number

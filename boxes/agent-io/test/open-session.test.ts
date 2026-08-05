@@ -56,6 +56,21 @@ describe('openSession', () => {
     assert.equal((status.body['counts'] as { segments: number }).segments, 360)
   })
 
+  it('reaches the agent with the line the user typed into the page', async (t) => {
+    const harness = await openAgentIo(t)
+
+    const opened = await harness.agentIo.openSession({
+      url: VIDEO_URL,
+      userPrompt: 'I only care about the attention part',
+    })
+    await until(() => harness.store.get(opened.id).phase !== 'transcribing', 'the transcript')
+
+    // Nothing else returns it: on this path the agent never saw the `open` call.
+    const status = await harness.call('status')
+
+    assert.equal(status.body['userPrompt'], 'I only care about the attention part')
+  })
+
   it('refuses a video the player will never load, the way the tool does', async (t) => {
     const harness = await openAgentIo(t)
     harness.ingest.source = { ...harness.ingest.source, embeddable: false }

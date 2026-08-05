@@ -3,8 +3,9 @@
  *
  * Audio comes down once, becomes 16 kHz mono, and is cut into chunks the endpoint accepts.
  * Each chunk is sent on its own and stitched back with the offset ffmpeg reported, so a
- * three-hour podcast arrives on one timeline. Progress counts chunks, which is the part
- * that actually takes the time.
+ * three-hour podcast arrives on one timeline. Progress counts the media seconds already
+ * transcribed out of the audio's own duration, which is the part that takes the time; the
+ * download and the split report their message alone, since bytes are not seconds.
  */
 
 import { readConfig } from '#config'
@@ -48,14 +49,22 @@ export const endpointAsr: Provider = {
     const config = readConfig()
     if (config.asrUrl === null) return nothing('no transcription endpoint is configured')
 
-    context.report({ step: 'audio', done: 0, total: 1, message: 'downloading audio' })
+    context.report({ step: 'audio', done: 0, total: 0, message: 'downloading audio' })
     const audio = await downloadAudio(source.url, context.scratch, context.report, context.ytdlpBin)
     if (typeof audio !== 'string') return broke(audio.error)
 
-    context.report({ step: 'chunks', done: 0, total: 1, message: 'preparing audio' })
+    context.report({ step: 'chunks', done: 0, total: 0, message: 'preparing audio' })
     const chunks = await splitAudio(audio, context.scratch, CHUNK_SECONDS, context.ffmpegBin)
     if (!Array.isArray(chunks)) return broke(chunks.error)
-    context.report({ step: 'chunks', done: 1, total: 1, message: `${chunks.length} chunks to transcribe` })
+
+    /** The last cut's end is how many seconds of audio there are to get through. */
+    const seconds = chunks[chunks.length - 1]?.end ?? 0
+    context.report({
+      step: 'chunks',
+      done: 0,
+      total: seconds,
+      message: `${chunks.length} chunks to transcribe`,
+    })
 
     const cues: Cue[] = []
     let language = context.language ?? null
@@ -64,8 +73,8 @@ export const endpointAsr: Provider = {
     for (const [index, chunk] of chunks.entries()) {
       context.report({
         step: 'transcribe',
-        done: index,
-        total: chunks.length,
+        done: chunk.offset,
+        total: seconds,
         message: `transcribing chunk ${index + 1} of ${chunks.length}`,
       })
       const answer = await transcribeChunk(chunk.path, chunk.offset, {
@@ -86,8 +95,8 @@ export const endpointAsr: Provider = {
 
     context.report({
       step: 'transcribe',
-      done: chunks.length,
-      total: chunks.length,
+      done: seconds,
+      total: seconds,
       message: 'stitching the chunks together',
     })
 

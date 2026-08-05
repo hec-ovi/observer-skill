@@ -138,6 +138,21 @@ describe('show and hide', () => {
     assert.deepEqual(sent, [{ type: 'show', artifactId: 'bins' }, { type: 'hide' }])
   })
 
+  it('hands back the narration the visual was built with, for the page to speak', async (t) => {
+    const harness = await openAgentIo(t)
+    await goLive(harness)
+    await putBuiltArtifact(harness, 'bins', {
+      narration: 'Each bin counts one slice of the spectrum.',
+    })
+    await putBuiltArtifact(harness, 'plain')
+
+    const spoken = await harness.call('show', { artifactId: 'bins' })
+    const silent = await harness.call('show', { artifactId: 'plain' })
+
+    assert.equal(spoken.body['narration'], 'Each bin counts one slice of the spectrum.')
+    assert.equal(silent.body['narration'], null)
+  })
+
   it('refuses to show a visual this session never built', async (t) => {
     const harness = await openAgentIo(t)
     await goLive(harness)

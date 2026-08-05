@@ -15,10 +15,26 @@ function progress(over: Partial<Progress> = {}): Progress {
   return { step: '', done: 0, total: 0, message: '', ...over }
 }
 
+/** A caption fetch is two round trips, so it sends no seconds: zeros and a message. */
+const CAPTIONS = progress({
+  step: 'captions',
+  done: 0,
+  total: 0,
+  message: 'looking for published captions',
+})
+
+/** Speech recognition knows the chunk it is on and how long the audio is, both in seconds. */
+const TRANSCRIBE = progress({
+  step: 'transcribe',
+  done: 120,
+  total: 600,
+  message: 'transcribing chunk 1 of 2',
+})
+
 const TRANSCRIBING = makeSession({
   phase: 'transcribing',
   transcript: null,
-  progress: progress({ step: 'captions', done: 120, total: 600, message: 'Reading the captions' }),
+  progress: CAPTIONS,
 })
 
 describe('the loader', () => {
@@ -26,13 +42,26 @@ describe('the loader', () => {
     history.replaceState(null, '', '/s/s1')
   })
 
+  it('shows the step message alone when the step reports no duration', async () => {
+    serve(TRANSCRIBING, segmentsOf(20))
+    const { container } = render(<App />)
+
+    expect(await screen.findByText('Transcribing')).toBeInTheDocument()
+    expect(screen.getByText('looking for published captions')).toBeInTheDocument()
+    expect(container.querySelector('.preparing-count')).not.toBeInTheDocument()
+    expect(screen.queryByText(/minute/)).not.toBeInTheDocument()
+  })
+
   it('follows the phase messages the server sends', async () => {
     serve(TRANSCRIBING, segmentsOf(20))
     render(<App />)
 
     expect(await screen.findByText('Transcribing')).toBeInTheDocument()
+
+    push('phase', { phase: 'transcribing', progress: TRANSCRIBE })
+
     expect(screen.getByText('2 of 10 minutes')).toBeInTheDocument()
-    expect(screen.getByText('Reading the captions')).toBeInTheDocument()
+    expect(screen.getByText('transcribing chunk 1 of 2')).toBeInTheDocument()
 
     push('phase', {
       phase: 'researching',

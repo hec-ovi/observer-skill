@@ -99,6 +99,32 @@
   accent-color: var(--accent);
 }
 
+.setting-loading {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.setting-bar {
+  inline-size: 100%;
+  block-size: var(--space-1);
+  appearance: none;
+  border: 0;
+  background: var(--surface-raised);
+  color: var(--accent);
+}
+
+.setting-bar::-webkit-progress-bar {
+  background: var(--surface-raised);
+}
+
+.setting-bar::-webkit-progress-value {
+  background: var(--accent);
+}
+
+.setting-bar::-moz-progress-bar {
+  background: var(--accent);
+}
+
 .setting-note,
 .setting-problem {
   margin: 0;

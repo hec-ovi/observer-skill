@@ -102,15 +102,15 @@ export const captions: Provider = {
   },
 
   async fetch(source: Source, context: ProviderContext): Promise<ProviderOutcome> {
-    context.report({ step: 'captions', done: 0, total: 2, message: 'looking for published captions' })
+    context.report({ step: 'captions', done: 0, total: 0, message: 'looking for published captions' })
 
-    for (const [index, automatic] of [false, true].entries()) {
+    for (const automatic of [false, true]) {
       const dir = join(context.scratch, automatic ? 'auto' : 'manual')
       const outcome = await pass(source, context, dir, automatic)
       context.report({
         step: 'captions',
-        done: index + 1,
-        total: 2,
+        done: 0,
+        total: 0,
         message: automatic ? 'reading machine captions' : 'reading published captions',
       })
       if (outcome === null) continue

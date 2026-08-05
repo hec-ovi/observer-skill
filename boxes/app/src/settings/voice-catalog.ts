@@ -32,7 +32,12 @@ export async function voicesOf(config: VoiceOutConfig): Promise<Voice[]> {
   }
 }
 
+/** Whole megabytes, for a pair that shares one unit: "98 of 195 MB". */
+export function megabytes(bytes: number): number {
+  return Math.round(bytes / 1e6)
+}
+
 /** A download, in the unit a person agrees to. */
 export function downloadSize(bytes: number): string {
-  return `${Math.round(bytes / 1e6)} MB`
+  return `${megabytes(bytes)} MB`
 }

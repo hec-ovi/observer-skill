@@ -73,6 +73,8 @@ export function makeArtifact(overrides: Partial<Artifact> = {}): Artifact {
     id: 'a1',
     title: 'A chart',
     kind: 'chart',
+    caption: null,
+    narration: null,
     conceptId: null,
     startsAt: null,
     endsAt: null,

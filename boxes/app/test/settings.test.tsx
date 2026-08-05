@@ -1,14 +1,15 @@
 /**
  * Settings: a change lands on the page and goes upstream at once, a heavy voice states its
- * download before it is chosen, and a refused microphone is reported beside the control that
- * asked for it.
+ * download before it is chosen and shows it arriving after, and a refused microphone is
+ * reported beside the control that asked for it.
  */
 
-import { render, screen, waitFor } from '@testing-library/react'
+import { act, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { dispose } from '@voice-out/index.ts'
 import { App } from '../src/App.tsx'
-import { fakeSpeechSynthesis, setMicrophoneAccess } from '../testing/fakes.ts'
+import { FakeWorker, fakeSpeechSynthesis, setMicrophoneAccess } from '../testing/fakes.ts'
 import { makeSession, segmentsOf } from './fixtures.ts'
 import { postedOf, serve } from './server.ts'
 import type { FakeServer } from './server.ts'
@@ -59,5 +60,50 @@ describe('the settings panel', () => {
     await user.pointer({ keys: '[/MouseLeft]' })
 
     expect(await screen.findByRole('alert')).toHaveTextContent('The microphone is blocked')
+  })
+
+  describe('with a voice that has to download first', () => {
+    beforeEach(() => {
+      // The in-browser voice refuses to run without these two, and jsdom has neither.
+      vi.stubGlobal('Worker', FakeWorker)
+      vi.stubGlobal('isSecureContext', true)
+      vi.stubGlobal('crossOriginIsolated', false)
+    })
+
+    afterEach(() => {
+      dispose()
+    })
+
+    it('shows the download arriving instead of a control that looks stuck', async () => {
+      const user = await openSettings()
+      const panel = within(screen.getByRole('group', { name: 'Voice' }))
+      expect(FakeWorker.live()).toHaveLength(0)
+
+      await user.selectOptions(panel.getByLabelText('Engine'), 'pocket')
+
+      await waitFor(() => expect(FakeWorker.live()).toHaveLength(1))
+      act(() => {
+        FakeWorker.last().reply({
+          type: 'progress',
+          step: 'model',
+          loaded: 97_680_913,
+          total: 195_361_827,
+        })
+      })
+
+      expect(
+        await panel.findByRole('progressbar', { name: 'Downloading the voice' }),
+      ).toBeInTheDocument()
+      expect(panel.getByText('Downloading the voice: 98 of 195 MB')).toBeInTheDocument()
+    })
+
+    it('credits the voice while it is the one chosen', async () => {
+      const user = await openSettings()
+      const panel = within(screen.getByRole('group', { name: 'Voice' }))
+
+      await user.selectOptions(panel.getByLabelText('Engine'), 'pocket')
+
+      expect(panel.getByText(/Speech synthesis by Pocket TTS/)).toBeInTheDocument()
+    })
   })
 })

@@ -1,6 +1,6 @@
 /**
- * Which voice reads the answers, what it costs to download before it is picked, and a line
- * to hear it say.
+ * Which voice reads the answers, what it costs to download before it is picked, how far that
+ * download has got, and a line to hear it say.
  */
 
 import { useEffect, useState } from 'react'
@@ -8,6 +8,8 @@ import { PROVIDER_IDS } from '@voice-out/index.ts'
 import type { Voice } from '@voice-out/index.ts'
 import type { Settings, SettingsPatch, VoiceOutProvider } from '../session/record.ts'
 import type { Speaker } from '../session/use-speaker.ts'
+import { useVoiceWarm } from './use-voice-warm.ts'
+import { VoiceLoading } from './VoiceLoading.tsx'
 import { costOf, downloadSize, VOICE_OUT_NAMES, voicesOf } from './voice-catalog.ts'
 import './settings.css'
 
@@ -28,6 +30,7 @@ export interface VoiceOutSettingsProps {
 export function VoiceOutSettings({ settings, speaker, onChange }: VoiceOutSettingsProps) {
   const { provider, voice } = settings.voiceOut
   const [choices, setChoices] = useState<readonly Voice[]>([])
+  const warming = useVoiceWarm(settings.voiceOut)
 
   useEffect(() => {
     let live = true
@@ -40,6 +43,7 @@ export function VoiceOutSettings({ settings, speaker, onChange }: VoiceOutSettin
   }, [provider])
 
   const { attribution } = costOf(provider)
+  const problem = speaker.problem ?? warming.problem
 
   return (
     <fieldset className="setting">
@@ -60,6 +64,8 @@ export function VoiceOutSettings({ settings, speaker, onChange }: VoiceOutSettin
           ))}
         </select>
       </label>
+
+      {warming.progress ? <VoiceLoading progress={warming.progress} /> : null}
 
       {choices.length > 0 ? (
         <label className="setting-row">
@@ -84,9 +90,9 @@ export function VoiceOutSettings({ settings, speaker, onChange }: VoiceOutSettin
         Speak a test line
       </button>
 
-      {speaker.problem ? (
+      {problem ? (
         <p className="setting-problem" role="alert">
-          {speaker.problem}
+          {problem}
         </p>
       ) : null}
     </fieldset>

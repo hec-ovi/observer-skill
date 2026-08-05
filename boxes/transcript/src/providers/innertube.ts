@@ -66,7 +66,7 @@ export const innertube: Provider = {
   },
 
   async fetch(source: Source, context: ProviderContext): Promise<ProviderOutcome> {
-    context.report({ step: 'innertube', done: 0, total: 1, message: 'opening the transcript panel' })
+    context.report({ step: 'innertube', done: 0, total: 0, message: 'opening the transcript panel' })
 
     let info: Info
     let panel: Panel
@@ -89,7 +89,7 @@ export const innertube: Provider = {
 
     const raw = (panel.transcript.content?.body?.initial_segments ?? []) as PanelSegment[]
     const segments = cuesToSegments(toCues(raw))
-    context.report({ step: 'innertube', done: 1, total: 1, message: 'read the transcript panel' })
+    context.report({ step: 'innertube', done: 0, total: 0, message: 'read the transcript panel' })
     if (segments.length === 0) return nothing('the transcript panel was empty')
 
     const track = served(info, panel)

@@ -16,7 +16,7 @@ import { fail } from '#errors'
 import type { Source } from '#ingest'
 import { createKnowledge } from '#knowledge'
 import { createStore } from '#session'
-import type { Session, SessionStore } from '#session'
+import type { ArtifactInput, Session, SessionStore } from '#session'
 import type { ReadOptions, TranscriptPage, TranscriptRef, TranscriptWindow } from '#transcript'
 import type { VerifyResult } from '#web-host'
 import { agentIoOn } from './src/api.ts'
@@ -342,7 +342,11 @@ export async function goLive(harness: Harness): Promise<Session> {
 }
 
 /** A verified visual on the record, as `build` leaves one. */
-export async function putBuiltArtifact(harness: Harness, id: string): Promise<Session> {
+export async function putBuiltArtifact(
+  harness: Harness,
+  id: string,
+  fields: Partial<ArtifactInput> = {},
+): Promise<Session> {
   const session = harness.session()
   return harness.store.putArtifact(session.id, {
     id,
@@ -350,5 +354,6 @@ export async function putBuiltArtifact(harness: Harness, id: string): Promise<Se
     kind: 'chart',
     status: 'built',
     bundlePath: `sessions/${session.id}/artifacts/${id}.js`,
+    ...fields,
   })
 }

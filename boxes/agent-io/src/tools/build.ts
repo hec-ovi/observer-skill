@@ -73,6 +73,22 @@ export const build = defineTool({
     title: z.string().min(1).describe('What the stage draws above it. Match `meta.title`.'),
     kind: z.enum(ARTIFACT_KINDS),
     source: z.string().min(1).describe('The ES module: `meta` and `mount(el, ctx)`.'),
+    caption: z
+      .string()
+      .min(1)
+      .optional()
+      .describe(
+        'One line the stage draws under the title. A chart whose values are illustrative ' +
+          'says so here.',
+      ),
+    narration: z
+      .string()
+      .min(1)
+      .optional()
+      .describe(
+        "Spoken in the user's chosen voice when this visual is shown. For a process worth " +
+          'walking through, not the caption read aloud.',
+      ),
     conceptId: z.string().min(1).optional().describe('Links it in the same call.'),
     startsAt: seconds.optional().describe('The stretch of video this visual is about.'),
     endsAt: seconds.optional(),
@@ -125,6 +141,8 @@ export const build = defineTool({
       id: input.id,
       title: input.title,
       kind: input.kind,
+      caption: input.caption ?? null,
+      narration: input.narration ?? null,
       conceptId: input.conceptId ?? null,
       startsAt: range?.startsAt ?? null,
       endsAt: range?.endsAt ?? null,

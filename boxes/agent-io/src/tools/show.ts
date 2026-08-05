@@ -6,8 +6,8 @@ import { defineTool } from '../tool.ts'
 export const show = defineTool({
   name: 'show',
   description:
-    'Move the stage from the video to a built visual, without saying anything. To show one ' +
-    'alongside an answer, pass its id to `say` instead.',
+    'Move the stage to a built visual, and speak the narration it was built with, if it has ' +
+    'one. To show a visual alongside an answer instead, pass its id to `say`.',
   phases: ['live'],
   input: z.object({
     sessionId: sessionIdInput,
@@ -15,12 +15,16 @@ export const show = defineTool({
   }),
   output: z.object({
     shown: z.string().nullable(),
+    /** What the page speaks as the visual goes up, written at `build` time. */
+    narration: z.string().nullable(),
   }),
 
   async run(input, call) {
     const session = call.require()
-    requireBuilt(session, input.artifactId)
+    const artifact = requireBuilt(session, input.artifactId)
+    // The narration rides the record, not the signal: the page already holds the artifact
+    // it was told to show, and a reload keeps what a transient message would have lost.
     call.runtime.deps.store.signal(session.id, { type: 'show', artifactId: input.artifactId })
-    return { shown: input.artifactId }
+    return { shown: input.artifactId, narration: artifact.narration }
   },
 })

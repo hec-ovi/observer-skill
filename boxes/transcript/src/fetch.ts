@@ -116,12 +116,9 @@ export async function fetchTranscript(source: Source, options: FetchOptions): Pr
     }
 
     const { provider, result } = produced
-    report({
-      step: 'transcript',
-      done: 0,
-      total: result.segments.length,
-      message: 'writing the transcript',
-    })
+    /** The words cover the whole video by the time they are written, so the count is its length. */
+    const seconds = duration(source, result)
+    report({ step: 'transcript', done: 0, total: seconds, message: 'writing the transcript' })
     const total = await writeTranscript(
       parsed.home,
       parsed.sessionId,
@@ -129,14 +126,14 @@ export async function fetchTranscript(source: Source, options: FetchOptions): Pr
         provider: provider.id,
         language: result.language,
         generated: result.generated,
-        duration: duration(source, result),
+        duration: seconds,
       },
       result.segments,
     )
     report({
       step: 'transcript',
-      done: total,
-      total,
+      done: seconds,
+      total: seconds,
       message: `${total} segments from ${provider.id}`,
     })
 
@@ -144,7 +141,7 @@ export async function fetchTranscript(source: Source, options: FetchOptions): Pr
       provider: provider.id,
       language: result.language,
       segmentCount: total,
-      duration: duration(source, result),
+      duration: seconds,
       generated: result.generated,
     }
   } finally {

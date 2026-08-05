@@ -21,7 +21,7 @@ import { phaseTitle } from './screens/preparing-lines.ts'
 import { Session } from './screens/Session.tsx'
 import { artifactUrl } from './session/artifact-url.ts'
 import { isPreparing } from './session/record.ts'
-import type { LogEntry, Settings, SettingsPatch } from './session/record.ts'
+import type { LogEntry, Session as SessionRecord, Settings, SettingsPatch } from './session/record.ts'
 import { unusableListener } from './session/unusable-listener.ts'
 import { useQuestions } from './session/use-questions.ts'
 import { useSession } from './session/use-session.ts'
@@ -54,6 +54,8 @@ export function SessionView({ sessionId }: SessionViewProps) {
   const speaker = useSpeaker()
   const stage = useStage(video)
   const settings = useRef<Settings | null>(null)
+  /** The live record, for the handlers that outlive the render they were made in. */
+  const shownArtifact = useRef<SessionRecord | null>(null)
 
   const verifier = useVerifier((result) =>
     upstream.send({
@@ -71,7 +73,16 @@ export function SessionView({ sessionId }: SessionViewProps) {
       const current = settings.current
       if (event.speak && current) speaker.say(event.text, current)
     },
-    show: (event) => stage.show(event.artifactId),
+    show: (event) => {
+      stage.show(event.artifactId)
+      // Narration the agent wrote while preparing, spoken as the visual arrives. `say`
+      // never speaks an artifact's narration: one line at a time, and that one is the answer.
+      const shown = shownArtifact.current?.artifacts.find(
+        (candidate) => candidate.id === event.artifactId && candidate.status === 'built',
+      )
+      const voice = settings.current
+      if (shown?.narration && voice) speaker.say(shown.narration, voice)
+    },
     hide: stage.hide,
     verify: (request) => verifier.verify(request),
   })
@@ -79,6 +90,8 @@ export function SessionView({ sessionId }: SessionViewProps) {
   const record = connection.record
   useEffect(() => {
     settings.current = record?.settings ?? null
+    // The `show` handler closes over the record it was made with, so it reads this instead.
+    shownArtifact.current = record
   })
 
   const { entries, remember } = useQuestions(record?.log ?? NO_LOG)
@@ -118,7 +131,14 @@ export function SessionView({ sessionId }: SessionViewProps) {
     const found = record.artifacts.find(
       (candidate) => candidate.id === showing.artifactId && candidate.status === 'built',
     )
-    return found ? { id: found.id, title: found.title, url: artifactUrl(record.id, found.id) } : null
+    if (!found) return null
+    return {
+      id: found.id,
+      title: found.title,
+      // The stage's caption is optional, so a null one is left off rather than passed on.
+      ...(found.caption === null ? {} : { caption: found.caption }),
+      url: artifactUrl(record.id, found.id),
+    }
   }, [record, stage.showing])
 
   const onPosition = useCallback(
