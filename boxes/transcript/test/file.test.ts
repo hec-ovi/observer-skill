@@ -5,7 +5,7 @@ import { after, describe, test } from 'node:test'
 
 import { fetch as fetchTranscript, read } from '#transcript'
 
-import { caught, fixture, pool, source } from '../fixtures.ts'
+import { caught, fixture, pool, source, words } from '../fixtures.ts'
 
 describe('file', () => {
   const boxes = pool()
@@ -56,6 +56,23 @@ describe('file', () => {
     const page = read(box.sessionId)
     assert.equal(page.segments.length, ref.segmentCount)
     assert.match(page.segments.map((segment) => segment.text).join(' '), /^so the first thing we need/)
+  })
+
+  test('a very short cue does not make a plain srt lose the words it repeats', async () => {
+    const box = await boxes.open('flush-cue')
+    await fetchTranscript(source(), {
+      home: box.home,
+      sessionId: box.sessionId,
+      provider: 'file',
+      file: fixture('flush-cue.srt'),
+      onProgress: box.onProgress,
+    })
+
+    const page = read(box.sessionId)
+    assert.deepEqual(words(page.segments.map((segment) => segment.text)), [
+      'and', 'then', 'the', 'fox', 'saw', 'the', 'rabbit',
+      'the', 'rabbit', 'ran', 'and', 'the', 'fox', 'went', 'home',
+    ])
   })
 
   test('no file to read names what to pass', async () => {

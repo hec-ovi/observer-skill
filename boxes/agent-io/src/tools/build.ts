@@ -3,6 +3,7 @@ import * as z from 'zod/v4'
 import { ARTIFACT_KINDS } from '#artifact'
 import { fail } from '#errors'
 import type { Session } from '#session'
+import { rangeOf } from '../range.ts'
 import { seconds, sessionIdInput } from '../schema.ts'
 import { artifactsDir, writeSnapshot } from '../snapshot.ts'
 import { defineTool } from '../tool.ts'
@@ -18,6 +19,21 @@ const buildErrorSchema = z.object({
   snippet: z.string().optional(),
   fix: z.string().optional(),
 })
+
+/**
+ * "Build visuals" is the user's switch. With it off there is no visual pass to open, and a
+ * session already past it would take the artifact anyway, so the setting is the gate.
+ */
+function requireToolkit(session: Session): void {
+  if (session.settings.toolkit) return
+  fail(
+    'WRONG_PHASE',
+    'This session has visuals turned off, so nothing is built for it.',
+    session.phase === 'live'
+      ? 'Answer with `say` instead.'
+      : 'Close preparation with `ready` instead.',
+  )
+}
 
 /**
  * An answer comes first and it comes as text, so authoring in `live` has to name the answer
@@ -77,7 +93,9 @@ export const build = defineTool({
   async run(input, call) {
     const session = call.require()
     const { store, artifact, host, knowledge, config } = call.runtime.deps
+    const range = rangeOf(input.startsAt, input.endsAt)
 
+    requireToolkit(session)
     if (session.phase === 'live') requireAnswered(session, input.afterEntryId)
 
     // Verification runs in the user's own page. Without one there is nowhere to check the
@@ -100,11 +118,6 @@ export const build = defineTool({
     if (!compiled.ok) {
       return { ok: false, artifactId: input.id, errors: compiled.errors }
     }
-
-    const range =
-      input.startsAt !== undefined && input.endsAt !== undefined
-        ? { startsAt: input.startsAt, endsAt: input.endsAt }
-        : undefined
 
     // The page fetches the bundle by id, which means the record has to name it before the
     // sandbox can run it. It stays failed until the page says otherwise.

@@ -1,4 +1,5 @@
 import * as z from 'zod/v4'
+import type { SessionStore } from '#session'
 import { fitPrefix } from '../budget.ts'
 import { eventView, nextAfter, viewOf } from '../events.ts'
 import { sessionIdInput } from '../schema.ts'
@@ -11,6 +12,20 @@ import { defineTool } from '../tool.ts'
  */
 const DEFAULT_TIMEOUT_MS = 45_000
 const MAX_TIMEOUT_MS = 60_000
+
+/**
+ * The first wait is the moment the user starts watching. Two waits can arrive together, and
+ * the second one is a waiter like any other: whoever loses the race finds the session
+ * already running and blocks instead of failing.
+ */
+async function startWatching(store: SessionStore, id: string): Promise<void> {
+  if (store.get(id).phase !== 'ready') return
+  try {
+    await store.advance(id, 'live')
+  } catch (error) {
+    if (store.get(id).phase !== 'live') throw error
+  }
+}
 
 export const wait = defineTool({
   name: 'wait',
@@ -45,8 +60,8 @@ export const wait = defineTool({
   async run(input, call) {
     const { store } = call.runtime.deps
     const session = call.require()
-    // The first wait is the moment the user starts watching.
-    const id = session.phase === 'ready' ? (await store.advance(session.id, 'live')).id : session.id
+    const id = session.id
+    if (session.phase === 'ready') await startWatching(store, id)
 
     const waiter = call.runtime.waiters.claim(id, call.signal)
     try {

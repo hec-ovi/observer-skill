@@ -6,6 +6,9 @@
  * every cue, with ten-millisecond flush cues in between and karaoke tags inside the text.
  * The flush cues are dropped here; the restated words are dropped by the normalizer's
  * overlap pass, which `rolling` asks for.
+ *
+ * Only the karaoke tags turn `rolling` on. They are what a rolling track always carries, and
+ * the overlap pass deletes real repeats anywhere else.
  */
 
 import type { Cue, Word } from '../normalize.ts'
@@ -79,7 +82,6 @@ export function parseSubtitles(source: string): ParsedSubtitles {
   const blocks = source.replace(/\r\n?/g, '\n').split(/\n{2,}/)
   const cues: Cue[] = []
   let tagged = false
-  let flushed = 0
 
   for (const block of blocks) {
     const lines = block.split('\n')
@@ -90,10 +92,7 @@ export function parseSubtitles(source: string): ParsedSubtitles {
     const start = stamp(rawStart ?? '')
     const end = stamp(rawEnd ?? '')
     if (start === null || end === null) continue
-    if (end - start < FLUSH_SECONDS) {
-      flushed += 1
-      continue
-    }
+    if (end - start < FLUSH_SECONDS) continue
 
     const payload = lines.slice(at + 1).join('\n')
     if (HAS_INLINE.test(payload)) tagged = true
@@ -103,5 +102,5 @@ export function parseSubtitles(source: string): ParsedSubtitles {
   }
 
   cues.sort((a, b) => a.start - b.start)
-  return { cues, rolling: tagged || flushed > 0 }
+  return { cues, rolling: tagged }
 }

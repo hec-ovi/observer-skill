@@ -19,6 +19,8 @@ import { createStore } from '#session'
 import type { Session, SessionStore } from '#session'
 import type { ReadOptions, TranscriptPage, TranscriptRef, TranscriptWindow } from '#transcript'
 import type { VerifyResult } from '#web-host'
+import { agentIoOn } from './src/api.ts'
+import type { AgentIo } from './src/api.ts'
 import type { AgentIoDeps, ArtifactPort, HostPort, IngestPort, TranscriptPort } from './src/index.ts'
 import { loadPrompts } from './src/prompts.ts'
 import { Runtime } from './src/runtime.ts'
@@ -182,6 +184,8 @@ export class FakeHost implements HostPort {
 
 export interface Harness {
   client: Client
+  /** The box's own surface, on the same runtime the client is talking to. */
+  agentIo: AgentIo
   deps: AgentIoDeps
   store: SessionStore
   ingest: FakeIngest
@@ -226,7 +230,9 @@ export async function openAgentIo(t: TestContext, options: HarnessOptions = {}):
   }
 
   const runtime = new Runtime(deps)
-  const server = createServer(runtime, loadPrompts())
+  const prompts = loadPrompts()
+  const agentIo = agentIoOn(runtime, prompts)
+  const server = createServer(runtime, prompts)
   const [clientSide, serverSide] = InMemoryTransport.createLinkedPair()
   const client = new Client({ name: 'observer-test', version: '0.0.0' })
 
@@ -243,6 +249,7 @@ export async function openAgentIo(t: TestContext, options: HarnessOptions = {}):
 
   const harness: Harness = {
     client,
+    agentIo,
     deps,
     store,
     ingest,

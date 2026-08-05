@@ -1,8 +1,7 @@
 import * as z from 'zod/v4'
-import { fail } from '#errors'
 import { sessionSchema } from '#session'
-import { openInBrowser } from '../browser.ts'
-import { pageUrlFor } from '../runtime.ts'
+import type { SettingsPatch } from '#session'
+import { openSession } from '../open-session.ts'
 import { defineTool } from '../tool.ts'
 
 export const open = defineTool({
@@ -28,35 +27,23 @@ export const open = defineTool({
   }),
 
   async run(input, call) {
-    const { store, ingest, host, config } = call.runtime.deps
-
-    const source = await ingest.resolve({ url: input.url, hasAds: input.hasAds })
-    if (!source.embeddable) {
-      fail(
-        'SOURCE_NOT_EMBEDDABLE',
-        `${source.title || source.url} cannot be played inside our page.`,
-        'Ask the user for another link; this one will never load in the player.',
-      )
-    }
-
-    const settings: { extraKnowledge?: boolean; toolkit?: boolean } = {}
+    const settings: SettingsPatch = {}
     if (input.extraKnowledge !== undefined) settings.extraKnowledge = input.extraKnowledge
     if (input.toolkit !== undefined) settings.toolkit = input.toolkit
 
-    const created = await store.create({
-      source,
+    // The page opens sessions through this same call, so there is one open path and a
+    // session started either way is the same session.
+    const opened = await openSession(call.runtime, {
+      url: input.url,
+      hasAds: input.hasAds ?? false,
       settings,
       userPrompt: input.userPrompt ?? null,
     })
-    await store.touchAgent(created.id)
 
-    const { url } = await host.start()
-    const pageUrl = pageUrlFor(url, created.id)
-    const session = await store.advance(created.id, 'transcribing')
-
-    if (config.openBrowser) openInBrowser(pageUrl)
-    call.runtime.transcriptions.start(session)
-
-    return { sessionId: session.id, pageUrl, source: session.source }
+    return {
+      sessionId: opened.session.id,
+      pageUrl: opened.pageUrl,
+      source: opened.session.source,
+    }
   },
 })

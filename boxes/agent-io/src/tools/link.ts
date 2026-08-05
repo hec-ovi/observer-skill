@@ -1,4 +1,5 @@
 import * as z from 'zod/v4'
+import { rangeOf } from '../range.ts'
 import { seconds, sessionIdInput } from '../schema.ts'
 import { defineTool } from '../tool.ts'
 
@@ -22,10 +23,7 @@ export const link = defineTool({
 
   async run(input, call) {
     const session = call.require()
-    const range =
-      input.startsAt !== undefined && input.endsAt !== undefined
-        ? { startsAt: input.startsAt, endsAt: input.endsAt }
-        : undefined
+    const range = rangeOf(input.startsAt, input.endsAt)
 
     await call.runtime.deps.knowledge.linkArtifact(
       session.id,

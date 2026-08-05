@@ -3,11 +3,14 @@
  * prompts, and the phase rules that keep a session moving in one direction. See CONTRACT.md.
  */
 
-import { loadPrompts } from './prompts.ts'
+import { agentIoOn } from './api.ts'
+import type { AgentIo } from './api.ts'
 import type { AgentIoDeps } from './ports.ts'
+import { loadPrompts } from './prompts.ts'
 import { Runtime } from './runtime.ts'
-import { serveOnStdio } from './serve.ts'
 
+export type { AgentIo } from './api.ts'
+export type { OpenSessionInput } from './open-session.ts'
 export type {
   AgentIoConfig,
   AgentIoDeps,
@@ -17,18 +20,8 @@ export type {
   TranscriptPort,
 } from './ports.ts'
 
-export interface AgentIo {
-  /** Speaks MCP on stdin and stdout until the stream closes, then shuts down. */
-  serve(): Promise<void>
-}
-
 export function createAgentIo(deps: AgentIoDeps): AgentIo {
-  const runtime = new Runtime(deps)
-  // Read once, at startup: a missing prompt file is a broken install and should say so
-  // before the first tool call, not during one.
-  const prompts = loadPrompts()
-
-  return {
-    serve: () => serveOnStdio(runtime, prompts),
-  }
+  // Prompts are read once, at startup: a missing prompt file is a broken install and should
+  // say so before the first tool call, not during one.
+  return agentIoOn(new Runtime(deps), loadPrompts())
 }

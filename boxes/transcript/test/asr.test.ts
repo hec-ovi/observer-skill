@@ -16,6 +16,20 @@ import { fetch as fetchTranscript, read } from '#transcript'
 import { FAKE_FFMPEG, FAKE_YTDLP, fixture, pool, source, stubFetch } from '../fixtures.ts'
 
 const BASE = 'http://127.0.0.1:9999'
+/** The second chunk the fake ffmpeg always cuts, when only the first one carries speech. */
+const SILENT = '{"task":"transcribe","language":"english","duration":0,"text":"","segments":[]}'
+
+/** Answers the first chunk from a fixture and the second with silence. */
+function serve(name: string): () => void {
+  let call = 0
+  return stubFetch(() => {
+    const body = call === 0 ? readFileSync(fixture(name), 'utf8') : SILENT
+    call += 1
+    return Promise.resolve(
+      new Response(body, { status: 200, headers: { 'content-type': 'application/json' } }),
+    )
+  })
+}
 
 describe('endpoint-asr', () => {
   const boxes = pool()
@@ -109,6 +123,49 @@ describe('endpoint-asr', () => {
       ['0/2', '1/2', '2/2'],
     )
     assert.ok(box.progress.some((entry) => entry.step === 'audio' && entry.total > 0))
+  })
+
+  test('a server that times token pieces still stores whole words', async () => {
+    const box = await boxes.open('asr-tokens')
+    const restore = serve('asr-tokens.json')
+    try {
+      await fetchTranscript(source({ duration: 905 }), {
+        home: box.home,
+        sessionId: box.sessionId,
+        provider: 'endpoint-asr',
+        onProgress: box.onProgress,
+      })
+    } finally {
+      restore()
+    }
+
+    const page = read(box.sessionId)
+    assert.deepEqual(
+      page.segments.map((segment) => segment.text),
+      ['So the second half is about entropy.'],
+    )
+    assert.equal(page.segments[0]?.start, 1.2)
+  })
+
+  test('a word timed outside its own segment is not dropped', async () => {
+    const box = await boxes.open('asr-gap-word')
+    const restore = serve('asr-gap-word.json')
+    try {
+      await fetchTranscript(source({ duration: 905 }), {
+        home: box.home,
+        sessionId: box.sessionId,
+        provider: 'endpoint-asr',
+        onProgress: box.onProgress,
+      })
+    } finally {
+      restore()
+    }
+
+    const page = read(box.sessionId)
+    assert.deepEqual(
+      page.segments.map((segment) => segment.text),
+      ['Ready to begin now', 'the second part.'],
+    )
   })
 
   test('an endpoint that refuses says what it answered', async () => {

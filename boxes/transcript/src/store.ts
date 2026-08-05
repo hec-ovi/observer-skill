@@ -57,11 +57,12 @@ export async function writeTranscript(
 ): Promise<number> {
   const target = transcriptPath(home, sessionId)
   const temp = `${target}.writing`
-  await mkdir(dirname(target), { recursive: true })
-
-  const stream = createWriteStream(temp, { encoding: 'utf8' })
+  let stream: WriteStream | null = null
   let count = 0
+
   try {
+    await mkdir(dirname(target), { recursive: true })
+    stream = createWriteStream(temp, { encoding: 'utf8' })
     await put(stream, '{"segments":[')
     for await (const segment of segments) {
       await put(stream, `${count === 0 ? '' : ','}\n${JSON.stringify({ ...segment, i: count })}`)
@@ -71,8 +72,9 @@ export async function writeTranscript(
     await put(stream, `\n],${JSON.stringify(tail).slice(1)}\n`)
     stream.end()
     await once(stream, 'finish')
+    await rename(temp, target)
   } catch (error) {
-    stream.destroy()
+    stream?.destroy()
     await rm(temp, { force: true })
     fail(
       'STORE_UNWRITABLE',
@@ -81,7 +83,6 @@ export async function writeTranscript(
     )
   }
 
-  await rename(temp, target)
   homes.set(sessionId, home)
   loaded.delete(sessionId)
   return count
