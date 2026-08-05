@@ -1,0 +1,165 @@
+import { join } from 'node:path'
+import * as z from 'zod/v4'
+import { ARTIFACT_KINDS } from '#artifact'
+import type { BuildError } from '#artifact'
+import { fail } from '#errors'
+import type { Session } from '#session'
+import { seconds, sessionIdInput } from '../schema.ts'
+import { artifactsDir, writeSnapshot } from '../snapshot.ts'
+import { defineTool } from '../tool.ts'
+
+/** What the record says while the page is still looking at the module. */
+const UNVERIFIED = 'Verification has not finished.'
+
+const buildErrorSchema = z.object({
+  stage: z.enum(['check', 'bundle', 'verify']),
+  message: z.string(),
+  line: z.number().int().optional(),
+  column: z.number().int().optional(),
+  snippet: z.string().optional(),
+  fix: z.string().optional(),
+})
+
+/**
+ * An answer comes first and it comes as text, so authoring in `live` has to name the answer
+ * that already went out.
+ */
+function requireAnswered(session: Session, afterEntryId: string | undefined): void {
+  if (afterEntryId === undefined) {
+    fail(
+      'WRONG_PHASE',
+      'Building during a live session needs `afterEntryId`, the id of an answer already sent.',
+      'Answer with `say` first, then build with the `entryId` it returned.',
+    )
+  }
+  const answered = session.log.some(
+    (entry) => entry.id === afterEntryId && entry.role === 'agent',
+  )
+  if (!answered) {
+    fail(
+      'WRONG_PHASE',
+      `No answer ${afterEntryId} has been sent in this session.`,
+      'Answer with `say` first, then build with the `entryId` it returned.',
+    )
+  }
+}
+
+export const build = defineTool({
+  name: 'build',
+  description:
+    'Compile one visual, run it in the open page, and return either line-accurate errors or ' +
+    'the snapshot to look at. Rebuilding the same `id` replaces it.',
+  phases: ['building', 'ready', 'live'],
+  input: z.object({
+    sessionId: sessionIdInput,
+    id: z.string().min(1).describe('Stable across rebuilds, so fixing one replaces it.'),
+    title: z.string().min(1).describe('What the stage draws above it. Match `meta.title`.'),
+    kind: z.enum(ARTIFACT_KINDS),
+    source: z.string().min(1).describe('The ES module: `meta` and `mount(el, ctx)`.'),
+    conceptId: z.string().min(1).optional().describe('Links it in the same call.'),
+    startsAt: seconds.optional().describe('The stretch of video this visual is about.'),
+    endsAt: seconds.optional(),
+    afterEntryId: z
+      .string()
+      .min(1)
+      .optional()
+      .describe('Required during a live session: the id of an answer already sent.'),
+  }),
+  output: z.object({
+    ok: z.boolean(),
+    artifactId: z.string(),
+    size: z.object({ width: z.number(), height: z.number() }).optional(),
+    snapshotPath: z.string().optional(),
+    errors: z.array(buildErrorSchema).optional(),
+  }),
+
+  async run(input, call) {
+    const session = call.require()
+    const { store, artifact, host, knowledge, config } = call.runtime.deps
+
+    if (session.phase === 'live') requireAnswered(session, input.afterEntryId)
+
+    // Verification runs in the user's own page. Without one there is nowhere to check the
+    // module, and an unchecked module is never stored.
+    if (!host.hasPage(session.id)) {
+      fail(
+        'PAGE_NOT_OPEN',
+        `No page is listening to session ${session.id}, so nothing can be verified.`,
+        'Ask the user to open the session page, then build again.',
+      )
+    }
+
+    const compiled = await artifact.build({
+      sessionId: session.id,
+      id: input.id,
+      source: input.source,
+      home: config.home,
+    })
+    if (!compiled.ok) {
+      return { ok: false, artifactId: input.id, errors: compiled.errors.map(toBuildError) }
+    }
+
+    const range =
+      input.startsAt !== undefined && input.endsAt !== undefined
+        ? { startsAt: input.startsAt, endsAt: input.endsAt }
+        : undefined
+
+    // The page fetches the bundle by id, which means the record has to name it before the
+    // sandbox can run it. It stays failed until the page says otherwise.
+    const pending = {
+      id: input.id,
+      title: input.title,
+      kind: input.kind,
+      conceptId: input.conceptId ?? null,
+      startsAt: range?.startsAt ?? null,
+      endsAt: range?.endsAt ?? null,
+      bundlePath: compiled.bundlePath,
+    }
+    await store.putArtifact(session.id, { ...pending, status: 'failed', error: UNVERIFIED })
+
+    const verified = await host.verify({ sessionId: session.id, artifactId: input.id })
+    if (!verified.ok) {
+      await store.putArtifact(session.id, {
+        ...pending,
+        status: 'failed',
+        error: verified.errors.join('\n'),
+      })
+      return {
+        ok: false,
+        artifactId: input.id,
+        errors: verified.errors.map((message) => ({ stage: 'verify' as const, message })),
+      }
+    }
+
+    const snapshot = await writeSnapshot(
+      join(artifactsDir(config.home, session.id), `${input.id}.png`),
+      verified.snapshot,
+    )
+    await store.putArtifact(session.id, {
+      ...pending,
+      status: 'built',
+      snapshotPath: snapshot?.path ?? null,
+      error: null,
+    })
+    if (input.conceptId !== undefined) {
+      await knowledge.linkArtifact(session.id, input.conceptId, input.id, range)
+    }
+
+    // The picture goes back with the result, so the agent judges what it made without a
+    // second call.
+    if (snapshot !== null) {
+      call.attach({ type: 'image', data: snapshot.base64, mimeType: 'image/png' })
+    }
+
+    return {
+      ok: true,
+      artifactId: input.id,
+      size: verified.size,
+      ...(snapshot === null ? {} : { snapshotPath: snapshot.path }),
+    }
+  },
+})
+
+function toBuildError(error: BuildError): z.infer<typeof buildErrorSchema> {
+  return { ...error }
+}
