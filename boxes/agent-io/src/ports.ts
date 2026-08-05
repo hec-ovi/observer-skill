@@ -7,7 +7,7 @@
 import type { BuildInput, BuildResult } from '#artifact'
 import type { Source } from '#ingest'
 import type { Knowledge } from '#knowledge'
-import type { SessionStore } from '#session'
+import type { Source as SessionSource, SessionStore } from '#session'
 import type {
   AtOptions,
   FetchOptions,
@@ -24,7 +24,8 @@ export interface IngestPort {
 }
 
 export interface TranscriptPort {
-  fetch(source: Source, options: FetchOptions): Promise<TranscriptRef>
+  /** The source as the record holds it, which is where a transcription run reads it from. */
+  fetch(source: SessionSource, options: FetchOptions): Promise<TranscriptRef>
   read(sessionId: string, options?: ReadOptions): TranscriptPage
   at(sessionId: string, time: number, options?: AtOptions): TranscriptWindow
 }

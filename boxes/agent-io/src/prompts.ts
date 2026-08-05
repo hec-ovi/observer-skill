@@ -70,7 +70,11 @@ export function loadPrompts(dir = promptsDir()): PromptFile[] {
   })
 }
 
-export function registerPrompts(server: McpServer, runtime: Runtime, prompts: PromptFile[]): void {
+export function registerPrompts(
+  server: McpServer,
+  runtime: Runtime,
+  prompts: readonly PromptFile[],
+): void {
   const ads = prompts.find((prompt) => prompt.name === 'ads')
 
   for (const prompt of prompts) {
