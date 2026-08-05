@@ -5,6 +5,7 @@ import type {
   SignalInput,
   Subscriber,
 } from '#session'
+import type { CreateSessionInput, TranscriptQuery } from './schema.ts'
 
 /**
  * The part of the `session` contract this box uses. The real store satisfies it, and a test
@@ -19,14 +20,7 @@ export interface SessionPort {
 }
 
 /** Resolves a URL into a session. Wired by the caller, because this box knows no providers. */
-export type CreateSession = (input: {
-  url: string
-  settings?: Record<string, unknown>
-  userPrompt: string | null
-}) => Promise<Session>
+export type CreateSession = (input: CreateSessionInput) => Promise<Session>
 
 /** Reads a page of transcript segments. Serialized as-is; this box does not read them. */
-export type ReadTranscript = (
-  sessionId: string,
-  range: { from?: number; to?: number; offset: number; limit: number },
-) => Promise<unknown>
+export type ReadTranscript = (sessionId: string, range: TranscriptQuery) => Promise<unknown>

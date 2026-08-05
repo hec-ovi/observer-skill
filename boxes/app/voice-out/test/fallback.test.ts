@@ -79,9 +79,9 @@ describe('a config that is wrong before any line starts', () => {
     expect(() => speak(LINE, { config: { provider: 'endpoint' } })).toThrow(
       /needs a baseUrl/,
     )
-    expect(() => speak(LINE, { config: { provider: 'endpoint', baseUrl: 'localhost:8880' } })).toThrow(
-      /is not a URL/,
-    )
+    expect(() =>
+      speak(LINE, { config: { provider: 'endpoint', baseUrl: 'localhost:8880' } }),
+    ).toThrow(/is not an http URL/)
   })
 })
 
