@@ -17,6 +17,7 @@ import { Client } from '@modelcontextprotocol/client'
 import { StdioClientTransport, getDefaultEnvironment } from '@modelcontextprotocol/client/stdio'
 
 import { createStore } from '#session'
+import type { Phase } from '#session'
 
 const OBSERVER = fileURLToPath(new URL('../observer.ts', import.meta.url))
 
@@ -71,15 +72,16 @@ async function emptyHome(): Promise<string> {
   return mkdtemp(join(tmpdir(), 'observer-cli-'))
 }
 
+const CHAIN: Phase[] = ['transcribing', 'researching', 'building', 'ready', 'live']
+
 /**
- * A home holding one session parked in `transcribing`, written by the real store so the
- * process under test reads back what an earlier run left. Nothing else can put a session in a
- * phase without the network.
+ * A home holding one session parked in a phase, written by the real store so the process under
+ * test reads back what an earlier run left. Nothing else reaches a phase without the network.
  */
-async function homeWithTranscribingSession(): Promise<string> {
+async function homeWithSession(phase: Phase): Promise<string> {
   const home = await emptyHome()
   const store = createStore({ home })
-  const session = await store.create({
+  let session = await store.create({
     source: {
       provider: 'youtube',
       videoId: 'dQw4w9WgXcQ',
@@ -88,7 +90,10 @@ async function homeWithTranscribingSession(): Promise<string> {
     },
     settings: {},
   })
-  await store.advance(session.id, 'transcribing')
+  for (const step of CHAIN) {
+    if (session.phase === phase) break
+    session = await store.advance(session.id, step)
+  }
   await store.close()
   return home
 }
@@ -153,7 +158,7 @@ describe('observer mcp', () => {
   })
 
   it('refuses a tool called in the wrong phase and names the call to make', async (t) => {
-    const { client } = await spawnObserver(t, await homeWithTranscribingSession())
+    const { client } = await spawnObserver(t, await homeWithSession('transcribing'))
 
     const answer = await call(client, 'transcript')
 
@@ -161,6 +166,22 @@ describe('observer mcp', () => {
     assert.equal(errorOf(answer).code, 'WRONG_PHASE')
     assert.equal(answer.body['next'], 'status')
     assert.match(errorOf(answer).hint, /`status`/)
+  })
+
+  // `concepts` is the one tool that writes through `knowledge`, so this is what proves that
+  // box was handed the same store the rest of the process works on.
+  it('writes a concept through the knowledge box the session was built with', async (t) => {
+    const { client } = await spawnObserver(t, await homeWithSession('researching'))
+
+    const answer = await call(client, 'concepts', {
+      concepts: [{ label: 'frequency bin', kind: 'jargon', startsAt: 0, endsAt: 60 }],
+    })
+
+    assert.equal(answer.isError, false)
+    assert.deepEqual((answer.body['written'] as { label: string }[]).map((c) => c.label), [
+      'frequency bin',
+    ])
+    assert.equal(answer.body['total'], 1)
   })
 
   it('shuts the process down when the client goes away', async (t) => {

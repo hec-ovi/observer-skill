@@ -50,6 +50,7 @@
     "dev": "node --watch bin/observer.ts serve",
     "dev:app": "vite",
     "build": "node scripts/build.ts",
+    "prepare": "node scripts/build.ts",
     "test": "node --run test:server && node --run test:app",
     "test:server": "node --test \"bin/test/*.test.ts\" \"boxes/*/test/*.test.ts\"",
     "test:app": "vitest run",
