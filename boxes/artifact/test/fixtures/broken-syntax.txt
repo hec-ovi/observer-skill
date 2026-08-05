@@ -1,0 +1,13 @@
+import * as echarts from 'echarts'
+
+export const meta = {
+  title: 'Half written',
+  kind: 'chart',
+}
+
+export function mount(el, ctx) {
+  const option = {
+    series: [{ type: 'bar', data: [1, 2, 3] }
+  echarts.init(el).setOption(option)
+  return () => {}
+}

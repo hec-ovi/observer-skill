@@ -1,0 +1,34 @@
+import * as echarts from 'echarts'
+
+interface Point {
+  label: string
+  value: number
+}
+
+const data: Point[] = [
+  { label: 'Jan', value: 12 },
+  { label: 'Feb', value: 18 },
+]
+
+export const meta = {
+  title: 'Monthly volume',
+  kind: 'chart' as const,
+  caption: 'Two months, one bar each.',
+}
+
+export function mount(el: HTMLElement, ctx: { theme: { text: string } }): () => void {
+  const chart = echarts.init(el)
+  chart.setOption({
+    textStyle: { color: ctx.theme.text },
+    xAxis: { type: 'category', data: data.map((point) => point.label) },
+    yAxis: { type: 'value' },
+    series: [
+      {
+        type: 'bar',
+        data: data.map((point) => point.value),
+        itemStyle: { borderRadius: 0 },
+      },
+    ],
+  })
+  return () => chart.dispose()
+}

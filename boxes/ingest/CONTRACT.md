@@ -50,6 +50,9 @@ None.
 ## Invariants
 
 - Resolution is read-only and downloads no media.
+- It works with nothing installed. The fast keyless embed lookup answers "does this exist
+  and can we play it" on its own; the richer lookup fills in duration, publish date, and the
+  caption list, and its absence degrades those fields rather than failing the call.
 - One network round trip's worth of work. This runs while the user is still looking at the
   paste box, so it answers in seconds or it fails.
 - The provider is chosen by the URL, and its name appears nowhere outside this box.

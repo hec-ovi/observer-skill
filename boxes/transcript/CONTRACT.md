@@ -13,8 +13,8 @@ Schema: [`schema/transcript.ts`](schema/transcript.ts)
 fetch(source, { home, sessionId, provider?, language?, onProgress }): Promise<TranscriptRef>
 ```
 
-- `provider`: `captions`, `endpoint-asr`, or `file`. Absent means choose: captions when
-  `source.hasCaptions`, otherwise the ASR endpoint when one is configured.
+- `provider`: one of the providers below, or `auto` (the default), which tries them in
+  order and stops at the first that produces text.
 - `onProgress({ step, done, total, message })` fires often enough for a loader to move on a
   three-hour podcast, and the totals are real, not invented.
 
@@ -53,8 +53,14 @@ The transcript file lives at `$home/sessions/<id>/transcript.json` and is the on
 | Provider | Source of text | Needs |
 |---|---|---|
 | `captions` | The platform's own captions, human first, machine second | the caption fetcher binary |
+| `innertube` | The same captions through the platform's own transcript panel | nothing |
 | `endpoint-asr` | Audio, extracted and sent to an OpenAI-compatible transcription route | ffmpeg, an endpoint |
 | `file` | An SRT or VTT the user supplies | nothing |
+
+`auto` tries them in that order and stops at the first that produces text. The two caption
+providers take different routes to the same words, and each works in cases where the other
+is blocked, which is why both exist. A machine gets a transcript with nothing installed;
+installing the fetcher binary raises the hit rate.
 
 ## Invariants
 

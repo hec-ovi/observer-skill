@@ -1,0 +1,90 @@
+/*
+ * Every colour, size, and duration in the app. Nothing outside this file holds a literal.
+ *
+ * The resolved theme is always an explicit `data-theme` attribute on the root: the inline
+ * script in index.html stamps it before the first paint, and `theme.ts` keeps it in step
+ * with the user's choice or the system query. `light` and `dark` are the only two values;
+ * `system` is a choice, not a state.
+ *
+ * Values are hex so that JS reading them through `readTokens()` can hand them straight to
+ * any chart library.
+ */
+
+:root {
+  /* Nothing is rounded. */
+  --radius: 0;
+
+  /* Type: small and tight, so density comes from the scale rather than from cramming. */
+  --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial,
+    sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', 'Cascadia Mono', Menlo, Consolas, monospace;
+  --text-xs: 0.6875rem;
+  --text-sm: 0.75rem;
+  --text-md: 0.8125rem;
+  --text-lg: 0.9375rem;
+  --text-xl: 1.125rem;
+  --leading-tight: 1.25;
+  --leading: 1.45;
+  --tracking-tight: -0.01em;
+
+  /* Space does the separating. Borders are for chart geometry and the rare hard edge. */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+
+  /* Motion: opacity plus a small translate, and nothing longer than this. */
+  --motion: 180ms;
+  --motion-shift: 0.5rem;
+  --ease: cubic-bezier(0.2, 0, 0, 1);
+}
+
+:root,
+:root[data-theme='light'] {
+  color-scheme: light;
+
+  --surface: #ffffff;
+  --surface-raised: #f4f5f7;
+  --text: #14171a;
+  --text-dim: #5b6570;
+  --border: #d8dce1;
+  --accent: #1f5fd0;
+
+  --series-1: #2563a8;
+  --series-2: #b7472a;
+  --series-3: #1f7a3d;
+  --series-4: #7c3aed;
+  --series-5: #8a6100;
+  --series-6: #0e7490;
+  --series-7: #be185d;
+  --series-8: #4d7c0f;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --surface: #101215;
+  --surface-raised: #191c21;
+  --text: #e8eaed;
+  --text-dim: #98a1ac;
+  --border: #2b3037;
+  --accent: #6fa8ff;
+
+  --series-1: #7cb0f0;
+  --series-2: #f0906a;
+  --series-3: #5ccb7f;
+  --series-4: #b79bfa;
+  --series-5: #dfb251;
+  --series-6: #5cc0d8;
+  --series-7: #f07aae;
+  --series-8: #a8cf62;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion: 0ms;
+    --motion-shift: 0;
+  }
+}

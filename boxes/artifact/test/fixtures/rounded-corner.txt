@@ -1,0 +1,24 @@
+import * as echarts from 'echarts'
+
+export const meta = {
+  title: 'Rounded totals',
+  kind: 'chart',
+}
+
+const css = `
+  .panel {
+    padding: 8px;
+    border-radius: 4px;
+  }
+`
+
+export function mount(el, ctx) {
+  const style = document.createElement('style')
+  style.textContent = css
+  el.appendChild(style)
+  const chart = echarts.init(el)
+  chart.setOption({
+    series: [{ type: 'bar', data: [1, 2, 3], itemStyle: { borderRadius: 6 } }],
+  })
+  return () => chart.dispose()
+}

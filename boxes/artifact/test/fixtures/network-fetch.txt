@@ -1,0 +1,14 @@
+import * as echarts from 'echarts'
+
+export const meta = {
+  title: 'Live prices',
+  kind: 'chart',
+}
+
+export function mount(el, ctx) {
+  const chart = echarts.init(el)
+  fetch('https://example.com/prices.json')
+    .then((response) => response.json())
+    .then((prices) => chart.setOption({ series: [{ type: 'line', data: prices }] }))
+  return () => chart.dispose()
+}

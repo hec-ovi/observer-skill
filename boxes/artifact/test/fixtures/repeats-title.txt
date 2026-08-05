@@ -1,0 +1,15 @@
+import * as d3 from 'd3'
+
+export const meta = {
+  title: 'Share of traffic',
+  kind: 'dataviz',
+}
+
+export function mount(el, ctx) {
+  el.innerHTML = '<h2>Share of traffic</h2>'
+  const svg = d3.select(el).append('svg')
+  svg.append('rect').attr('width', 40).attr('height', 20)
+  return () => {
+    el.innerHTML = ''
+  }
+}

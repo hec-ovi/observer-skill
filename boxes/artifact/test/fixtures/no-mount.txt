@@ -1,0 +1,10 @@
+import * as katex from 'katex'
+
+export const meta = {
+  title: 'Bayes rule',
+  kind: 'diagram',
+}
+
+function draw(el) {
+  katex.render('P(A|B)', el)
+}

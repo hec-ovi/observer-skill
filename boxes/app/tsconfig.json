@@ -1,0 +1,41 @@
+{
+  "compilerOptions": {
+    "target": "es2024",
+    "lib": ["ES2024", "DOM", "DOM.Iterable"],
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "moduleDetection": "force",
+    "jsx": "react-jsx",
+
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "erasableSyntaxOnly": true,
+    "verbatimModuleSyntax": true,
+    "resolveJsonModule": true,
+
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "skipLibCheck": true,
+
+    "types": [
+      "node",
+      "vite/client",
+      "vitest/globals",
+      "@testing-library/jest-dom/vitest",
+      "youtube"
+    ],
+
+    "paths": {
+      "@app/*": ["./src/*"],
+      "@player/*": ["./player/src/*"],
+      "@stage/*": ["./stage/src/*"],
+      "@voice-out/*": ["./voice-out/src/*"],
+      "@voice-in/*": ["./voice-in/src/*"],
+      "@dialogue/*": ["./dialogue/src/*"]
+    }
+  },
+  "include": ["**/*.ts", "**/*.tsx", "../../vite.config.ts", "../../vitest.config.ts"]
+}
