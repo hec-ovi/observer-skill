@@ -50,6 +50,8 @@ export interface AgentIoConfig {
   transcript: ProviderChoice
   /** Open the study page in the user's browser when a session starts. */
   openBrowser: boolean
+  /** Reported to the client as the server version. */
+  version?: string
 }
 
 export interface AgentIoDeps {

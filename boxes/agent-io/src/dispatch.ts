@@ -58,6 +58,15 @@ export async function dispatch(
     const body = await tool.run(args as never, call)
     return toolResult(body, stampedPhase(runtime, body, session), attachments)
   } catch (error) {
-    return errorResult(error, session === null ? null : runtime.deps.store.get(session.id).phase)
+    return errorResult(error, failedPhase(runtime, tool, session))
   }
+}
+
+/**
+ * The phase a failure reports. A call that never found its session has none to report; a
+ * failed `open` leaves the process where it started.
+ */
+function failedPhase(runtime: Runtime, tool: Tool, session: Session | null): Phase | null {
+  if (session !== null) return runtime.deps.store.get(session.id).phase
+  return targetsSession(tool) ? null : 'feed'
 }
