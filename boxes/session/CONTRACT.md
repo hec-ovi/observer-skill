@@ -20,7 +20,10 @@ createStore({ home }): SessionStore
 store.create({ source, settings, userPrompt? }): Promise<Session>
 ```
 
-- `source`: `{ provider, videoId, url, title, duration, hasAds }` as resolved by `ingest`.
+- `source`: the video exactly as `ingest` resolved it. Everything it learned is kept: the
+  research pass reads `publishedAt` to find what has moved since the recording, and
+  `hasCaptions` decides which transcript provider runs first. Unknown fields are `null`, so
+  a degraded lookup is never read as a no.
 - `settings`: `{ theme, language, extraKnowledge, toolkit, voiceOut, voiceIn }`. Every field
   has a default, so `{}` is a complete answer.
 - `userPrompt`: what the user wants from this video, in their words, or absent.
@@ -119,7 +122,8 @@ store.list(): Session[]         // newest first
 ```ts
 {
   id, createdAt, updatedAt,
-  source:   { provider, videoId, url, title, duration, hasAds },
+  source:   { provider, videoId, url, title, channel, duration, publishedAt,
+              hasCaptions, captionLanguages, hasAds, embeddable, degraded },
   settings: { theme, language, extraKnowledge, toolkit,
               voiceOut: { provider, voice },
               voiceIn:  { provider, endpoint } },

@@ -69,14 +69,16 @@ nothing about the server beyond `web-host`'s HTTP shape.
 
 ## The session record
 
-One JSON document per session under `$OBSERVER_HOME/sessions/<id>.json`. It is the only
-shared state; both faces read and write it through `session`. The transcript itself lives
-beside it in its own file, so a patch never carries a hundred kilobytes of text.
+One directory per session under `$OBSERVER_HOME/sessions/<id>/`: `session.json`, the
+transcript beside it, and the built artifacts and their snapshots. The record is the only
+shared state and both faces read and write it through `session`; the transcript has its own
+file so a patch never carries a hundred kilobytes of text.
 
 ```
 {
   id, createdAt,
-  source:   { provider, videoId, url, title, duration, hasAds },
+  source:   { provider, videoId, url, title, channel, duration, publishedAt,
+              hasCaptions, captionLanguages, hasAds, embeddable, degraded },
   settings: { theme, language, extraKnowledge, toolkit,
               voiceOut: { provider, voice }, voiceIn: { provider, endpoint } },
   phase, progress: { step, done, total, message },
