@@ -5,18 +5,16 @@ import './switch.css'
 export interface SwitchProps {
   label: string
   checked: boolean
-  disabled?: boolean
   onChange(checked: boolean): void
 }
 
-export function Switch({ label, checked, disabled = false, onChange }: SwitchProps) {
+export function Switch({ label, checked, onChange }: SwitchProps) {
   return (
     <label className="switch">
       <input
         type="checkbox"
         role="switch"
         checked={checked}
-        disabled={disabled}
         onChange={(event) => onChange(event.target.checked)}
       />
       {label}

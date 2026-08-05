@@ -18,8 +18,3 @@
   accent-color: var(--accent);
   cursor: inherit;
 }
-
-.switch:has(input:disabled) {
-  color: var(--text-dim);
-  cursor: default;
-}

@@ -7,6 +7,7 @@ import userEvent from '@testing-library/user-event'
 import { act } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { theme } from '@app/theme.ts'
+import { FakeResizeObserver } from '../../testing/fakes.ts'
 import { Stage, type Artifact } from '../src/index.ts'
 
 function fixture(name: string): string {
@@ -60,6 +61,39 @@ describe('Stage', () => {
     expect(screen.getByTestId('panel')).toBeInTheDocument()
   })
 
+  it('follows the space it is given, without remounting', async () => {
+    render(<Stage active artifact={panel} onDismiss={vi.fn()} />)
+    await screen.findByTestId('panel')
+    const mounts = screen.getByTestId('panel-mounts').textContent
+
+    act(() => FakeResizeObserver.last().resize(800, 400))
+
+    expect(screen.getByTestId('panel-size')).toHaveTextContent('800x400')
+    expect(screen.getByTestId('panel-mounts')).toHaveTextContent(String(mounts))
+  })
+
+  it('dismisses when the user closes it', async () => {
+    const onDismiss = vi.fn()
+    const user = userEvent.setup()
+    render(<Stage active artifact={panel} onDismiss={onDismiss} />)
+    await screen.findByTestId('panel')
+
+    await user.click(screen.getByRole('button', { name: 'Close' }))
+
+    expect(onDismiss).toHaveBeenCalledTimes(1)
+  })
+
+  it('dismisses when the user presses escape', async () => {
+    const onDismiss = vi.fn()
+    const user = userEvent.setup()
+    render(<Stage active artifact={panel} onDismiss={onDismiss} />)
+    await screen.findByTestId('panel')
+
+    await user.keyboard('{Escape}')
+
+    expect(onDismiss).toHaveBeenCalledTimes(1)
+  })
+
   it('shows one line and a way back when a module throws', async () => {
     const onDismiss = vi.fn()
     const user = userEvent.setup()
@@ -85,10 +119,9 @@ describe('Stage', () => {
   })
 
   it('blames the registry only for a specifier it maps, not for a url that reads like one', async () => {
-    // No such fixture file: the import fails to load, and the url happens to spell `d3`.
-    render(
-      <Stage active artifact={{ ...panel, url: fixture('d3-force-layout') }} onDismiss={vi.fn()} />,
-    )
+    // The module is simply not there, and its id happens to spell a library name.
+    const missing = { ...panel, url: '/api/artifact/s1/d3-force-layout.js' }
+    render(<Stage active artifact={missing} onDismiss={vi.fn()} />)
 
     const failure = await screen.findByRole('alert')
     expect(failure).toHaveTextContent('This visual could not be loaded.')

@@ -33,9 +33,11 @@ createVerifier({ onResult }): Verifier
 ## The registry
 
 `echarts`, `d3`, and `katex` are provided to artifact modules. Each is one built module
-under `/sandbox/vendor/`, mapped to its bare name by an import map that the page and the
-verify document both carry, so they are loaded once and shared and the tenth chart costs
-nothing to open. `vendor/echarts.ts` registers the charts and components an artifact may
+under `/sandbox/vendor/`, mapped to its bare name by a single inline import map, carried
+with the same bytes by `index.html` and `sandbox.html`, so they are loaded once and shared
+and the tenth chart costs nothing to open. Import maps are per document and cannot be loaded
+from a file, which is why there are two copies; a test holds them to each other and to
+`src/registry.ts`. `vendor/echarts.ts` registers the charts and components an artifact may
 use, and the `observer-light` and `observer-dark` themes, built from the page's tokens in
 `vendor/themes.ts`. Adding a library is one entry in `src/registry.ts`, one entry in
 `vendor/vite.config.ts`, and one line in the artifact contract's allowlist.
@@ -81,6 +83,8 @@ visual that has not passed here is never shown to the user.
 
 `ARTIFACT_LOAD_FAILED`, `ARTIFACT_MOUNT_FAILED`, `ARTIFACT_TIMEOUT`, `REGISTRY_MISSING`.
 A failed artifact shows a single line and a way back to the video, never a stack trace.
+`REGISTRY_MISSING` is for the one case it names: the engine could not resolve one of the
+registry's specifiers. Everything else that will not load is `ARTIFACT_LOAD_FAILED`.
 
 ## Dependencies
 
@@ -100,6 +104,13 @@ None. It is handed a url and a theme; it does not know what a session or a conce
 ## What `web-host` has to serve
 
 - `GET /sandbox/frame` → the built `sandbox.html`, with the sandbox headers and CSP.
+- That CSP's `script-src` has to allow the document's inline import map, as a
+  `'sha256-...'` of the script body or a nonce stamped on the tag. Without the allowance the
+  map is dropped, no artifact resolves `echarts`, `d3`, or `katex`, and every artifact that
+  uses the registry comes back `REGISTRY_MISSING`. Compute it from the inline scripts of the
+  document being served, never from a copy kept elsewhere, so the policy cannot drift away
+  from the page it protects. Any policy later put on the app's own document needs the same
+  allowance: it carries the same map.
 - `GET /sandbox/vendor/*.js` and the app's `/assets/*`, both with
   `Access-Control-Allow-Origin: *`: every module and stylesheet the frame loads is a CORS
   fetch from an opaque origin.
@@ -108,7 +119,7 @@ None. It is handed a url and a theme; it does not know what a session or a conce
 
 The loader (`src/loader.ts`) and the runtime (`src/runtime.ts`) are one pair used by both
 the visible stage and the frame's script in `sandbox/`; change them once. Tests mount a real
-fixture module in a simulated DOM, assert cleanup runs, assert a theme change reaches the
-module without a remount, and assert a module that throws produces one line and a working
-way back. The verifier is driven through the port it hands the frame, which is the whole of
-the protocol between them.
+fixture module in a simulated DOM, assert cleanup runs, assert a theme change and a resize
+reach the module without a remount, assert both ways out call `onDismiss`, and assert a
+module that throws produces one line and a working way back. The verifier is driven through
+the port it hands the frame, which is the whole of the protocol between them.

@@ -15,8 +15,6 @@ interface Asked {
   after: number
 }
 
-let asks = 0
-
 function weave(log: readonly LogEntry[], asked: readonly Asked[]): LogEntry[] {
   const entries: LogEntry[] = []
   for (let i = 0; i <= log.length; i += 1) {
@@ -43,10 +41,11 @@ export function useQuestions(log: readonly LogEntry[]): Questions {
     answers.current = log.length
   })
 
+  const asks = useRef(0)
   const remember = useCallback((text: string, at: number): void => {
-    asks += 1
+    asks.current += 1
     const entry: LogEntry = {
-      id: `asked-${asks}`,
+      id: `asked-${asks.current}`,
       role: 'user',
       text,
       at,

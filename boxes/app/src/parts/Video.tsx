@@ -50,9 +50,14 @@ export function Video({ source, locked, covered, startAt, onPosition, ref }: Vid
     if (!el) return
     setFailure(null)
 
+    // The player reports ready again once it can correct its own metadata, so the resume is
+    // pinned to the first one: the user is never pulled back to where they started.
+    let resumed = false
     const created = createPlayer(el, {
       source,
       onReady: () => {
+        if (resumed) return
+        resumed = true
         if (resume.current > 0) created.seek(resume.current)
       },
       onPosition: (position) => report.current(position),

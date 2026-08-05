@@ -9,12 +9,25 @@ import { StageError } from './errors.ts'
 import { REGISTRY_NAMES } from './registry.ts'
 import type { ArtifactModule } from './types.ts'
 
+/** How every engine words a bare specifier it could not resolve. */
+const RESOLUTION_FAILURE = /\b(?:module|bare) specifier\b/i
+
+/** The engines quote the specifier they name: Chrome and Safari `'x'`, Firefox `“x”`. */
+function quotedSpecifier(name: string): RegExp {
+  return new RegExp(`["'“”]${name}["'“”]`)
+}
+
 /**
- * A failed import that names one of the registry specifiers means the document has no
- * import map (or the map points at nothing), not that the module is bad.
+ * A failed import that could not resolve one of the registry specifiers means the document
+ * has no import map (or the map points at nothing), not that the module is bad.
+ *
+ * Both halves matter. Reading the name out of any failure text mistakes ordinary failures
+ * for this one: a module that will not load from `/api/artifact/s1/d3-force-layout.js`, or a
+ * top-level `d3.scaleLinear is not a function`, has a registry that works fine.
  */
 function isRegistryFailure(message: string): boolean {
-  return REGISTRY_NAMES.some((name) => new RegExp(`\\b${name}\\b`).test(message))
+  if (!RESOLUTION_FAILURE.test(message)) return false
+  return REGISTRY_NAMES.some((name) => quotedSpecifier(name).test(message))
 }
 
 export async function loadArtifactModule(url: string): Promise<ArtifactModule> {

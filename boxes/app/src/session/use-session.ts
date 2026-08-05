@@ -58,6 +58,9 @@ export function useSession(sessionId: string, signals: SessionSignals): Connecti
     }
 
     const load = (): void => {
+      // Patches hold while a read is in flight, on the first one and on every resume, so a
+      // change the snapshot missed is applied on top of it instead of being overwritten.
+      landed = false
       void readSession(sessionId)
         .then((fetched) => {
           if (!live) return
