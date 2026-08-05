@@ -101,8 +101,6 @@ class Verification {
       case 'done':
         this.#finish()
         break
-      default:
-        break
     }
   }
 

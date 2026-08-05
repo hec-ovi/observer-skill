@@ -42,7 +42,9 @@ export interface NormalizeOptions {
 
 interface Timed extends Word {
   key: string
+  /** Where the next word starts, never later than the frame this word came from. */
   end: number
+  cueEnd: number
 }
 
 const DEFAULTS = { gapSeconds: 0.8, maxSeconds: 14, maxWords: 48, minWords: 4 }
@@ -87,11 +89,14 @@ function cueWords(cue: Cue): Timed[] {
         w,
       }))
   return raw
-    .map((word) => ({ ...word, key: wordKey(word.w), end }))
+    .map((word) => ({ ...word, key: wordKey(word.w), end, cueEnd: end }))
     .filter((word) => word.key.length > 0 || /[.!?…]/.test(word.w))
 }
 
-/** Stage 2. Cues become one word stream; every word knows when the next one starts. */
+/**
+ * Stage 2. Cues become one word stream. A word ends where the next one starts, but never
+ * later than its own frame, so a pause between frames stays a pause.
+ */
 export function cuesToWords(cues: Cue[], options: NormalizeOptions = {}): Timed[] {
   const out: Timed[] = []
   for (const cue of cues) {
@@ -99,12 +104,10 @@ export function cuesToWords(cues: Cue[], options: NormalizeOptions = {}): Timed[
     if (words.length === 0) continue
     const skip = options.dedupeOverlap ? overlapLen(out, words) : 0
     for (const word of words.slice(skip)) out.push(word)
-    const last = out[out.length - 1]
-    if (last && cue.end !== null) last.end = cue.end
   }
   for (const [i, word] of out.entries()) {
     const next = out[i + 1]
-    word.end = next ? next.t : Math.max(word.end, word.t)
+    word.end = Math.max(word.t, next ? Math.min(next.t, word.cueEnd) : word.cueEnd)
   }
   return out
 }

@@ -51,7 +51,7 @@ document.addEventListener('securitypolicyviolation', (event) => {
 
 const consoleError = console.error.bind(console)
 console.error = (...args: unknown[]): void => {
-  send({ type: 'error', message: `console.error: ${args.map((arg) => describeError(arg)).join(' ')}` })
+  send({ type: 'error', message: `console.error: ${args.map(describeError).join(' ')}` })
   consoleError(...args)
 }
 
