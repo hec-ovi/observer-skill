@@ -61,8 +61,12 @@ export function readRange(input: TimeRangeInput): TimeRange {
   return result.data
 }
 
-/** The range has to be a stretch of this video, or the lookup by second means nothing. */
-export function assertInBounds(what: string, range: TimeRange, duration: number): void {
+/**
+ * The range has to be a stretch of this video, or the lookup by second means nothing.
+ * A source whose duration is unknown is checked for order and for a negative start only:
+ * an unknown length is not a reason to refuse a concept the agent read out of the video.
+ */
+export function assertInBounds(what: string, range: TimeRange, duration: number | null): void {
   if (range.endsAt < range.startsAt) {
     fail(
       'INVALID_CONCEPT',
@@ -70,7 +74,14 @@ export function assertInBounds(what: string, range: TimeRange, duration: number)
       'Write the range as startsAt then endsAt, in video seconds.',
     )
   }
-  if (range.startsAt < 0 || range.endsAt > duration) {
+  if (range.startsAt < 0) {
+    fail(
+      'RANGE_OUT_OF_BOUNDS',
+      `${what} starts at ${range.startsAt}s, before the video does.`,
+      'Keep the range inside the video duration.',
+    )
+  }
+  if (duration !== null && range.endsAt > duration) {
     fail(
       'RANGE_OUT_OF_BOUNDS',
       `${what} covers ${range.startsAt}s to ${range.endsAt}s, outside this video's 0s to ${duration}s.`,

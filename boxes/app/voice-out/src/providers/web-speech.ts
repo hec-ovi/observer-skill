@@ -5,7 +5,7 @@
  * first load in most browsers, which is the only thing `warm` waits for.
  */
 
-import type { ProviderInfo, Voice, VoiceOutConfig } from '../../schema/voice-out.ts'
+import type { ProviderInfo, Voice } from '../../schema/voice-out.ts'
 import type { SpeakRequest, VoiceProvider } from './provider.ts'
 
 /** How long to wait for `voiceschanged` before accepting whatever the engine has. */
@@ -61,7 +61,7 @@ export const webSpeechProvider: VoiceProvider = {
     if (synth) await listVoices(synth)
   },
 
-  async voices(_config: VoiceOutConfig): Promise<Voice[]> {
+  async voices(): Promise<Voice[]> {
     const synth = engine()
     if (!synth) return []
     const found = await listVoices(synth)

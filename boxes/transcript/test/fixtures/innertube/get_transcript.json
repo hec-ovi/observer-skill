@@ -1,0 +1,105 @@
+{
+  "actions": [
+    {
+      "updateEngagementPanelAction": {
+        "targetId": "engagement-panel-searchable-transcript",
+        "content": {
+          "transcriptRenderer": {
+            "content": {
+              "transcriptSearchPanelRenderer": {
+                "targetId": "engagement-panel-searchable-transcript",
+                "body": {
+                  "transcriptSegmentListRenderer": {
+                    "initialSegments": [
+                      {
+                        "transcriptSegmentRenderer": {
+                          "startMs": "0",
+                          "endMs": "3120",
+                          "snippet": { "runs": [{ "text": "In a single minute your body" }] },
+                          "startTimeText": { "simpleText": "0:00" },
+                          "targetId": "L9NRuLoAQBg.CgNhc3ISAmVuGgA%3D.0"
+                        }
+                      },
+                      {
+                        "transcriptSegmentRenderer": {
+                          "startMs": "3120",
+                          "endMs": "6400",
+                          "snippet": { "runs": [{ "text": "produces 120 million red blood cells." }] },
+                          "startTimeText": { "simpleText": "0:03" },
+                          "targetId": "L9NRuLoAQBg.CgNhc3ISAmVuGgA%3D.1"
+                        }
+                      },
+                      {
+                        "transcriptSegmentRenderer": {
+                          "startMs": "6400",
+                          "endMs": "9880",
+                          "snippet": { "runs": [{ "text": "Each one carries oxygen from the lungs" }] },
+                          "startTimeText": { "simpleText": "0:06" },
+                          "targetId": "L9NRuLoAQBg.CgNhc3ISAmVuGgA%3D.2"
+                        }
+                      },
+                      {
+                        "transcriptSegmentRenderer": {
+                          "startMs": "9880",
+                          "endMs": "13200",
+                          "snippet": { "runs": [{ "text": "to every tissue that needs it." }] },
+                          "startTimeText": { "simpleText": "0:09" },
+                          "targetId": "L9NRuLoAQBg.CgNhc3ISAmVuGgA%3D.3"
+                        }
+                      },
+                      {
+                        "transcriptSegmentRenderer": {
+                          "startMs": "13200",
+                          "endMs": "16040",
+                          "snippet": { "runs": [{ "text": "[Music]" }] },
+                          "startTimeText": { "simpleText": "0:13" },
+                          "targetId": "L9NRuLoAQBg.CgNhc3ISAmVuGgA%3D.4"
+                        }
+                      },
+                      {
+                        "transcriptSegmentRenderer": {
+                          "startMs": "16040",
+                          "endMs": "19600",
+                          "snippet": { "runs": [{ "text": "The whole trip takes about" }] },
+                          "startTimeText": { "simpleText": "0:16" },
+                          "targetId": "L9NRuLoAQBg.CgNhc3ISAmVuGgA%3D.5"
+                        }
+                      },
+                      {
+                        "transcriptSegmentRenderer": {
+                          "startMs": "19600",
+                          "endMs": "22800",
+                          "snippet": { "runs": [{ "text": "twenty seconds." }] },
+                          "startTimeText": { "simpleText": "0:19" },
+                          "targetId": "L9NRuLoAQBg.CgNhc3ISAmVuGgA%3D.6"
+                        }
+                      }
+                    ],
+                    "noResultLabel": { "simpleText": "No results found" },
+                    "retryLabel": { "simpleText": "Retry" },
+                    "touchCaptionsEnabled": true
+                  }
+                },
+                "footer": {
+                  "transcriptFooterRenderer": {
+                    "languageMenu": {
+                      "sortFilterSubMenuRenderer": {
+                        "subMenuItems": [
+                          {
+                            "title": "English",
+                            "selected": true,
+                            "continuation": { "reloadContinuationData": { "continuation": "CgtMOU5SdUxvQVFCZxIA" } }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

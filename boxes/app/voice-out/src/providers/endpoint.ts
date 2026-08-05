@@ -6,7 +6,7 @@
  * Decoded audio plays through the box's own graph, so the page gets a live analyser.
  */
 
-import type { ProviderInfo, Voice, VoiceOutConfig } from '../../schema/voice-out.ts'
+import type { ProviderInfo, Voice } from '../../schema/voice-out.ts'
 import type { SpeakRequest, VoiceProvider, WarmRequest } from './provider.ts'
 
 /** Servers differ on their default container; mp3 is the one every browser can decode. */
@@ -70,10 +70,8 @@ function play(buffer: AudioBuffer, request: SpeakRequest): Promise<void> {
 export const endpointProvider: VoiceProvider = {
   id: 'endpoint',
 
-  async available(config: VoiceOutConfig): Promise<boolean> {
-    return (
-      Boolean(config.baseUrl) && typeof fetch === 'function' && typeof AudioContext !== 'undefined'
-    )
+  async available(): Promise<boolean> {
+    return typeof fetch === 'function' && typeof AudioContext !== 'undefined'
   },
 
   /** Nothing downloads; the latency worth removing is opening and resuming the context. */

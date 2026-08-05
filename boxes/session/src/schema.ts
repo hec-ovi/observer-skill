@@ -36,13 +36,27 @@ export const PHASES = ['feed', 'transcribing', 'researching', 'building', 'ready
 export const phaseSchema = z.enum(PHASES)
 export type Phase = z.infer<typeof phaseSchema>
 
+/**
+ * The video, exactly as `ingest` resolved it. Everything it learned is kept: the research
+ * pass compares `publishedAt` against today to find what has moved since the recording,
+ * and `hasCaptions` decides which transcript provider runs first.
+ */
 export const sourceSchema = z.object({
   provider: z.string().min(1),
   videoId: z.string().min(1),
   url: z.string().min(1),
   title: z.string(),
-  duration: z.number().min(0),
+  channel: z.string().default(''),
+  duration: z.number().min(0).nullable().default(null),
+  /** `YYYY-MM-DD`, or null when only the keyless lookup answered. */
+  publishedAt: z.string().nullable().default(null),
+  /** Null when unknown, so "no captions" is never guessed. */
+  hasCaptions: z.boolean().nullable().default(null),
+  captionLanguages: z.array(z.string()).default([]),
   hasAds: z.boolean().default(false),
+  embeddable: z.boolean().default(true),
+  /** True when only the keyless lookup answered, so the fields above may be unknown. */
+  degraded: z.boolean().default(false),
 })
 export type Source = z.infer<typeof sourceSchema>
 

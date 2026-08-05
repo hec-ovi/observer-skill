@@ -1,0 +1,20 @@
+{
+  "engagementPanels": [
+    {
+      "engagementPanelSectionListRenderer": {
+        "panelIdentifier": "engagement-panel-searchable-transcript",
+        "content": {
+          "continuationItemRenderer": {
+            "trigger": "CONTINUATION_TRIGGER_ON_ITEM_SHOWN",
+            "continuationEndpoint": {
+              "commandMetadata": {
+                "webCommandMetadata": { "sendPost": true, "apiUrl": "/youtubei/v1/get_transcript" }
+              },
+              "getTranscriptEndpoint": { "params": "CgtMOU5SdUxvQVFCZxISQ2dOaGMzSVNBbVZ1R2dBJTNE" }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

@@ -103,6 +103,21 @@ describe('web-speech', () => {
     expect(synth.spoken).toHaveLength(0)
   })
 
+  it('ends without speaking when the signal was already aborted', async () => {
+    const synth = fakeSpeechSynthesis()
+    const ends: SpeakEnd[] = []
+
+    speak('too late', {
+      config,
+      signal: AbortSignal.abort(),
+      onEnd: (event) => ends.push(event),
+    })
+
+    expect(ends).toHaveLength(1)
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    expect(synth.spoken).toHaveLength(0)
+  })
+
   it('ends the line when the outside signal aborts it', async () => {
     const synth = fakeSpeechSynthesis()
     const controller = new AbortController()
