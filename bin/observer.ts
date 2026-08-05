@@ -41,9 +41,9 @@ function commandOf(argv: readonly string[]): Command | null {
 async function mcp(config: Config): Promise<void> {
   const wiring = await wire(config)
   const shutdown = new Shutdown(wiring.close).onSignals()
-  // `serve` reads stdin itself and returns when the client closes it, so nothing else here
-  // may touch that stream.
-  await wiring.agentIo.serve()
+  // `agent-io` reads stdin itself and returns when the client closes it, so nothing else here
+  // may touch that stream. A signal gets there first or the stream does; either one ends it.
+  await Promise.race([wiring.agentIo.serve(), shutdown.run()])
   await shutdown.now()
 }
 
@@ -59,7 +59,7 @@ async function serve(config: Config): Promise<void> {
   console.error(`[observer] the page is at ${url}`)
   console.error('[observer] stop it with ctrl-c.')
 
-  await shutdown.now()
+  await shutdown.run()
 }
 
 async function run(command: Command, config: Config): Promise<number> {
