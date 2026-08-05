@@ -7,35 +7,19 @@ const yt = await Innertube.create({
   enable_session_cache: false,
 })
 
-const query = process.argv[2]!
-const res = await yt.search(query, { type: 'video' })
-const ids: string[] = []
-for (const v of res.videos) {
-  const id = (v as unknown as { id?: string }).id
-  if (id) ids.push(id)
-}
-console.error('found', ids.length)
-
-for (const id of ids.slice(0, 25)) {
+for (const id of process.argv.slice(2)) {
   try {
-    const info = await yt.getBasicInfo(id, { client: 'IOS' })
-    const caps = info.captions?.caption_tracks?.length ?? 0
-    const emb = info.playability_status?.embeddable
-    if (caps === 0 || emb === false) {
-      console.error(
-        'HIT',
-        id,
-        '| captions',
-        caps,
-        '| embeddable',
-        emb,
-        '| status',
-        info.playability_status?.status,
-        '|',
-        info.basic_info.title,
-      )
-    }
+    const info = await yt.getInfo(id, { client: 'IOS' })
+    console.error(
+      id,
+      '| status', info.playability_status?.status,
+      '| caps', info.captions?.caption_tracks?.length ?? 0,
+      '| emb', info.playability_status?.embeddable,
+      '| dur', info.basic_info.duration,
+      '| published', JSON.stringify(info.primary_info?.published?.text),
+      '| relative', JSON.stringify(info.primary_info?.relative_date?.text),
+    )
   } catch (e) {
-    console.error('err', id, (e as Error).message)
+    console.error(id, 'THREW', (e as Error).message)
   }
 }
