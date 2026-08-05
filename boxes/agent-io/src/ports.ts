@@ -51,6 +51,8 @@ export interface AgentIoConfig {
   transcript: ProviderChoice
   /** Open the study page in the user's browser when a session starts. */
   openBrowser: boolean
+  /** Where the prompt files are. The install's own folder when null. */
+  prompts?: string | null
   /** Reported to the client as the server version. */
   version?: string
 }

@@ -47,6 +47,8 @@ export type UpstreamEvent = z.infer<typeof upstreamEventSchema>
 /** `POST /api/session`: a URL, and whatever the user chose in the page. */
 export const createSessionInputSchema = z.object({
   url: z.string().min(1),
+  /** The user's word that this video carries sponsor reads, which the agent reads as noise. */
+  hasAds: z.boolean().default(false),
   settings: settingsPatchSchema.optional(),
   userPrompt: z.string().nullable().default(null),
 })

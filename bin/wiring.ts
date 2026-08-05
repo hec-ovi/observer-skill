@@ -10,7 +10,7 @@ import type { Config } from '#config'
 import { resolve } from '#ingest'
 import { createKnowledge } from '#knowledge'
 import { createStore } from '#session'
-import { at, fetch, read } from '#transcript'
+import { at, fetch as fetchTranscript, read } from '#transcript'
 import { createHost } from '#web-host'
 import type { Host } from '#web-host'
 import { VERSION, appDir } from './paths.ts'
@@ -26,7 +26,13 @@ export async function wire(config: Config): Promise<Wiring> {
   const store = createStore({ home: config.home })
 
   const ingest: IngestPort = { resolve }
-  const transcript: TranscriptPort = { fetch, read, at }
+  const transcript: TranscriptPort = {
+    // The binaries are the process's business, not the agent's: the box takes them per call.
+    fetch: (source, options) =>
+      fetchTranscript(source, { ...options, ytdlpBin: config.ytdlpBin, ffmpegBin: config.ffmpegBin }),
+    read,
+    at,
+  }
   const artifact: ArtifactPort = { build }
   const knowledge = createKnowledge({ store })
 
@@ -40,6 +46,10 @@ export async function wire(config: Config): Promise<Wiring> {
     bind: config.bind,
     version: VERSION,
     readTranscript: async (sessionId, range) => read(sessionId, range),
+    // The page's feed screen opens videos itself, through the one open path `agent-io` owns,
+    // so a session pasted into the browser is the session the `open` tool would have made.
+    // The browser is left alone: the user is already looking at the page that asked.
+    createSession: (input) => agentIo.openSession({ ...input, openBrowser: false }),
   })
 
   const agentIo = createAgentIo({
@@ -53,6 +63,7 @@ export async function wire(config: Config): Promise<Wiring> {
       home: config.home,
       transcript: config.transcript,
       openBrowser: config.openBrowser,
+      prompts: config.prompts,
       version: VERSION,
     },
   })

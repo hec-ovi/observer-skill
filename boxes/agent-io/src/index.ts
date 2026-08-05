@@ -23,5 +23,5 @@ export type {
 export function createAgentIo(deps: AgentIoDeps): AgentIo {
   // Prompts are read once, at startup: a missing prompt file is a broken install and should
   // say so before the first tool call, not during one.
-  return agentIoOn(new Runtime(deps), loadPrompts())
+  return agentIoOn(new Runtime(deps), loadPrompts(deps.config.prompts ?? null))
 }

@@ -11,6 +11,10 @@ export interface ProviderContext {
   file?: string | undefined
   /** A scratch directory this call owns; it is removed when the call ends. */
   scratch: string
+  /** The caption fetcher binary to run. */
+  ytdlpBin: string
+  /** The audio converter to run. */
+  ffmpegBin: string
   report: ProgressFn
 }
 

@@ -26,7 +26,7 @@ const PROMPT_CHARS = 220
 export const endpointAsr: Provider = {
   id: 'endpoint-asr',
 
-  async available(): Promise<Availability> {
+  async available(context: ProviderContext): Promise<Availability> {
     const config = readConfig()
     if (config.asrUrl === null) {
       return {
@@ -35,8 +35,10 @@ export const endpointAsr: Provider = {
         hint: 'Set OBSERVER_ASR_URL to an OpenAI-compatible transcription endpoint.',
       }
     }
-    if (!(await ytdlpPresent())) return { ok: false, missing: 'yt-dlp', hint: YTDLP_INSTALL }
-    if (!(await ffmpegPresent())) {
+    if (!(await ytdlpPresent(context.ytdlpBin))) {
+      return { ok: false, missing: 'yt-dlp', hint: YTDLP_INSTALL }
+    }
+    if (!(await ffmpegPresent(context.ffmpegBin))) {
       return { ok: false, missing: 'ffmpeg', hint: 'Install ffmpeg, or set FFMPEG_BIN to it.' }
     }
     return { ok: true }
@@ -47,11 +49,11 @@ export const endpointAsr: Provider = {
     if (config.asrUrl === null) return nothing('no transcription endpoint is configured')
 
     context.report({ step: 'audio', done: 0, total: 1, message: 'downloading audio' })
-    const audio = await downloadAudio(source.url, context.scratch, context.report)
+    const audio = await downloadAudio(source.url, context.scratch, context.report, context.ytdlpBin)
     if (typeof audio !== 'string') return broke(audio.error)
 
     context.report({ step: 'chunks', done: 0, total: 1, message: 'preparing audio' })
-    const chunks = await splitAudio(audio, context.scratch, CHUNK_SECONDS)
+    const chunks = await splitAudio(audio, context.scratch, CHUNK_SECONDS, context.ffmpegBin)
     if (!Array.isArray(chunks)) return broke(chunks.error)
     context.report({ step: 'chunks', done: 1, total: 1, message: `${chunks.length} chunks to transcribe` })
 

@@ -12,7 +12,7 @@ interface Command {
   detail: string
 }
 
-interface Variable {
+export interface Variable {
   name: string
   /** The setting it fills in, so a renamed field fails the type check, not the reader. */
   key: keyof Config
@@ -27,7 +27,8 @@ const COMMANDS: readonly Command[] = [
   { name: '--version', detail: 'Print the version.' },
 ]
 
-const ENVIRONMENT: readonly Variable[] = [
+/** Every setting, one line each. A `Config` field with no line here fails the help test. */
+export const ENVIRONMENT: readonly Variable[] = [
   { name: 'OBSERVER_PORT', key: 'port', detail: 'First port to try for the page; a taken one moves up.' },
   { name: 'OBSERVER_BIND', key: 'bind', detail: 'Address to listen on.' },
   { name: 'OBSERVER_HOME', key: 'home', detail: 'Where sessions, transcripts and artifacts live.' },
@@ -36,6 +37,9 @@ const ENVIRONMENT: readonly Variable[] = [
   { name: 'OBSERVER_ASR_KEY', key: 'asrKey', detail: 'Bearer token for that endpoint.' },
   { name: 'OBSERVER_ASR_MODEL', key: 'asrModel', detail: 'Model name that endpoint should use.' },
   { name: 'OBSERVER_OPEN', key: 'openBrowser', detail: 'Open the page in a browser when a session starts.' },
+  { name: 'OBSERVER_PROMPTS', key: 'prompts', detail: "The agent's prompt files, when they are kept outside the install." },
+  { name: 'YTDLP_BIN', key: 'ytdlpBin', detail: 'The caption fetcher binary.' },
+  { name: 'FFMPEG_BIN', key: 'ffmpegBin', detail: 'The audio converter speech recognition needs.' },
 ]
 
 const NAME_WIDTH = 20

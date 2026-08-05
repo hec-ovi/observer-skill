@@ -207,6 +207,8 @@ export interface CallOutcome {
 export interface HarnessOptions {
   /** An existing home, so a test can build a second process on sessions already on disk. */
   home?: string
+  /** Where the prompt files are read from, as the process passes it down. */
+  prompts?: string
 }
 
 /** A real MCP client on one end, the real server on the other, nothing in between. */
@@ -226,11 +228,18 @@ export async function openAgentIo(t: TestContext, options: HarnessOptions = {}):
     knowledge: createKnowledge({ store }),
     artifact,
     host,
-    config: { home, transcript: 'auto', openBrowser: false, version: '0.0.0-test' },
+    config: {
+      home,
+      transcript: 'auto',
+      openBrowser: false,
+      prompts: options.prompts ?? null,
+      version: '0.0.0-test',
+    },
   }
 
   const runtime = new Runtime(deps)
-  const prompts = loadPrompts()
+  // The same call `createAgentIo` makes, so a harness reads prompts the way the process does.
+  const prompts = loadPrompts(deps.config.prompts ?? null)
   const agentIo = agentIoOn(runtime, prompts)
   const server = createServer(runtime, prompts)
   const [clientSide, serverSide] = InMemoryTransport.createLinkedPair()

@@ -58,7 +58,7 @@ async function pass(
   dir: string,
   automatic: boolean,
 ): Promise<PassOutcome> {
-  const outcome = await ytdlp([
+  const outcome = await ytdlp(context.ytdlpBin, [
     '--no-progress',
     '--no-playlist',
     '--skip-download',
@@ -96,8 +96,8 @@ async function pass(
 export const captions: Provider = {
   id: 'captions',
 
-  async available(): Promise<Availability> {
-    if (await ytdlpPresent()) return { ok: true }
+  async available(context: ProviderContext): Promise<Availability> {
+    if (await ytdlpPresent(context.ytdlpBin)) return { ok: true }
     return { ok: false, missing: 'yt-dlp', hint: YTDLP_INSTALL }
   },
 

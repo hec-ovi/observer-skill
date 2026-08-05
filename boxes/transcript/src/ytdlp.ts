@@ -1,5 +1,5 @@
 /**
- * The caption fetcher binary. `YTDLP_BIN` points at it; `yt-dlp` on PATH is the default.
+ * The caption fetcher binary. The caller names it; `yt-dlp` on PATH is the default.
  *
  * A JavaScript runtime is mandatory for this extractor now, and Node is already here, so it
  * is passed explicitly rather than relying on the one runtime that is enabled by default.
@@ -10,9 +10,8 @@
 import type { RunOptions, RunOutcome } from './runner.ts'
 import { present, run } from './runner.ts'
 
-export function ytdlpBin(): string {
-  return process.env['YTDLP_BIN'] ?? 'yt-dlp'
-}
+/** What it is called when nobody says otherwise. */
+export const YTDLP_DEFAULT = 'yt-dlp'
 
 export const YTDLP_INSTALL =
   'Install yt-dlp (the standalone binary is enough) or set YTDLP_BIN to it.'
@@ -33,12 +32,12 @@ const BASE = [
   '0.75',
 ]
 
-export function ytdlp(args: string[], options: RunOptions = {}): Promise<RunOutcome> {
-  return run(ytdlpBin(), [...BASE, ...args], options)
+export function ytdlp(bin: string, args: string[], options: RunOptions = {}): Promise<RunOutcome> {
+  return run(bin, [...BASE, ...args], options)
 }
 
-export function ytdlpPresent(): Promise<boolean> {
-  return present(ytdlpBin(), ['--version'])
+export function ytdlpPresent(bin: string): Promise<boolean> {
+  return present(bin, ['--version'])
 }
 
 const REASONS: [RegExp, string][] = [

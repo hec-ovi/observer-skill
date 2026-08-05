@@ -17,12 +17,14 @@ import { readConfig } from '#config'
 import { fail } from '#errors'
 import type { Source } from '#ingest'
 
+import { FFMPEG_DEFAULT } from './asr/audio.ts'
 import type { Provider, ProviderContext, ProviderOutcome, ProviderResult } from './provider.ts'
 import { broke } from './provider.ts'
 import { PROVIDERS, providerById } from './registry.ts'
 import type { FetchOptions, ProviderChoice, TranscriptRef } from './schema.ts'
 import { FetchOptionsSchema } from './schema.ts'
 import { writeTranscript } from './store.ts'
+import { YTDLP_DEFAULT } from './ytdlp.ts'
 
 function chosen(option: ProviderChoice | undefined): ProviderChoice {
   if (option !== undefined) return option
@@ -64,6 +66,8 @@ export async function fetchTranscript(source: Source, options: FetchOptions): Pr
     language: parsed.language,
     file: parsed.file,
     scratch,
+    ytdlpBin: parsed.ytdlpBin ?? YTDLP_DEFAULT,
+    ffmpegBin: parsed.ffmpegBin ?? FFMPEG_DEFAULT,
     report,
   }
 

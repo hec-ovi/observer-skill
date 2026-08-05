@@ -21,6 +21,12 @@ export interface Config {
   asrModel: string
   /** Open the page in the user's browser when a session starts. */
   openBrowser: boolean
+  /** Where the agent's prompt files are read from. Null means the install's own folder. */
+  prompts: string | null
+  /** The caption fetcher binary, found on PATH unless a path is given. */
+  ytdlpBin: string
+  /** The audio converter speech recognition feeds its chunks through. */
+  ffmpegBin: string
 }
 
 function int(value: string | undefined, fallback: number): number {
@@ -31,6 +37,11 @@ function int(value: string | undefined, fallback: number): number {
 function flag(value: string | undefined, fallback: boolean): boolean {
   if (value === undefined || value === '') return fallback
   return !['0', 'false', 'no', 'off'].includes(value.toLowerCase())
+}
+
+/** An empty variable is an unset one: `VAR=` in a shell must not name the empty path. */
+function path(value: string | undefined): string | null {
+  return value === undefined || value.length === 0 ? null : value
 }
 
 function defaultHome(env: NodeJS.ProcessEnv): string {
@@ -54,5 +65,8 @@ export function readConfig(env: NodeJS.ProcessEnv = process.env): Config {
     asrKey: env['OBSERVER_ASR_KEY'] ?? null,
     asrModel: env['OBSERVER_ASR_MODEL'] ?? 'whisper-1',
     openBrowser: flag(env['OBSERVER_OPEN'], true),
+    prompts: path(env['OBSERVER_PROMPTS']),
+    ytdlpBin: env['YTDLP_BIN'] ?? 'yt-dlp',
+    ffmpegBin: env['FFMPEG_BIN'] ?? 'ffmpeg',
   }
 }

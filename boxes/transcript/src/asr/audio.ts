@@ -20,12 +20,11 @@ export interface Chunk {
   offset: number
 }
 
-export function ffmpegBin(): string {
-  return process.env['FFMPEG_BIN'] ?? 'ffmpeg'
-}
+/** What the converter is called when nobody says otherwise. */
+export const FFMPEG_DEFAULT = 'ffmpeg'
 
-export function ffmpegPresent(): Promise<boolean> {
-  return present(ffmpegBin(), ['-version'])
+export function ffmpegPresent(bin: string): Promise<boolean> {
+  return present(bin, ['-version'])
 }
 
 export interface AudioFailure {
@@ -37,9 +36,11 @@ export async function downloadAudio(
   url: string,
   dir: string,
   report: ProgressFn,
+  bin: string,
 ): Promise<string | AudioFailure> {
   let total = 0
   const outcome = await ytdlp(
+    bin,
     [
       '--no-playlist',
       '--progress',
@@ -104,9 +105,10 @@ export async function splitAudio(
   input: string,
   dir: string,
   chunkSeconds: number,
+  bin: string,
 ): Promise<Chunk[] | AudioFailure> {
   const list = join(dir, 'chunks.csv')
-  const outcome = await run(ffmpegBin(), [
+  const outcome = await run(bin, [
     '-hide_banner',
     '-loglevel',
     'error',

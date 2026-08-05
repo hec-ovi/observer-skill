@@ -62,8 +62,8 @@ function checkNode(): Check {
   }
 }
 
-async function checkYtDlp(): Promise<Check> {
-  const found = await version(process.env['YTDLP_BIN'] ?? 'yt-dlp', ['--version'])
+async function checkYtDlp(config: Config): Promise<Check> {
+  const found = await version(config.ytdlpBin, ['--version'])
   if (found !== null) return { name: 'yt-dlp', level: 'ok', detail: found }
   return {
     name: 'yt-dlp',
@@ -74,7 +74,7 @@ async function checkYtDlp(): Promise<Check> {
 }
 
 async function checkFfmpeg(config: Config): Promise<Check> {
-  const found = await version('ffmpeg', ['-version'])
+  const found = await version(config.ffmpegBin, ['-version'])
   if (found !== null) return { name: 'ffmpeg', level: 'ok', detail: found.slice(0, 60) }
   const needed = config.asrUrl !== null
   return {
@@ -142,7 +142,7 @@ export async function diagnose(config: Config): Promise<Check[]> {
     checkNode(),
     await checkHome(config),
     await checkPort(config),
-    await checkYtDlp(),
+    await checkYtDlp(config),
     await checkFfmpeg(config),
     checkAsr(config),
   ]

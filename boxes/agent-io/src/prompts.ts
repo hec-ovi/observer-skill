@@ -26,12 +26,11 @@ export const PROMPT_NAMES = [
 const PREPARATION: readonly string[] = ['study-plan', 'research', 'visual-plan']
 
 /**
- * `../prompts/` is the source layout, `./prompts/` the published one. `OBSERVER_PROMPTS`
- * overrides both, for a checkout that keeps them somewhere else.
+ * `../prompts/` is the source layout, `./prompts/` the published one. A directory the
+ * process was configured with wins over both, for an install that keeps them elsewhere.
  */
-function promptsDir(): string {
-  const declared = process.env['OBSERVER_PROMPTS']
-  if (declared !== undefined && declared.length > 0) return declared
+function promptsDir(declared: string | null): string {
+  if (declared !== null) return declared
 
   const candidates = ['../prompts/', './prompts/'].map((relative) =>
     fileURLToPath(new URL(relative, import.meta.url)),
@@ -41,7 +40,7 @@ function promptsDir(): string {
     fail(
       'INTERNAL',
       `No prompts directory at ${candidates.join(' or ')}.`,
-      'Reinstall the package, or point OBSERVER_PROMPTS at the prompts folder.',
+      'Reinstall the package, or set OBSERVER_PROMPTS to the prompts folder.',
     )
   }
   return found
@@ -59,8 +58,8 @@ function headingOf(text: string): string {
   return first.replace(/^#+\s*/, '').trim()
 }
 
-export function loadPrompts(): PromptFile[] {
-  const dir = promptsDir()
+export function loadPrompts(declared: string | null = null): PromptFile[] {
+  const dir = promptsDir(declared)
   return PROMPT_NAMES.map((name) => {
     const file = join(dir, `${name}.md`)
     if (!existsSync(file)) {

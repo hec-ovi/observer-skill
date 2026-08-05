@@ -73,6 +73,10 @@ export const FetchOptionsSchema = z.object({
   provider: ProviderChoiceSchema.optional(),
   language: z.string().min(1).optional(),
   file: z.string().min(1).optional(),
+  /** The caption fetcher binary. `yt-dlp` on PATH when it is not named. */
+  ytdlpBin: z.string().min(1).optional(),
+  /** The audio converter speech recognition feeds. `ffmpeg` on PATH when it is not named. */
+  ffmpegBin: z.string().min(1).optional(),
 })
 
 export interface FetchOptions extends z.infer<typeof FetchOptionsSchema> {
