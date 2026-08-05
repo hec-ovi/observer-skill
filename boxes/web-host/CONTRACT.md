@@ -16,7 +16,7 @@ createHost({ store, appDir, home, port, bind, version, heartbeatMs,
 ```
 
 - `store`: anything satisfying `SessionPort`, the part of the `session` contract used here.
-- `appDir`: the built app. `index.html`, `assets/`, and `sandbox/runner.js`.
+- `appDir`: the built app. `index.html`, `assets/`, `sandbox.html`, and `sandbox/vendor/`.
 - `home`: where sessions live. Bundles and snapshots resolve inside the session's folder.
 - `port` (4830), `bind` (`127.0.0.1`), `version` (`0.0.0`), `heartbeatMs` (15000) are
   defaults. `port: 0` asks the kernel for a free one.
@@ -56,16 +56,18 @@ that never answers resolves as a failed verification, never as a hang.
 | `/api/snapshot/:sessionId/:artifactId` | GET | The PNG the agent looked at |
 | `/live/:id` | GET | Server-sent events for this session |
 | `/live/:id/event` | POST | One upstream event from the page |
-| `/sandbox/:sessionId/:artifactId` | GET | The isolated document that verification runs a module in |
-| `/sandbox/*` | GET | The stage's runner and whatever ships beside it, from `appDir/sandbox` |
+| `/sandbox/frame` | GET | The isolated document verification runs a module in |
+| `/sandbox/*` | GET | The library registry an artifact imports, from `appDir/sandbox` |
 | `/healthz` | GET | Liveness, and the version |
 
-The sandbox document is served from a route, not a `srcdoc` or a blob, because only an HTTP
+The verify frame is served from a route, not a `srcdoc` or a blob, because only an HTTP
 response carries its own content policy: it runs with `default-src 'none'`,
-`connect-src 'none'` and `sandbox allow-scripts`, and it loads `/sandbox/runner.js`. That
-runner, and the postMessage protocol it speaks, belong to `app/stage`. Both script routes
-send `Access-Control-Allow-Origin: *`, because a module script is always a CORS fetch and
-the sandbox has an opaque origin.
+`connect-src 'none'` and `sandbox allow-scripts`. The document itself is the app build's
+own `sandbox.html`, so it runs the same loader the visible stage does; that document and the
+protocol it speaks belong to `app/stage`, and which module to run reaches it over a port
+rather than through the URL. Every script route sends `Access-Control-Allow-Origin: *`,
+because a module script is always a CORS fetch and a sandboxed document has an opaque
+origin.
 
 ## The live channel
 
