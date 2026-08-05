@@ -6,7 +6,6 @@
 export { fetchTranscript as fetch } from './fetch.ts'
 export { read } from './read.ts'
 export { at } from './at.ts'
-export { transcriptPath } from './store.ts'
 
 export type {
   AtOptions,

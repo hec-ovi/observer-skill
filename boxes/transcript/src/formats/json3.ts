@@ -24,7 +24,7 @@ function num(value: unknown): number | null {
   return typeof value === 'number' && Number.isFinite(value) ? value : null
 }
 
-export function isJson3(doc: unknown): boolean {
+function isJson3(doc: unknown): boolean {
   return typeof doc === 'object' && doc !== null && Array.isArray((doc as { events?: unknown }).events)
 }
 

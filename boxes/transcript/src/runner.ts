@@ -18,8 +18,8 @@ export interface RunOptions {
   timeoutMs?: number
   /** yt-dlp's `-J` dump runs to tens of megabytes; Node's default is one. */
   maxBuffer?: number
+  /** Called per line as the binary prints, for progress that arrives while it runs. */
   onStdoutLine?: (line: string) => void
-  onStderrLine?: (line: string) => void
 }
 
 function byLine(stream: Readable | null, sink: (line: string) => void): void {
@@ -63,7 +63,6 @@ export function run(bin: string, args: string[], options: RunOptions = {}): Prom
       },
     )
     if (options.onStdoutLine) byLine(child.stdout, options.onStdoutLine)
-    if (options.onStderrLine) byLine(child.stderr, options.onStderrLine)
   })
 }
 

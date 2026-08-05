@@ -4,10 +4,11 @@
  */
 
 import assert from 'node:assert/strict'
-import { rm } from 'node:fs/promises'
+import { rm, stat } from 'node:fs/promises'
+import { join } from 'node:path'
 import { after, before, describe, test } from 'node:test'
 
-import { at, fetch as fetchTranscript, read, transcriptPath } from '#transcript'
+import { at, fetch as fetchTranscript, read } from '#transcript'
 
 import type { Harness } from '../fixtures.ts'
 import { FAKE_YTDLP, caught, fixture, harness, source } from '../fixtures.ts'
@@ -104,8 +105,11 @@ describe('read and at', () => {
   })
 
   test('a lookup reads no disk once the transcript is loaded', async () => {
+    const path = join(box.home, 'sessions', box.sessionId, 'transcript.json')
+    assert.ok((await stat(path)).isFile())
+
     const before = at(box.sessionId, 10)
-    await rm(transcriptPath(box.home, box.sessionId))
+    await rm(path)
     assert.deepEqual(at(box.sessionId, 10), before)
   })
 

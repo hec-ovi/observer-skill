@@ -34,7 +34,7 @@ export interface LoadedTranscript {
 const homes = new Map<string, string>()
 const loaded = new Map<string, LoadedTranscript>()
 
-export function transcriptPath(home: string, sessionId: string): string {
+function transcriptPath(home: string, sessionId: string): string {
   return join(home, 'sessions', sessionId, 'transcript.json')
 }
 

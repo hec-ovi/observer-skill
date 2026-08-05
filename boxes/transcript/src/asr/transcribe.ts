@@ -46,7 +46,7 @@ interface VerboseResponse {
 }
 
 /** The endpoint is given as a base; the route is the standard one. */
-export function transcriptionUrl(base: string): string {
+function transcriptionUrl(base: string): string {
   const trimmed = base.replace(/\/+$/, '')
   if (trimmed.endsWith('/audio/transcriptions')) return trimmed
   if (trimmed.endsWith('/v1')) return `${trimmed}/audio/transcriptions`
@@ -70,7 +70,7 @@ function words(list: unknown, offset: number): Word[] {
 }
 
 /** The response as cues on the video's own timeline. */
-export function verboseToCues(body: unknown, offset: number): Cue[] {
+function verboseToCues(body: unknown, offset: number): Cue[] {
   const response = (body ?? {}) as VerboseResponse
   const list = Array.isArray(response.segments) ? (response.segments as VerboseSegment[]) : []
   const loose = words(response.words, offset)

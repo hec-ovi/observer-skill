@@ -9,7 +9,7 @@ import type { AtOptions, Segment, TranscriptWindow } from './schema.ts'
 import { AtOptionsSchema } from './schema.ts'
 import { indexAt, loadTranscript } from './store.ts'
 
-export function clock(time: number): string {
+function clock(time: number): string {
   const whole = Math.max(0, Math.floor(time))
   const hours = Math.floor(whole / 3600)
   const minutes = Math.floor((whole % 3600) / 60)

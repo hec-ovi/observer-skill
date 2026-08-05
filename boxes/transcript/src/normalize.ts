@@ -54,7 +54,7 @@ function isMarker(cue: Cue): boolean {
 }
 
 /** Fill missing ends, clamp an end that overruns the next cue, and keep ends ordered. */
-export function closeCues(cues: Cue[]): Cue[] {
+function closeCues(cues: Cue[]): Cue[] {
   for (const [i, cue] of cues.entries()) {
     const next = cues[i + 1]
     if (cue.end === null) cue.end = next ? next.start : cue.start + 2
@@ -97,7 +97,7 @@ function cueWords(cue: Cue): Timed[] {
  * Stage 2. Cues become one word stream. A word ends where the next one starts, but never
  * later than its own frame, so a pause between frames stays a pause.
  */
-export function cuesToWords(cues: Cue[], options: NormalizeOptions = {}): Timed[] {
+function cuesToWords(cues: Cue[], options: NormalizeOptions = {}): Timed[] {
   const out: Timed[] = []
   for (const cue of cues) {
     const words = cueWords(cue)
@@ -113,7 +113,7 @@ export function cuesToWords(cues: Cue[], options: NormalizeOptions = {}): Timed[
 }
 
 /** Stage 3. Words become sentences where the text allows, and blocks where it does not. */
-export function wordsToSentences(words: Timed[], options: NormalizeOptions = {}): Segment[] {
+function wordsToSentences(words: Timed[], options: NormalizeOptions = {}): Segment[] {
   const gap = options.gapSeconds ?? DEFAULTS.gapSeconds
   const maxSeconds = options.maxSeconds ?? DEFAULTS.maxSeconds
   const maxWords = options.maxWords ?? DEFAULTS.maxWords
