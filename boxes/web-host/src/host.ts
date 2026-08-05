@@ -112,7 +112,7 @@ class WebHost implements Host {
     const timeoutMs = request.timeoutMs ?? DEFAULT_VERIFY_TIMEOUT_MS
     const { requestId, result } = this.#verifications.start(artifactId, timeoutMs)
     const url = `${this.#origin()}/sandbox/${encodeURIComponent(sessionId)}/${encodeURIComponent(artifactId)}`
-    this.#context.store.signal(sessionId, { type: 'verify', requestId, url, timeoutMs })
+    this.#store.signal(sessionId, { type: 'verify', requestId, url, timeoutMs })
     return result
   }
 

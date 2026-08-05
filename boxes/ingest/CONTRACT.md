@@ -7,31 +7,37 @@ early whether it can actually be watched and transcribed.
 
 ## Inputs
 
-Schema: [`schema/source.ts`](schema/source.ts) → `ResolveInput`
+Schema: [`src/schema.ts`](src/schema.ts) → `ResolveInput`
 
 ```ts
 resolve({ url, hasAds }): Promise<Source>
 ```
 
-- `url`: what the user pasted. Full watch URLs, short links, embed URLs, playlist URLs with
-  a video in them, and a bare eleven-character id are all accepted.
+- `url`: what the user pasted. Full watch URLs, short links, embed URLs, shorts, live URLs,
+  playlist URLs with a video in them, and a bare eleven-character id are all accepted. A
+  missing `https://` is tolerated.
 - `hasAds`: the user's answer to "does this video carry ads", carried through untouched.
+  Optional, false when not asked.
 
 ## Outputs
 
-Schema: [`schema/source.ts`](schema/source.ts) → `Source`
+Schema: [`src/schema.ts`](src/schema.ts) → `Source`
 
 ```ts
 { provider: 'youtube', videoId, url, title, channel, duration, publishedAt,
-  hasCaptions, captionLanguages, hasAds, embeddable }
+  hasCaptions, captionLanguages, hasAds, embeddable, degraded }
 ```
 
-- `duration` in seconds. `publishedAt` is an ISO date and is what the research pass
+- `url` is the canonical watch URL, whatever form was pasted.
+- `duration` in seconds. `publishedAt` is `YYYY-MM-DD` and is what the research pass
   compares against today to find what has moved since.
 - `hasCaptions` and `captionLanguages` let the caller pick the transcript provider before
   spending a minute finding out.
 - `embeddable` is false when the owner disabled embedding. The caller must refuse the
   session then, before any preparation, because the player will never load.
+- `degraded` is true when only the keyless lookup answered. `duration`, `publishedAt` and
+  `hasCaptions` are then null and `captionLanguages` empty, so an unknown is never read as
+  a no.
 
 ## Errors
 
@@ -58,10 +64,11 @@ None.
 - The provider is chosen by the URL, and its name appears nowhere outside this box.
 - No cookies, tokens, or account state are required for a public video. When a provider
   needs credentials to see a video, that is `SOURCE_UNAVAILABLE` with a hint, not a prompt.
+  A challenge aimed at us rather than at the video degrades the source instead.
 - Nothing here reads captions. It only reports whether they exist.
 
 ## How to modify this box safely
 
-A provider is one file exporting `{ matches(url), resolve(url) }` plus a registry line.
-Add its fixtures to the tests: a normal video, one with no captions, one that cannot be
-embedded, one that does not exist. Those four cases are the contract.
+A provider is one file exporting `{ id, matches(url), resolve(url, hasAds) }` plus a line in
+`src/registry.ts`. Add its fixtures to the tests: a normal video, one with no captions, one
+that cannot be embedded, one that does not exist. Those four cases are the contract.

@@ -4,7 +4,7 @@ import { createHash } from 'node:crypto'
  * Case, spacing and punctuation are noise: "Back-Propagation", "back propagation" and
  * "  Back  propagation " are one concept written four ways.
  */
-export function normalizeLabel(label: string): string {
+function normalizeLabel(label: string): string {
   return label
     .normalize('NFKC')
     .toLowerCase()

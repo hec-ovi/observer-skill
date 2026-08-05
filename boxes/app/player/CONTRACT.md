@@ -15,13 +15,17 @@ createPlayer(el, { source, onReady, onPosition, onState, onError }): Player
 
 `Player` is `{ play, pause, seek(seconds), time(), state(), duration(), destroy }`.
 
+`source` is `{ provider, videoId, url?, title?, duration? }`. The provider name picks the
+implementation; the title and duration stand in until the player reports its own, which it
+cannot do until the video has started.
+
 ## Outputs
 
 - `onReady({ duration, title })` once the video can be controlled.
 - `onPosition({ time, state })` on play, on pause, on seek, on end, and on a steady tick
   while playing. The tick is fast enough that a pause maps to the right sentence and slow
-  enough that it is not a network event storm; the caller is told the cadence and does not
-  guess.
+  enough that it is not a network event storm: `POSITION_TICK_MS` is exported, so the
+  caller reads the cadence instead of guessing it.
 - `onState(state)`: `unstarted`, `playing`, `paused`, `buffering`, `ended`, `cued`. Seeking
   is reported as a position jump, not as a state.
 - `onError({ code, message, hint })`.
@@ -30,7 +34,10 @@ createPlayer(el, { source, onReady, onPosition, onState, onError }): Player
 
 - `PLAYER_UNAVAILABLE`: the provider's script would not load.
 - `NOT_EMBEDDABLE`: the owner disabled embedding, or the video is restricted where we are.
-  This is the failure the user must hear about before a session is prepared, not after.
+  This is the failure the user must hear about before a session is prepared, not after. A
+  video that paints its own refusal inside the frame and reports nothing (an age wall, a
+  regional block, a sign-in) is reported the same way, eight seconds after the user pressed
+  play.
 - `VIDEO_UNAVAILABLE`: removed, private, or wrong id.
 
 ## Invariants
@@ -54,7 +61,9 @@ None.
 
 ## How to modify this box safely
 
-A provider is one file exporting `{ id, matches(source), create(el, opts) }`. The tests run
-against a fake provider that implements the same interface, so player-driven behaviour
-elsewhere in the app is testable without a network or an iframe. The real provider has its
-own thin test that asserts the script loads once and the error codes map correctly.
+A provider is one file exporting `{ id, matches(source), create(el, opts) }` plus its line
+in the registry. The fake provider implements the same interface with no network and no
+frame, so player-driven behaviour elsewhere in the app is testable and buildable without
+one: pass a source with `provider: 'fake'`, or call the exported `createFakePlayer` to also
+get `advance(seconds)` and `fail(code)`. The real provider has its own tests: the script
+loads once across a teardown and remount, and every error code maps correctly.
