@@ -55,8 +55,13 @@ const sum = (total: number, asset: PocketAsset): number => total + asset.bytes
 /** 177,861,718 bytes of model assets. */
 export const POCKET_ASSET_BYTES = POCKET_ASSETS.reduce(sum, 0)
 
-/** 13,479,978 bytes of ORT wasm plus 4,020,131 of SentencePiece, both once per browser. */
-export const POCKET_RUNTIME_BYTES = 13_479_978 + 4_020_131
+/** The wasm-only ORT binary, once per browser. */
+export const POCKET_ORT_WASM_BYTES = 13_479_978
+
+/** SentencePiece with its wasm inlined, once per browser. */
+export const POCKET_TOKENIZER_BYTES = 4_020_131
+
+export const POCKET_RUNTIME_BYTES = POCKET_ORT_WASM_BYTES + POCKET_TOKENIZER_BYTES
 
 /**
  * 195,361,827 bytes, about 186 MiB, downloaded once and then served from the Cache API.

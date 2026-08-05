@@ -12,6 +12,7 @@ import type * as ORT from 'onnxruntime-web'
 
 export type Ort = typeof ORT
 export type Tensor = ORT.Tensor
+export type Session = ORT.InferenceSession
 export type TensorMap = Record<string, Tensor>
 
 /**

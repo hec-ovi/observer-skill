@@ -1,7 +1,7 @@
 import express from 'express'
 import type { Router } from 'express'
 import { fail } from '#errors'
-import type { Artifact } from '#session'
+import { artifactOf } from '../artifact-lookup.ts'
 import type { HostContext } from '../context.ts'
 import { sessionFile } from '../paths.ts'
 import { createSessionInputSchema, transcriptQuerySchema } from '../schema.ts'
@@ -59,7 +59,10 @@ export function apiRoutes(ctx: HostContext): Router {
     res.set('Access-Control-Allow-Origin', '*')
     res.set('Content-Type', 'text/javascript; charset=utf-8')
     res.set('Cache-Control', 'no-cache')
-    await sendFile(res, sessionFile(ctx.home, sessionId, artifact.bundlePath), 'The bundle')
+    await sendFile(res, sessionFile(ctx.home, sessionId, artifact.bundlePath), {
+      message: `The bundle for ${artifactId} is not on disk.`,
+      hint: 'Build the artifact again; the record points at a file that is gone.',
+    })
   })
 
   router.get('/snapshot/:sessionId/:artifactId', async (req, res) => {
@@ -74,21 +77,11 @@ export function apiRoutes(ctx: HostContext): Router {
     }
     res.set('Content-Type', 'image/png')
     res.set('Cache-Control', 'no-cache')
-    await sendFile(res, sessionFile(ctx.home, sessionId, artifact.snapshotPath), 'The snapshot')
+    await sendFile(res, sessionFile(ctx.home, sessionId, artifact.snapshotPath), {
+      message: `The snapshot for ${artifactId} is not on disk.`,
+      hint: 'Verify the artifact again so a new snapshot is taken.',
+    })
   })
 
   return router
-}
-
-function artifactOf(ctx: HostContext, sessionId: string, artifactId: string): Artifact {
-  const session = ctx.store.get(sessionId)
-  const artifact = session.artifacts.find((candidate) => candidate.id === artifactId)
-  if (artifact === undefined) {
-    fail(
-      'UNKNOWN_ARTIFACT',
-      `Session ${sessionId} has no artifact ${artifactId}.`,
-      'Build the artifact first, then read it back by the id it was given.',
-    )
-  }
-  return artifact
 }

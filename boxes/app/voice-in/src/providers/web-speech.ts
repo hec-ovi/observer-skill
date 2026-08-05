@@ -62,6 +62,14 @@ interface Recognition {
 
 type RecognitionCtor = new () => Recognition
 
+/** One space between two pieces, whichever of them the engine left empty. */
+function joinText(left: string, right: string): string {
+  const head = left.trim()
+  const tail = right.trim()
+  if (!tail) return head
+  return head ? `${head} ${tail}` : tail
+}
+
 function recognitionCtor(): RecognitionCtor | null {
   const scope = globalThis as {
     SpeechRecognition?: RecognitionCtor
@@ -155,10 +163,10 @@ class WebSpeechHold implements Hold {
       const result = event.results[i]
       const alternative = result?.[0]
       if (!result || !alternative) continue
-      if (result.isFinal) this.#final += alternative.transcript
-      else interim += alternative.transcript
+      if (result.isFinal) this.#final = joinText(this.#final, alternative.transcript)
+      else interim = joinText(interim, alternative.transcript)
     }
-    this.#options.onPartial((this.#final + interim).trim())
+    this.#options.onPartial(joinText(this.#final, interim))
   }
 
   #failed(error: string): void {

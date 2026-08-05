@@ -17,7 +17,8 @@ export const conceptDraftSchema = z.object({
   kind: z.enum(CONCEPT_KINDS),
   startsAt: seconds,
   endsAt: seconds,
-  summary: z.string().default(''),
+  /** Omitted on a later pass, the summary already stored stays. */
+  summary: z.string().optional(),
 })
 export type ConceptDraft = z.infer<typeof conceptDraftSchema>
 export type ConceptDraftInput = z.input<typeof conceptDraftSchema>

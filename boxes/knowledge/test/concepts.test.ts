@@ -41,6 +41,11 @@ describe('writeConcepts', () => {
       merged.notes.map((note) => note.text),
       ['Joseph Fourier published it in 1807.'],
     )
+
+    const [again] = await knowledge.writeConcepts(session.id, [
+      { label: 'Fourier transform', kind: 'equation', startsAt: 90, endsAt: 300 },
+    ])
+    assert.equal(again?.summary, 'Time in, frequencies out.')
     assert.equal(knowledge.all(session.id).length, 1)
   })
 

@@ -14,7 +14,7 @@ interface SentencePieceProcessor {
   decodeIds(ids: number[]): string
 }
 
-interface SentencePieceModule {
+export interface SentencePieceModule {
   SentencePieceProcessor: new () => SentencePieceProcessor
 }
 
@@ -32,8 +32,14 @@ function toBase64(bytes: ArrayBuffer): string {
   return btoa(text)
 }
 
-export async function loadTokenizer(moduleUrl: string, model: ArrayBuffer): Promise<Tokenizer> {
-  const loaded = (await import(/* @vite-ignore */ moduleUrl)) as SentencePieceModule
+export async function importSentencePiece(moduleUrl: string): Promise<SentencePieceModule> {
+  return (await import(/* @vite-ignore */ moduleUrl)) as SentencePieceModule
+}
+
+export async function createTokenizer(
+  loaded: SentencePieceModule,
+  model: ArrayBuffer,
+): Promise<Tokenizer> {
   const processor = new loaded.SentencePieceProcessor()
   await processor.loadFromB64StringModel(toBase64(model))
   return {

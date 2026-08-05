@@ -9,7 +9,9 @@ import type { PlayerError, PlayerErrorCode } from '../schema/player.ts'
 const COPY: Record<PlayerErrorCode, { message: string; hint: string }> = {
   PLAYER_UNAVAILABLE: {
     message: 'The video player could not start.',
-    hint: 'Check the connection and reload the page. A content blocker can also stop the player script.',
+    hint:
+      'Check the connection and reload the page. A content blocker can also stop the ' +
+      'player script.',
   },
   NOT_EMBEDDABLE: {
     message: 'This video cannot be played inside another page.',

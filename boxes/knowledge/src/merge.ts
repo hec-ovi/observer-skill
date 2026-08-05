@@ -5,8 +5,9 @@ import type { ConceptDraft } from './schema.ts'
 /**
  * The write plan: one entry per label, its range widened over whatever is stored, and no
  * `notes` or `artifactIds` key at all, so the store keeps the research and the visuals a
- * first pass attached. Drafts are applied in order, so a label written twice in one call
- * behaves exactly like a label written in two calls.
+ * first pass attached. A summary that is not written keeps the one already there. Drafts
+ * are applied in order, so a label written twice in one call behaves exactly like a label
+ * written in two calls.
  */
 export function planWrite(
   stored: readonly Concept[],
@@ -22,7 +23,7 @@ export function planWrite(
       kind: draft.kind,
       startsAt: previous === undefined ? draft.startsAt : Math.min(previous.startsAt, draft.startsAt),
       endsAt: previous === undefined ? draft.endsAt : Math.max(previous.endsAt, draft.endsAt),
-      summary: draft.summary,
+      summary: draft.summary ?? previous?.summary ?? '',
     })
   }
   return [...planned.values()]

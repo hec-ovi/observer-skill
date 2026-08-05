@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { mkdtemp } from 'node:fs/promises'
+import { mkdtemp, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { describe, it } from 'node:test'
@@ -27,9 +27,14 @@ describe('doctor', () => {
   })
 
   it('says a directory it cannot write is broken', async () => {
-    const checks = await diagnose({ ...(await config()), home: '/proc/observer' })
+    const base = await config()
+    // A file where a directory has to be: the store can never be created here.
+    const blocker = join(base.home, 'not-a-directory')
+    await writeFile(blocker, '')
+    const checks = await diagnose({ ...base, home: join(blocker, 'sessions') })
     const home = checks.find((c) => c.name === 'data directory')
     assert.equal(home?.level, 'broken')
+    assert.ok(home?.fix)
   })
 
   it('exits non-zero only when something is actually broken', () => {

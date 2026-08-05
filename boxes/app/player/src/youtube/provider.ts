@@ -21,6 +21,10 @@ import type {
  */
 const SILENT_FAILURE_MS = 8000
 
+const SILENT_FAILURE_HINT =
+  'YouTube is showing its own message inside the frame. The video is usually age ' +
+  'restricted, blocked in this country, or behind a sign-in. Pick another video.'
+
 class YouTubePlayer implements Player {
   #el: HTMLElement
   #options: PlayerOptions
@@ -176,12 +180,7 @@ class YouTubePlayer implements Player {
     this.#unwatch()
     this.#watchdog = setTimeout(() => {
       this.#watchdog = null
-      this.#options.onError?.(
-        playerError(
-          'NOT_EMBEDDABLE',
-          'YouTube is showing its own message inside the frame. The video is usually age restricted, blocked in this country, or behind a sign-in. Pick another video.',
-        ),
-      )
+      this.#options.onError?.(playerError('NOT_EMBEDDABLE', SILENT_FAILURE_HINT))
     }, SILENT_FAILURE_MS)
   }
 
