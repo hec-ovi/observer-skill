@@ -62,6 +62,8 @@ None.
 ## Invariants
 
 - One microphone session per hold. `getUserMedia` on start, every track stopped on stop.
+- `dispose` is final: the device comes back from wherever the hold was, including while it was
+  still being opened, the engine is told to drop the hold, and no callback fires afterwards.
 - A hold is `start` to `stop`, not a pause in the speech. Silence inside a hold is kept.
 - No audio is stored anywhere. The recording exists for the length of one transcription.
 - No unbounded restart loops: a session that ends by itself reopens at most twice per hold,
@@ -79,8 +81,14 @@ The capture is shared: one `getUserMedia` session per hold through an AudioWorkl
 them, and the gate's peak comes with them. `web-speech` cannot be fed audio, so it runs on
 its own microphone and uses this capture only for the gate and the diagnostic.
 
-The tests fake `getUserMedia`, `AudioContext`, the worklet port, `SpeechRecognition`, and
-`fetch`, and assert: one utterance per hold, the gate dropping a short hold and a silent
-one, a denied microphone settling into `denied` and never asking again, a failing endpoint
-delivering an empty utterance, and a recognition session that ends by itself reopening at
-most twice.
+The `whisper-web` worker outlives the hold that built it, so the model is downloaded and
+compiled once. Requests carry an id and replies are routed by it: two holds can be waiting on
+the same worker.
+
+The tests fake `getUserMedia`, `AudioContext`, the worklet port, `SpeechRecognition`,
+`Worker`, and `fetch`, and assert: one utterance per hold, the gate dropping a short hold and
+a silent one, a denied microphone settling into `denied` and never asking again, a failing
+endpoint delivering an empty utterance, a recognition session that ends by itself reopening
+at most twice and shutting down once its hold is delivered, what the model worker is handed
+and that two holds on it do not cross answers, and disposal giving the device back mid-open
+and aborting the request in flight.

@@ -1,0 +1,22 @@
+/* The rail on top, the dialogue under it, both scrolling inside their own space. */
+
+.session {
+  display: grid;
+  grid-template-rows: minmax(6rem, 1fr) auto;
+  gap: var(--space-4);
+  min-block-size: 0;
+  padding: var(--space-4);
+}
+
+.session-rail {
+  min-block-size: 0;
+  margin-inline: calc(var(--space-3) * -1);
+}
+
+.session-dialogue {
+  display: grid;
+  gap: var(--space-4);
+  max-block-size: 45vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}

@@ -137,6 +137,7 @@ describe('a store that cannot write', () => {
     const home = await newHome(t)
     const store = createStore({ home })
     t.after(() => store.close())
+    // A file where the sessions directory belongs: the record cannot reach the disk.
     await rm(join(home, 'sessions'), { recursive: true })
     await writeFile(join(home, 'sessions'), 'in the way')
 
@@ -150,6 +151,7 @@ describe('a store that cannot write', () => {
   it('leaves no half-written file behind when the record cannot land', async (t) => {
     const { home, store, session } = await openSession(t)
     const dir = join(home, 'sessions', session.id)
+    // A directory where the record belongs: the temp file is written, the rename fails.
     await rm(join(dir, 'session.json'))
     await mkdir(join(dir, 'session.json'))
 

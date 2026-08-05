@@ -2,16 +2,25 @@ import assert from 'node:assert/strict'
 import { readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { describe, it } from 'node:test'
+import type { TestContext } from 'node:test'
 import { createStore } from '#session'
-import type { SubscriberMessage } from '#session'
+import type { SessionStore, SubscriberMessage } from '#session'
 import { SOURCE, newHome, openSession } from '../fixtures.ts'
 
 /** The presence window the contract promises: ninety seconds since the last tool call. */
 const PRESENCE_MS = 90_000
 
-/** One turn of the event loop, so a queued write and its patch have been applied. */
+/** One turn of the event loop, so a queued change and its patch have been applied. */
 function settle(): Promise<void> {
   return new Promise((resolve) => setImmediate(resolve))
+}
+
+/** A tool call while time is faked: the write it owes is debounced, so time moves past it. */
+async function touchUnderFakeTime(t: TestContext, store: SessionStore, id: string): Promise<void> {
+  const touching = store.touchAgent(id)
+  await settle()
+  t.mock.timers.tick(50)
+  await touching
 }
 
 describe('the phase machine', () => {
@@ -80,10 +89,7 @@ describe('agent presence', () => {
     const { store, session } = await openSession(t)
     t.mock.timers.enable({ apis: ['setTimeout', 'Date'], now: Date.now() })
 
-    const touching = store.touchAgent(session.id)
-    await settle()
-    t.mock.timers.tick(20)
-    await touching
+    await touchUnderFakeTime(t, store, session.id)
 
     const messages: SubscriberMessage[] = []
     store.subscribe(session.id, (message) => messages.push(message))
@@ -102,11 +108,8 @@ describe('agent presence', () => {
     const { store, session } = await openSession(t)
     t.mock.timers.enable({ apis: ['setTimeout', 'Date'], now: Date.now() })
 
-    for (let elapsed = 0; elapsed < PRESENCE_MS * 2; elapsed += PRESENCE_MS / 2) {
-      const touching = store.touchAgent(session.id)
-      await settle()
-      t.mock.timers.tick(20)
-      await touching
+    for (let calls = 0; calls < 4; calls += 1) {
+      await touchUnderFakeTime(t, store, session.id)
       t.mock.timers.tick(PRESENCE_MS / 2)
       await settle()
     }

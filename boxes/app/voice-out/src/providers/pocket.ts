@@ -72,7 +72,7 @@ export const pocketProvider: VoiceProvider = {
 
   async speak(text: string, request: SpeakRequest): Promise<void> {
     const ready = await open(request.audio)
-    await ready.load(options(request.config), () => {})
+    await ready.load(options(request.config))
     if (request.signal.aborted) return
     await ready.speak(text, voiceOf(request.config), request)
   },

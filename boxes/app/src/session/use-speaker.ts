@@ -32,7 +32,7 @@ export function useSpeaker(): Speaker {
     setProblem(null)
     try {
       line.current = speak(text, {
-        config: voiceOutConfig(settings),
+        config: voiceOutConfig(settings.voiceOut),
         language: settings.language,
         onEnd: ({ error }) => {
           if (error) setProblem(error.message)

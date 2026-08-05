@@ -6,6 +6,7 @@
  * chart is: the text arrives whole and is spoken whole.
  */
 
+import { VoiceOutError } from '../schema/voice-out.ts'
 import type {
   Handle,
   ProgressListener,
@@ -17,6 +18,7 @@ import type {
 import { AudioHub } from './audio.ts'
 import { Line } from './line.ts'
 import { PROVIDERS, requireProvider } from './registry.ts'
+import { unavailable } from './unavailable.ts'
 
 class VoiceOut {
   readonly #audio = new AudioHub()
@@ -34,7 +36,12 @@ class VoiceOut {
 
   warm = async (config: VoiceOutConfig, onProgress?: ProgressListener): Promise<void> => {
     const provider = requireProvider(config)
-    await provider.warm({ config, audio: this.#audio, onProgress: onProgress ?? (() => {}) })
+    try {
+      await provider.warm({ config, audio: this.#audio, onProgress })
+    } catch (error) {
+      if (error instanceof VoiceOutError) throw error
+      throw unavailable(`${provider.id} could not load`, error)
+    }
   }
 
   voices = async (config: VoiceOutConfig): Promise<Voice[]> => {

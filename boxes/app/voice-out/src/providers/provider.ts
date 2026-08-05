@@ -30,7 +30,8 @@ export interface SpeakRequest {
 export interface WarmRequest {
   config: VoiceOutConfig
   audio: AudioHub
-  onProgress: ProgressListener
+  /** Absent when the caller is not watching the download. */
+  onProgress: ProgressListener | undefined
 }
 
 export interface VoiceProvider {

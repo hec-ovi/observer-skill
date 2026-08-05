@@ -19,6 +19,8 @@ const TRANSFORMERS_MODULE_URL = 'https://cdn.jsdelivr.net/npm/@huggingface/trans
 const DEFAULT_MODEL = 'onnx-community/moonshine-tiny-ONNX'
 
 export interface TranscribeRequest {
+  /** Echoed back on the reply. The worker outlives a hold, so replies have to be addressed. */
+  id: number
   moduleUrl: string
   model: string
   /** A language name, which is the form the pipeline takes. Null lets it detect. */
@@ -27,7 +29,16 @@ export interface TranscribeRequest {
   sampleRate: number
 }
 
-export type TranscribeReply = { ok: true; text: string } | { ok: false; message: string }
+export type TranscribeReply =
+  | { id: number; ok: true; text: string }
+  | { id: number; ok: false; message: string }
+
+type TranscribeInput = Omit<TranscribeRequest, 'id'>
+
+interface Waiting {
+  resolve: (text: string) => void
+  reject: (failure: EngineFailure) => void
+}
 
 /** `en-US` reaches the pipeline as `english`. */
 function languageName(tag: string): string | null {
@@ -40,31 +51,43 @@ function languageName(tag: string): string | null {
 }
 
 let worker: Worker | null = null
+let lastId = 0
+const waiting = new Map<number, Waiting>()
 
+/** Built once and kept, with handlers bound once, so replies are routed rather than raced. */
 function ensureWorker(): Worker {
-  worker ??= new Worker(new URL('./whisper.worker.ts', import.meta.url), { type: 'module' })
-  return worker
+  if (worker) return worker
+  const active = new Worker(new URL('./whisper.worker.ts', import.meta.url), { type: 'module' })
+  active.onmessage = (event: MessageEvent<TranscribeReply>) => {
+    const reply = event.data
+    const pending = waiting.get(reply.id)
+    if (!pending) return
+    waiting.delete(reply.id)
+    if (reply.ok) pending.resolve(reply.text)
+    else pending.reject(new EngineFailure(reply.message))
+  }
+  active.onerror = (event: ErrorEvent) => {
+    dropWorker(new EngineFailure(event.message || 'worker failed'))
+  }
+  worker = active
+  return active
 }
 
-function dropWorker(): void {
+/** The worker is gone, so every request still on it is gone with it. */
+function dropWorker(failure: EngineFailure): void {
   worker?.terminate()
   worker = null
+  const abandoned = [...waiting.values()]
+  waiting.clear()
+  for (const pending of abandoned) pending.reject(failure)
 }
 
-function transcribe(request: TranscribeRequest): Promise<string> {
+function transcribe(input: TranscribeInput): Promise<string> {
   const active = ensureWorker()
+  const id = (lastId += 1)
   return new Promise<string>((resolve, reject) => {
-    active.onmessage = (event: MessageEvent<TranscribeReply>) => {
-      active.onmessage = null
-      active.onerror = null
-      if (event.data.ok) resolve(event.data.text)
-      else reject(new EngineFailure(event.data.message))
-    }
-    active.onerror = (event: ErrorEvent) => {
-      dropWorker()
-      reject(new EngineFailure(event.message || 'worker failed'))
-    }
-    active.postMessage(request, [request.pcm.buffer])
+    waiting.set(id, { resolve, reject })
+    active.postMessage({ ...input, id }, [input.pcm.buffer])
   })
 }
 
@@ -91,7 +114,9 @@ class WhisperHold implements Hold {
   }
 
   cancel(): void {
-    // Nothing has been sent: the model only ever sees a hold that passed the gate.
+    // A gated-out hold sent nothing: the model only ever sees a hold that passed the gate. A
+    // disposed one lets the worker finish and throws the answer away, because terminating it
+    // would cost the next hold the model download and the graph compile again.
   }
 }
 

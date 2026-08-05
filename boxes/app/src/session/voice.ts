@@ -4,12 +4,10 @@ import type { ListenConfig } from '@voice-in/index.ts'
 import type { VoiceOutConfig } from '@voice-out/index.ts'
 import type { Settings } from './record.ts'
 
-export function voiceOutConfig(settings: Settings): VoiceOutConfig {
-  const { provider, voice } = settings.voiceOut
+export function voiceOutConfig({ provider, voice }: Settings['voiceOut']): VoiceOutConfig {
   return voice ? { provider, voice } : { provider }
 }
 
-export function listenConfig(settings: Settings): ListenConfig {
-  const { provider, endpoint } = settings.voiceIn
+export function listenConfig({ provider, endpoint }: Settings['voiceIn']): ListenConfig {
   return endpoint ? { provider, baseUrl: endpoint } : { provider }
 }

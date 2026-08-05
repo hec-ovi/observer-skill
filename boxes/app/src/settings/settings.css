@@ -1,0 +1,115 @@
+/* The panel sits over the page. Sections are separated by space, not by rules. */
+
+.panel {
+  position: fixed;
+  inset-block: 0;
+  inset-inline-end: 0;
+  z-index: 2;
+  display: grid;
+  align-content: start;
+  gap: var(--space-6);
+  inline-size: min(22rem, 100%);
+  overflow-y: auto;
+  padding: var(--space-4);
+  border-inline-start: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  animation: panel-in var(--motion) var(--ease);
+}
+
+@keyframes panel-in {
+  from {
+    opacity: 0;
+    transform: translateX(var(--motion-shift));
+  }
+}
+
+.panel-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.panel-title {
+  margin: 0;
+  font-size: var(--text-lg);
+  font-weight: 600;
+  letter-spacing: var(--tracking-tight);
+}
+
+.panel-head button,
+.setting button {
+  justify-self: start;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius);
+  background: none;
+  color: var(--accent);
+  font: inherit;
+  font-size: var(--text-sm);
+  cursor: pointer;
+}
+
+.setting {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.setting-title {
+  padding: 0;
+  color: var(--text-dim);
+  font-size: var(--text-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.setting-choices {
+  display: flex;
+  gap: var(--space-4);
+}
+
+.setting-choice,
+.setting-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--text);
+  font-size: var(--text-md);
+  cursor: pointer;
+}
+
+.setting-row select {
+  flex: 1;
+  min-inline-size: 0;
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface-raised);
+  color: var(--text);
+  font: inherit;
+  font-size: var(--text-sm);
+}
+
+.setting-choice input {
+  accent-color: var(--accent);
+}
+
+.setting-note,
+.setting-problem {
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: var(--leading);
+}
+
+.setting-note {
+  color: var(--text-dim);
+}
+
+.setting-problem {
+  color: var(--text);
+}

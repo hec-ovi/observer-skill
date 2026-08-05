@@ -28,7 +28,7 @@ export class PocketHost {
   #player: PcmStreamPlayer | null = null
   #loaded: Promise<void> | null = null
   #settleLoad: { resolve: () => void; reject: (error: Error) => void } | null = null
-  #progress: ProgressListener = () => {}
+  readonly #progress = new Set<ProgressListener>()
   #next = 0
   #line: ActiveLine | null = null
 
@@ -40,9 +40,13 @@ export class PocketHost {
     })
   }
 
-  /** Download, compile, and speak one line into the void. Safe to call repeatedly. */
-  load(options: PocketOptions, onProgress: ProgressListener): Promise<void> {
-    this.#progress = onProgress
+  /**
+   * Download, compile, and speak one line into the void. Safe to call repeatedly: the work
+   * happens once, and every listener handed in along the way hears it, so a line spoken
+   * mid-download cannot take the settings panel's bar away from it.
+   */
+  load(options: PocketOptions, onProgress?: ProgressListener): Promise<void> {
+    if (onProgress) this.#progress.add(onProgress)
     this.#loaded ??= new Promise<void>((resolve, reject) => {
       this.#settleLoad = { resolve, reject }
       this.#worker.postMessage({ type: 'load', ...options })
@@ -88,6 +92,7 @@ export class PocketHost {
     this.#player?.dispose()
     this.#player = null
     this.#loaded = null
+    this.#progress.clear()
     this.#worker.postMessage({ type: 'dispose' })
     this.#worker.terminate()
   }
@@ -107,10 +112,13 @@ export class PocketHost {
 
   #receive(message: EngineMessage): void {
     switch (message.type) {
-      case 'progress':
-        this.#progress({ step: message.step, loaded: message.loaded, total: message.total })
+      case 'progress': {
+        const progress = { step: message.step, loaded: message.loaded, total: message.total }
+        for (const listen of this.#progress) listen(progress)
         return
+      }
       case 'ready':
+        this.#progress.clear()
         this.#settleLoad?.resolve()
         return
       case 'audio': {
@@ -131,6 +139,7 @@ export class PocketHost {
       case 'failed':
         if (message.line === null) {
           this.#loaded = null
+          this.#progress.clear()
           this.#settleLoad?.reject(new Error(message.reason))
           return
         }

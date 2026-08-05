@@ -6,16 +6,11 @@
  * that fails too, which means the machine has no way to speak at all.
  */
 
-import { VoiceOutError } from '../schema/voice-out.ts'
-import type { SpeakOptions } from '../schema/voice-out.ts'
+import type { SpeakOptions, VoiceOutError } from '../schema/voice-out.ts'
 import type { AudioHub } from './audio.ts'
 import type { SpeakRequest, VoiceProvider } from './providers/provider.ts'
 import { PROVIDERS } from './registry.ts'
-
-function describe(cause: unknown): string {
-  if (cause instanceof Error) return cause.message
-  return String(cause)
-}
+import { unavailable } from './unavailable.ts'
 
 export class Line {
   readonly #text: string
@@ -56,11 +51,11 @@ export class Line {
         this.#end()
         return
       }
-      this.#end(this.#unavailable(provider, second))
+      this.#end(unavailable(`${provider.id} could not speak`, second))
       return
     }
 
-    this.#end(this.#unavailable(provider, failure))
+    this.#end(unavailable(`${provider.id} could not speak`, failure))
   }
 
   /** `null` when the line was spoken, otherwise why it was not. */
@@ -89,14 +84,6 @@ export class Line {
       onBoundary: (charIndex) => this.#options.onBoundary?.({ charIndex }),
       signal: this.#cutter.signal,
     }
-  }
-
-  #unavailable(provider: VoiceProvider, cause: unknown): VoiceOutError {
-    return new VoiceOutError(
-      'VOICE_UNAVAILABLE',
-      `${provider.id} could not speak: ${describe(cause)}`,
-      'Pick another voice in settings, or check the endpoint URL and key.',
-    )
   }
 
   #end(error?: VoiceOutError): void {

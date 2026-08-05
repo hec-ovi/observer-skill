@@ -243,5 +243,7 @@ edit plus a default. Concurrency is proven by a test that fires overlapping appe
 asserts nothing is lost.
 
 Tests live in `test/` and share `fixtures.ts` at the box root, which sits outside `test/`
-because the node runner counts every file under a `test/` directory as a test.
+because the node runner counts every file under a `test/` directory as a test. `one-shot.ts`
+sits beside it: a test spawns it as a caller that creates a session and exits, which is how
+the owed write is proven to land with nothing else holding the loop open.
 Run them with `node --test "boxes/session/test/*.test.ts"`.

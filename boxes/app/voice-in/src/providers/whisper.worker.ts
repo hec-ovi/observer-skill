@@ -2,8 +2,8 @@
  * Transcription off the main thread: WASM inference is synchronous C++, so on the page's
  * thread a hold would freeze everything for the length of the decode.
  *
- * One message in, one message out. The pipeline is built on the first request and kept, so
- * only the first hold pays for the download and the graph compile.
+ * One message in, one message out carrying the id it came in with. The pipeline is built on
+ * the first request and kept, so only the first hold pays for the download and the compile.
  */
 
 import type { TranscribeReply, TranscribeRequest } from './whisper-web.ts'
@@ -58,9 +58,10 @@ scope.onmessage = async (event: MessageEvent<TranscribeRequest>) => {
       options.chunk_length_s = CHUNK_SECONDS
     }
     const output = await transcriber(request.pcm, options)
-    scope.postMessage({ ok: true, text: output.text.trim() })
+    scope.postMessage({ id: request.id, ok: true, text: output.text.trim() })
   } catch (error) {
     scope.postMessage({
+      id: request.id,
       ok: false,
       message: error instanceof Error ? error.message : String(error),
     })

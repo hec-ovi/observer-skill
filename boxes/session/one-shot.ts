@@ -5,19 +5,10 @@
  */
 
 import { createStore } from '#session'
+import { SOURCE } from './fixtures.ts'
 
 const home = process.argv[2]
 if (home === undefined) throw new Error('usage: one-shot.ts <home>')
 
 const store = createStore({ home })
-await store.create({
-  source: {
-    provider: 'youtube',
-    videoId: 'dQw4w9WgXcQ',
-    url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-    title: 'How a Fourier transform works',
-    duration: 1800,
-    hasAds: false,
-  },
-  settings: {},
-})
+await store.create({ source: SOURCE, settings: {} })

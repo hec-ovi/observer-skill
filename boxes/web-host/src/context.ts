@@ -7,7 +7,7 @@ export interface HostContext {
   store: SessionPort
   /** Where sessions live; artifact bundles and snapshots resolve inside it. */
   home: string
-  /** The built app: `index.html`, `assets/`, and `sandbox/runner.js`. */
+  /** The built app: `index.html`, `assets/`, `sandbox.html`, and `sandbox/vendor/`. */
   appDir: string
   version: string
   hub: LiveHub

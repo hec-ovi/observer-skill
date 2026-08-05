@@ -20,7 +20,7 @@ const LOOPBACK = new Set(['127.0.0.1', 'localhost', '::1'])
 
 export interface HostOptions {
   store: SessionPort
-  /** The built app: `index.html`, `assets/`, and `sandbox/runner.js`. */
+  /** The built app: `index.html`, `assets/`, `sandbox.html`, and `sandbox/vendor/`. */
   appDir: string
   /** Where sessions live. Bundles and snapshots resolve inside the session's own folder. */
   home: string
@@ -110,7 +110,7 @@ class WebHost implements Host {
       )
     }
     const timeoutMs = request.timeoutMs ?? DEFAULT_VERIFY_TIMEOUT_MS
-    const { requestId, result } = this.#verifications.start(artifactId, timeoutMs)
+    const { requestId, result } = this.#verifications.start(sessionId, artifactId, timeoutMs)
     // The module, not a document: the page owns the frame it runs the module in.
     const url = `${this.#origin()}/api/artifact/${encodeURIComponent(sessionId)}/${encodeURIComponent(artifactId)}`
     this.#store.signal(sessionId, { type: 'verify', requestId, url, timeoutMs })
@@ -118,6 +118,10 @@ class WebHost implements Host {
   }
 
   async close(): Promise<void> {
+    // A close that lands inside the bind window still has to reap the listener that window is
+    // about to produce, or the socket outlives the host and holds the process open.
+    await this.#starting?.catch(() => undefined)
+
     this.#verifications.closeAll()
     this.#hub.closeAll()
 

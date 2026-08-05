@@ -5,7 +5,7 @@
 
 import { describe, expect, it, vi } from 'vitest'
 import { FakeSpeechRecognition } from '../../testing/fakes.ts'
-import { hear, recordedListener } from './support.ts'
+import { flush, hear, recordedListener } from './support.ts'
 
 const PAST_THE_RESTART_DELAY = 200
 const PAST_THE_FINAL_WAIT = 3500
@@ -52,6 +52,26 @@ describe('the web-speech provider', () => {
     const delivered = partials.length
     recognition.say('stale tail')
     expect(partials).toHaveLength(delivered)
+  })
+
+  it('lets go of a release that was still waiting when the listener was disposed', async () => {
+    const { listener, heard } = recordedListener({ provider: 'web-speech' })
+
+    await listener.start()
+    hear(1, 0.5)
+    const recognition = FakeSpeechRecognition.last()
+    recognition.say('half a question')
+    recognition.stop = (): void => {}
+
+    const stopped = listener.stop()
+    await flush()
+    expect(listener.state).toBe('working')
+
+    listener.dispose()
+    await stopped
+
+    expect(recognition.started).toBe(false)
+    expect(heard).toEqual([])
   })
 
   it('delivers an empty utterance when the engine fails, with the reason', async () => {
