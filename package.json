@@ -50,10 +50,10 @@
     "dev": "node --watch bin/observer.ts serve",
     "dev:app": "vite",
     "build": "node scripts/build.ts",
-    "test": "node --test && vitest run",
-    "test:server": "node --test",
+    "test": "node --run test:server && node --run test:app",
+    "test:server": "node --test \"bin/test/*.test.ts\" \"boxes/*/test/*.test.ts\"",
     "test:app": "vitest run",
-    "test:watch": "node --test --watch",
+    "test:watch": "node --test \"bin/test/*.test.ts\" \"boxes/*/test/*.test.ts\" --watch",
     "typecheck": "tsc --noEmit && tsc --noEmit -p boxes/app/tsconfig.json"
   },
   "dependencies": {

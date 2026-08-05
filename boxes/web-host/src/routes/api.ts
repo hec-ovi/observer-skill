@@ -22,12 +22,7 @@ export function apiRoutes(ctx: HostContext): Router {
       )
     }
     const input = parse(createSessionInputSchema, req.body, 'session request')
-    const session = await create({
-      url: input.url,
-      settings: input.settings,
-      userPrompt: input.userPrompt,
-    })
-    res.status(201).json(session)
+    res.status(201).json(await create(input))
   })
 
   router.get('/session/:id', (req, res) => {

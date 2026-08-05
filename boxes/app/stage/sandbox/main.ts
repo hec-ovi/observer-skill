@@ -28,7 +28,7 @@ function send(message: SandboxMessage): void {
 
 addEventListener(
   'error',
-  (event) => {
+  (event: Event) => {
     if (event instanceof ErrorEvent) {
       send({ type: 'error', message: event.error ? describeError(event.error) : event.message })
       return

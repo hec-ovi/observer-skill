@@ -29,7 +29,8 @@ export class Line {
     this.#text = text
     this.#options = options
     this.#audio = audio
-    options.signal?.addEventListener('abort', this.cut)
+    if (options.signal?.aborted) this.cut()
+    else options.signal?.addEventListener('abort', this.cut)
   }
 
   /** Stop making sound now, and report the end once. Safe at any point, including twice. */
@@ -46,8 +47,10 @@ export class Line {
       return
     }
 
+    // Only a provider that never made a sound is worth retrying: repeating a line the user
+    // already half heard is worse than ending it.
     const fallback = PROVIDERS['web-speech']
-    if (provider.id !== fallback.id) {
+    if (provider.id !== fallback.id && !this.#started) {
       const second = await this.#attempt(fallback)
       if (second === null || this.#cutter.signal.aborted) {
         this.#end()

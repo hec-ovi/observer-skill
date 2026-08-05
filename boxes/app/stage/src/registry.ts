@@ -8,9 +8,9 @@
  */
 
 export const REGISTRY = {
-  echarts: '/api/vendor/echarts.js',
-  d3: '/api/vendor/d3.js',
-  katex: '/api/vendor/katex.js',
+  echarts: '/sandbox/vendor/echarts.js',
+  d3: '/sandbox/vendor/d3.js',
+  katex: '/sandbox/vendor/katex.js',
 } as const
 
 export const REGISTRY_NAMES = Object.keys(REGISTRY)
