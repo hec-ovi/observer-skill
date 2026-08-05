@@ -1,6 +1,7 @@
 import * as z from 'zod/v4'
 import { PHASES, sessionSchema } from '#session'
 import type { Session } from '#session'
+import { countsOf, countsSchema } from '../counts.ts'
 import { sessionIdInput } from '../schema.ts'
 import { defineTool } from '../tool.ts'
 
@@ -30,13 +31,7 @@ export const status = defineTool({
     sessionId: z.string(),
     progress: sessionSchema.shape.progress,
     error: sessionSchema.shape.error,
-    counts: z.object({
-      segments: z.number().int(),
-      concepts: z.number().int(),
-      notes: z.number().int(),
-      artifacts: z.number().int(),
-      answers: z.number().int(),
-    }),
+    counts: countsSchema,
     missing: z.array(z.string()),
     settings: sessionSchema.shape.settings,
     source: sessionSchema.shape.source,
@@ -52,13 +47,7 @@ export const status = defineTool({
       sessionId: session.id,
       progress: session.progress,
       error: session.error,
-      counts: {
-        segments: session.transcript?.segmentCount ?? 0,
-        concepts: session.concepts.length,
-        notes: session.concepts.reduce((total, concept) => total + concept.notes.length, 0),
-        artifacts: session.artifacts.filter((artifact) => artifact.status === 'built').length,
-        answers: session.log.filter((entry) => entry.role === 'agent').length,
-      },
+      counts: countsOf(session),
       missing: missingFor(session),
       settings: session.settings,
       source: session.source,
