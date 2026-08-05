@@ -11,7 +11,7 @@ import { parse } from './validate.ts'
 import { RecordWriter } from './writer.ts'
 
 /** How long after its last tool call an agent still counts as listening. */
-export const PRESENCE_MS = 90_000
+const PRESENCE_MS = 90_000
 
 interface Applied {
   record: Session
@@ -115,7 +115,7 @@ export class SessionHandle {
 
   #apply(apply: (draft: Session) => Session | void): Applied {
     const before = this.#record
-    const draft = structuredClone(before) as Session
+    const draft = structuredClone(before)
     const next = parse(
       sessionSchema,
       apply(draft) ?? draft,
