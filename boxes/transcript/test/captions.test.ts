@@ -11,6 +11,7 @@ import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 import { after, before, describe, test } from 'node:test'
 
+import type { TranscriptRef } from '#transcript'
 import { fetch as fetchTranscript, read } from '#transcript'
 
 import type { Harness } from '../fixtures.ts'
@@ -27,10 +28,10 @@ async function json3Words(name: string): Promise<string[]> {
   return words(spoken)
 }
 
-async function transcribe(box: Harness, track: { manual?: string; auto?: string }): Promise<void> {
+function transcribe(box: Harness, track: { manual?: string; auto?: string }): Promise<TranscriptRef> {
   process.env['FAKE_YTDLP_MANUAL'] = track.manual ? fixture(track.manual) : ''
   process.env['FAKE_YTDLP_AUTO'] = track.auto ? fixture(track.auto) : ''
-  await fetchTranscript(source(), {
+  return fetchTranscript(source(), {
     home: box.home,
     sessionId: box.sessionId,
     provider: 'captions',
@@ -63,14 +64,7 @@ describe('captions', () => {
 
   test('a track a human wrote becomes one segment per sentence, and is not marked generated', async () => {
     const box = await open('human')
-    process.env['FAKE_YTDLP_MANUAL'] = fixture('human.json3')
-    process.env['FAKE_YTDLP_AUTO'] = ''
-    const ref = await fetchTranscript(source(), {
-      home: box.home,
-      sessionId: box.sessionId,
-      provider: 'captions',
-      onProgress: box.onProgress,
-    })
+    const ref = await transcribe(box, { manual: 'human.json3' })
 
     assert.equal(ref.provider, 'captions')
     assert.equal(ref.generated, false)
@@ -103,14 +97,7 @@ describe('captions', () => {
 
   test('a rolling machine track is marked generated and never overlaps itself', async () => {
     const box = await open('rolling-times')
-    await transcribe(box, { auto: 'rolling.json3' })
-
-    const ref = await fetchTranscript(source(), {
-      home: box.home,
-      sessionId: box.sessionId,
-      provider: 'captions',
-      onProgress: box.onProgress,
-    })
+    const ref = await transcribe(box, { auto: 'rolling.json3' })
     assert.equal(ref.generated, true)
 
     const page = read(box.sessionId)

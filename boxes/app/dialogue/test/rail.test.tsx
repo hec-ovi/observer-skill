@@ -21,9 +21,10 @@ function rail(segments: readonly Segment[], time: number, state: string) {
   return <TranscriptRail segments={segments} position={{ time, state }} onSeek={vi.fn()} />
 }
 
+/** Where a row was laid out, which is the only place its height shows. */
 function topOf(row: Element | undefined): number {
-  const found = /translateY\((-?[\d.]+)px\)/.exec((row as HTMLElement | undefined)?.style.transform ?? '')
-  return Number.parseFloat(found?.[1] ?? 'NaN')
+  const transform = (row as HTMLElement | undefined)?.style.transform ?? ''
+  return Number.parseFloat(/translateY\((-?[\d.]+)px\)/.exec(transform)?.[1] ?? 'NaN')
 }
 
 describe('TranscriptRail', () => {

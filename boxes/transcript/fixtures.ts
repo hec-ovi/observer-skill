@@ -7,6 +7,8 @@ import { mkdtemp, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
+import type { ObserverError } from '#errors'
+import { isObserverError } from '#errors'
 import type { Source } from '#ingest'
 
 import type { Progress } from './src/schema.ts'
@@ -74,6 +76,17 @@ export function stubFetch(handler: (url: string, init?: RequestInit) => Promise<
   return () => {
     globalThis.fetch = original
   }
+}
+
+/** The error a call was supposed to throw, so a test can read its code and its hint. */
+export async function caught(run: () => Promise<unknown>): Promise<ObserverError> {
+  try {
+    await run()
+  } catch (error) {
+    if (isObserverError(error)) return error
+    throw error
+  }
+  throw new Error('the call was expected to fail and did not')
 }
 
 /** Every word of the transcript, in order, for the duplication checks. */

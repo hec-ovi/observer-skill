@@ -90,7 +90,7 @@ function cueWords(cue: Cue): Timed[] {
       }))
   return raw
     .map((word) => ({ ...word, key: wordKey(word.w), end, cueEnd: end }))
-    .filter((word) => word.key.length > 0 || /[.!?…]/.test(word.w))
+    .filter((word) => word.key.length > 0)
 }
 
 /**
