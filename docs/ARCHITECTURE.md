@@ -82,7 +82,7 @@ file so a patch never carries a hundred kilobytes of text.
   settings: { theme, language, extraKnowledge, toolkit,
               voiceOut: { provider, voice }, voiceIn: { provider, endpoint } },
   phase, progress: { step, done, total, message },
-  transcript: { provider, language, segmentCount, duration },
+  transcript: { provider, language, segmentCount, duration, generated },
   concepts: [{ id, label, kind, startsAt, endsAt, summary, notes[], artifactIds[] }],
   artifacts:[{ id, title, kind, conceptId, status, bundlePath, snapshotPath, error }],
   position: { time, state },

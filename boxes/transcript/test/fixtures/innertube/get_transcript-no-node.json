@@ -1,0 +1,11 @@
+{
+  "responseContext": {},
+  "actions": [
+    {
+      "updateEngagementPanelAction": {
+        "targetId": "engagement-panel-searchable-transcript",
+        "content": {}
+      }
+    }
+  ]
+}

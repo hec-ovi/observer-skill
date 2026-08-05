@@ -4,6 +4,9 @@
  * `auto` walks the registry and stops at the first provider that produces text, keeping what
  * each one said so the failure a caller sees names the reason rather than the fact. A named
  * provider is run alone, and its absence is reported as the missing thing to install.
+ *
+ * A provider that throws instead of answering is a provider that failed: the walk carries on
+ * with what it said, so one platform changing its JSON shape does not end the session.
  */
 
 import { mkdtemp, rm } from 'node:fs/promises'
@@ -14,7 +17,8 @@ import { readConfig } from '#config'
 import { fail } from '#errors'
 import type { Source } from '#ingest'
 
-import type { Provider, ProviderContext, ProviderResult } from './provider.ts'
+import type { Provider, ProviderContext, ProviderOutcome, ProviderResult } from './provider.ts'
+import { broke } from './provider.ts'
 import { PROVIDERS, providerById } from './registry.ts'
 import type { FetchOptions, ProviderChoice, TranscriptRef } from './schema.ts'
 import { FetchOptionsSchema } from './schema.ts'
@@ -29,6 +33,19 @@ function planFor(choice: ProviderChoice): Provider[] {
   if (choice === 'auto') return PROVIDERS
   const provider = providerById(choice)
   return provider ? [provider] : []
+}
+
+/** Whatever the provider does, the walk gets an outcome back. */
+async function attempt(
+  provider: Provider,
+  source: Source,
+  context: ProviderContext,
+): Promise<ProviderOutcome> {
+  try {
+    return await provider.fetch(source, context)
+  } catch (error) {
+    return broke((error as Error).message)
+  }
 }
 
 function duration(source: Source, result: ProviderResult): number {
@@ -69,7 +86,7 @@ export async function fetchTranscript(source: Source, options: FetchOptions): Pr
         continue
       }
 
-      const outcome = await provider.fetch(source, context)
+      const outcome = await attempt(provider, source, context)
       notes.push(`${provider.id}: ${outcome.note}`)
       anyBroke ||= outcome.broke
       if (outcome.result) {

@@ -131,7 +131,7 @@ store.list(): Session[]         // newest first
   phase: 'feed'|'transcribing'|'researching'|'building'|'ready'|'live',
   progress: { step, done, total, message },
   error:      { code, message, hint } | null,
-  transcript: { provider, language, segmentCount, duration } | null,
+  transcript: { provider, language, segmentCount, duration, generated } | null,
   concepts:  Concept[],
   artifacts: Artifact[],
   position:  { time, state },

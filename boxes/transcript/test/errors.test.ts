@@ -4,12 +4,13 @@
  */
 
 import assert from 'node:assert/strict'
+import { chmod, mkdir } from 'node:fs/promises'
 import { join } from 'node:path'
 import { after, before, describe, test } from 'node:test'
 
 import { fetch as fetchTranscript } from '#transcript'
 
-import { FAKE_YTDLP, caught, pool, source, stubFetch } from '../fixtures.ts'
+import { FAKE_YTDLP, caught, fixture, pool, source, stubFetch } from '../fixtures.ts'
 
 describe('errors', () => {
   const boxes = pool()
@@ -75,5 +76,29 @@ describe('errors', () => {
     assert.equal(error.code, 'NO_TRANSCRIPT')
     assert.match(error.hint, /OBSERVER_ASR_URL/)
     assert.match(error.hint, /captions: this video publishes no caption track we can read/)
+  })
+
+  test('a home that will not take the words says which setting to check', async () => {
+    const box = await boxes.open('unwritable')
+    const locked = join(box.home, 'locked')
+    await mkdir(locked)
+    await chmod(locked, 0o500)
+
+    let error
+    try {
+      error = await caught(() =>
+        fetchTranscript(source(), {
+          home: locked,
+          sessionId: box.sessionId,
+          provider: 'file',
+          file: fixture('talk.srt'),
+        }),
+      )
+    } finally {
+      await chmod(locked, 0o700)
+    }
+
+    assert.equal(error.code, 'STORE_UNWRITABLE')
+    assert.match(error.hint, /OBSERVER_HOME/)
   })
 })

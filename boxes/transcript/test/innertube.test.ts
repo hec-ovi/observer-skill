@@ -14,15 +14,15 @@ import { FAKE_YTDLP, FIXTURES, pool, source, stubFetch } from '../fixtures.ts'
 
 const panel = (name: string): string => readFileSync(join(FIXTURES, 'innertube', name), 'utf8')
 
-/** The three calls the panel route makes, answered from the recording. */
-function serve(next: string): () => void {
+/** The three calls the panel route makes, answered from the recording unless overridden. */
+function serve(over: { player?: string; next?: string; transcript?: string } = {}): () => void {
   return stubFetch((url) => {
     const body = url.includes('/player')
-      ? panel('player.json')
+      ? (over.player ?? panel('player.json'))
       : url.includes('/next')
-        ? next
+        ? (over.next ?? panel('next.json'))
         : url.includes('/get_transcript')
-          ? panel('get_transcript.json')
+          ? (over.transcript ?? panel('get_transcript.json'))
           : '{}'
     return Promise.resolve(
       new Response(body, { status: 200, headers: { 'content-type': 'application/json' } }),
@@ -50,7 +50,7 @@ describe('innertube', () => {
 
   test('the panel becomes sentences, not the windows it was written in', async () => {
     const box = await boxes.open('panel')
-    const restore = serve(panel('next.json'))
+    const restore = serve()
     try {
       const ref = await fetchTranscript(source(), {
         home: box.home,
@@ -81,7 +81,7 @@ describe('innertube', () => {
 
   test('auto walks past the caption binary when it finds nothing published', async () => {
     const box = await boxes.open('auto-panel')
-    const restore = serve(panel('next.json'))
+    const restore = serve()
     try {
       const ref = await fetchTranscript(source(), {
         home: box.home,
@@ -96,7 +96,7 @@ describe('innertube', () => {
 
   test('a video with no panel is not a failure, it is nothing to read', async () => {
     const box = await boxes.open('no-panel')
-    const restore = serve('{}')
+    const restore = serve({ next: '{}' })
     try {
       await assert.rejects(
         fetchTranscript(source(), {

@@ -4,6 +4,9 @@
  * A different route to the caption text than the fetcher binary takes, so it answers on
  * videos where that route is blocked, and it needs nothing installed. The panel hands back
  * caption windows with string milliseconds, which the normalizer re-cuts into sentences.
+ *
+ * The panel names the language it served; the player's own track list says what that track
+ * is. `kind: 'asr'` there is the platform's word for "a machine wrote this".
  */
 
 import { Innertube } from 'youtubei.js'
@@ -22,6 +25,10 @@ interface PanelSegment {
   end_ms?: string
   snippet?: { toString(): string }
 }
+
+type Info = Awaited<ReturnType<Innertube['getInfo']>>
+type Panel = Awaited<ReturnType<Info['getTranscript']>>
+type Track = NonNullable<NonNullable<Info['captions']>['caption_tracks']>[number]
 
 const NO_PANEL = [
   'Cannot get transcript from basic video info.',
@@ -44,6 +51,13 @@ function toCues(segments: PanelSegment[]): Cue[] {
   return cues
 }
 
+/** The caption track the panel answered with, matched by the name the panel shows for it. */
+function served(info: Info, panel: Panel): Track | undefined {
+  const selected = panel.selectedLanguage
+  if (selected.length === 0) return undefined
+  return info.captions?.caption_tracks?.find((track) => track.name.toString() === selected)
+}
+
 export const innertube: Provider = {
   id: 'innertube',
 
@@ -54,7 +68,8 @@ export const innertube: Provider = {
   async fetch(source: Source, context: ProviderContext): Promise<ProviderOutcome> {
     context.report({ step: 'innertube', done: 0, total: 1, message: 'opening the transcript panel' })
 
-    let panel
+    let info: Info
+    let panel: Panel
     try {
       const client = await Innertube.create({
         retrieve_player: false,
@@ -64,7 +79,7 @@ export const innertube: Provider = {
         fetch: (input, init) => globalThis.fetch(input, init),
         ...(context.language ? { lang: context.language } : {}),
       })
-      const info = await client.getInfo(source.videoId)
+      info = await client.getInfo(source.videoId)
       panel = await info.getTranscript()
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error)
@@ -77,11 +92,12 @@ export const innertube: Provider = {
     context.report({ step: 'innertube', done: 1, total: 1, message: 'read the transcript panel' })
     if (segments.length === 0) return nothing('the transcript panel was empty')
 
+    const track = served(info, panel)
     return produced(
       {
         segments,
-        language: context.language ?? source.captionLanguages[0] ?? 'unknown',
-        generated: true,
+        language: track?.language_code ?? context.language ?? source.captionLanguages[0] ?? 'unknown',
+        generated: track ? track.kind === 'asr' : true,
       },
       `${segments.length} segments from the transcript panel`,
     )

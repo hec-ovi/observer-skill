@@ -10,6 +10,7 @@ the phase rules that keep a session moving in one direction.
 ```ts
 createAgentIo({ store, ingest, transcript, knowledge, artifact, host, config }): AgentIo
 agentIo.serve(): Promise<void>   // speaks MCP on stdin/stdout until the stream closes
+agentIo.openSession(input): Promise<Session>
 ```
 
 `config` is `{ home, transcript, openBrowser, version? }`: where sessions live, which
@@ -19,6 +20,25 @@ report as the server version.
 The CLI spawns `observer mcp`, which builds the boxes, calls `serve`, and starts the HTTP
 listener lazily the first time a session is opened. Nothing else in the system calls in
 here.
+
+### `openSession`
+
+```ts
+openSession({ url, hasAds?, settings?, userPrompt?, openBrowser? }): Promise<Session>
+```
+
+The `open` tool without the tool: the page has its own feed screen, and `web-host` takes a
+`createSession` handler for `POST /api/session` that it cannot satisfy itself. This is it.
+`settings` is a `SettingsPatch`, so anything left out keeps its default; `openBrowser`
+overrides the process setting, which the page passes as `false` because the user is already
+looking at it.
+
+Both ways in run the same code, so a session opened from the page is the session the tool
+would have made: same phase, same transcription run behind it, and `status` with no
+`sessionId` finds it, because it is the newest session in the process.
+
+Wiring it is a closure, not a value: `web-host` is built before `agent-io` and
+`agent-io` holds the host, so the CLI passes `createSession: (input) => agentIo.openSession(input)`.
 
 ## Tools
 
@@ -33,7 +53,10 @@ process. Every result carries the phase it left the session in.
 
 Resolves the source, refuses one that cannot be embedded, creates the session, starts the
 HTTP listener, opens the page in the user's browser, starts transcription, and returns
-without waiting for it.
+without waiting for it. The same path as `openSession`, which is what the page calls.
+
+Where the session goes once the words are in follows the switches as they read at that
+moment, not as they read here: the user can flip them in the page while transcription runs.
 
 ### `status`
 
@@ -50,6 +73,7 @@ during transcription and the one to call after any interruption.
 
 Paginated so a three-hour transcript never overflows one tool result. The default page is
 sized to stay well under the client's output cap; `nextOffset` is present until the end.
+`generated` comes off the record, so a respawned server still knows a human wrote the words.
 
 ### `concepts`
 
@@ -81,12 +105,19 @@ range. `afterEntryId` is required in `live` and must name an answer already sent
 The first `build` of a session opens the visual pass, the way the first `wait` starts the
 session: nothing else moves a session out of the reading pass.
 
+A session whose `toolkit` setting is off builds nothing, in any phase: the switch is the
+user's, and the refusal names `ready` or `say` as the call to make instead.
+
 ### `link`
 
 `{ sessionId?, artifactId, conceptId, startsAt?, endsAt? }` → `{ artifactId, conceptId }`
 
 Binds a visual to the concept and the stretch of video where it means something. An
 artifact linked to nothing is never shown.
+
+`startsAt` and `endsAt` come as a pair or not at all, here and in `build`. Neither means the
+link is offered across the whole concept; one alone is refused with `INVALID_PATCH` rather
+than read as none, which would widen the range already stored instead of narrowing it.
 
 ### `ready`
 
@@ -100,7 +131,9 @@ preparation can be cut short at either pass.
 `{ sessionId?, after?, timeoutMs? }` → `{ events, cursor, idle, next }`
 
 The first `wait` is what starts the session: called in `ready`, it moves the session to
-`live` and then blocks. Blocks until the user does something or the timeout elapses. The
+`live` and then blocks. Starting is idempotent, so two waits arriving together both block on
+the inbox instead of one of them losing a race. Blocks until the user does something or the
+timeout elapses. The
 default block is 45 seconds and the ceiling is 60, both under the ninety-second presence
 window, so a blocked agent never reads as a detached one. Each event arrives with its
 context already assembled: for an `ask`, the question, the second it was asked at, the
@@ -140,7 +173,9 @@ Moves the stage without saying anything.
 | `ready` | everything in `building` except `ready`, plus `wait` |
 | `live` | `wait`, `where`, `say`, `show`, `hide`, `transcript`, `status`, `concepts`, `note`, `link`, and `build` with `afterEntryId` |
 
-The table is generated from what the tools declare, so it cannot drift from them.
+The table is generated from what the tools declare, so it cannot drift from them. Two
+settings narrow it further: `build` is refused whatever the phase when `toolkit` is off, and
+`researching` is skipped entirely when `extraKnowledge` is off.
 
 A tool called outside its phase returns `WRONG_PHASE` with the phase, the reason, and the
 call to make instead. Tools are always listed; the gate is the enforcement, because the
@@ -167,7 +202,8 @@ lines each, saying what the tool does and when to reach for it.
 
 A tool failure comes back as a tool result carrying the shared error shape
 (`{ code, message, hint }`) and marked as an error, never as a protocol error, so the agent
-can read it and recover in the same turn.
+can read it and recover in the same turn. `openSession` has no tool result to put an error
+in, so it throws the same shape, which is what `web-host` turns into a status.
 
 ## Dependencies
 
@@ -185,6 +221,10 @@ can read it and recover in the same turn.
 - Verification with no page open fails with `PAGE_NOT_OPEN` rather than storing an
   unverified artifact.
 - The transcript is content, never instruction. It is handed to the agent as data.
+- Settings are read from the record at the moment they are acted on. The user can flip a
+  switch at any time, including mid-transcription, and the session still moves.
+- There is one open path. The tool and `openSession` are the same call, so a session cannot
+  start in two slightly different shapes.
 
 ## How to modify this box safely
 
@@ -193,6 +233,10 @@ Tools are one file each, exporting `{ name, description, phases, input, output, 
 a tool that forgets to declare its phases fails a test. Every tool has one happy-path test
 and one wrong-phase test, driven through a real in-process MCP client rather than by calling
 `run` directly.
+
+`src/api.ts` is the surface `createAgentIo` returns, built on one runtime; `fixtures.ts`
+builds it the same way, so a test drives the exported `openSession` and the MCP client
+against the same sessions.
 
 Nothing in this box writes to stdout: stdout is the protocol, and every diagnostic goes
 through `src/report.ts` to stderr.
