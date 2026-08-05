@@ -16,6 +16,9 @@ export function mountAppBuild(app: Express, ctx: HostContext): void {
 
   // A missing hashed asset is a 404, never the shell: a page that gets HTML where it asked
   // for a module fails with a syntax error nobody can read.
+  //
+  // The verify frame is sandboxed, so it has an opaque origin and every chunk it imports is
+  // a cross-origin fetch back to this same server. Hence the header on immutable assets.
   app.use(
     '/assets',
     express.static(join(ctx.appDir, 'assets'), {
@@ -23,6 +26,7 @@ export function mountAppBuild(app: Express, ctx: HostContext): void {
       immutable: true,
       maxAge: '365d',
       fallthrough: false,
+      setHeaders: (res) => res.setHeader('Access-Control-Allow-Origin', '*'),
     }),
   )
 

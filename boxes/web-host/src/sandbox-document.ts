@@ -1,23 +1,22 @@
 /**
- * The document verification runs a module in. It is served from a route rather than written
- * into a srcdoc or a blob, because only an http response carries its own policy: a local
- * scheme inherits the page's, and then the module could never be locked down on its own.
+ * The policy the verify frame runs under.
  *
- * Nothing here is inline script, so the policy needs no hashes and no `unsafe-inline` for
- * scripts. `runner.js` belongs to the stage, ships with the app build, and reads its own
- * query string; this box only points at it.
+ * The document itself belongs to `app/stage`: it ships with the app build as `sandbox.html`
+ * and uses the same loader the visible stage does, so passing verification means the module
+ * will render. This box only serves it, and only this box can give it a policy, because a
+ * policy travels on an http response and a srcdoc or blob would inherit the page's instead.
  */
 
 /**
- * `'self'` matches nothing in a sandboxed document, so the script sources are absolute
- * origins with a path prefix. `connect-src 'none'` is the network gate: a module that tries
- * to fetch is blocked here, whatever the static checks concluded earlier.
+ * `'self'` matches nothing in a sandboxed document, so every source is an absolute origin
+ * with a path prefix. `connect-src 'none'` is the network gate: a module that tries to
+ * fetch is blocked here, whatever the static checks concluded earlier.
  */
 export function sandboxPolicy(origin: string): string {
   return [
     "default-src 'none'",
-    `script-src ${origin}/sandbox/ ${origin}/api/artifact/`,
-    "style-src 'unsafe-inline'",
+    `script-src ${origin}/sandbox/ ${origin}/assets/ ${origin}/api/artifact/`,
+    `style-src ${origin}/assets/ 'unsafe-inline'`,
     'img-src data: blob:',
     'font-src data:',
     "connect-src 'none'",
@@ -26,23 +25,4 @@ export function sandboxPolicy(origin: string): string {
     "frame-src 'none'",
     'sandbox allow-scripts',
   ].join('; ')
-}
-
-function attribute(value: string): string {
-  return value.replaceAll('&', '&amp;').replaceAll('"', '&quot;').replaceAll('<', '&lt;')
-}
-
-export function sandboxDocument(options: { bundleUrl: string; parentOrigin: string }): string {
-  const src = attribute(
-    `/sandbox/runner.js?bundle=${encodeURIComponent(options.bundleUrl)}` +
-      `&parent=${encodeURIComponent(options.parentOrigin)}`,
-  )
-  return `<!doctype html>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>verify</title>
-<style>html,body{margin:0;height:100%}#root{height:100%;overflow:hidden}</style>
-<div id="root"></div>
-<script type="module" src="${src}" crossorigin="anonymous"></script>
-`
 }

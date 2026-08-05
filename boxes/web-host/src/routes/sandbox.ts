@@ -2,11 +2,13 @@ import type { ServerResponse } from 'node:http'
 import { join } from 'node:path'
 import express from 'express'
 import type { Router } from 'express'
-import { artifactOf } from '../artifact-lookup.ts'
 import type { HostContext } from '../context.ts'
-import { sandboxDocument, sandboxPolicy } from '../sandbox-document.ts'
+import { sandboxPolicy } from '../sandbox-document.ts'
 
-/** The runner is a module script fetched from an opaque origin, so it needs CORS headers. */
+/**
+ * Everything the frame loads is a CORS fetch: a sandboxed document has an opaque origin, so
+ * its own server is cross-origin to it.
+ */
 function allowAnyOrigin(res: ServerResponse): void {
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader('Cache-Control', 'no-cache')
@@ -15,24 +17,18 @@ function allowAnyOrigin(res: ServerResponse): void {
 export function sandboxRoutes(ctx: HostContext): Router {
   const router = express.Router()
 
-  router.get('/:sessionId/:artifactId', (req, res) => {
-    const { sessionId, artifactId } = req.params
-    artifactOf(ctx, sessionId, artifactId)
-
-    const origin = ctx.origin()
-    res.set('Content-Type', 'text/html; charset=utf-8')
-    res.set('Content-Security-Policy', sandboxPolicy(origin))
+  // The frame. One document for every verification; which module to run arrives over the
+  // port the page hands it, so nothing about a session is in the URL.
+  router.get('/frame', (_req, res, next) => {
+    res.set('Content-Security-Policy', sandboxPolicy(ctx.origin()))
     res.set('X-Content-Type-Options', 'nosniff')
     res.set('Cache-Control', 'no-store')
-    res.send(
-      sandboxDocument({
-        bundleUrl: `/api/artifact/${encodeURIComponent(sessionId)}/${encodeURIComponent(artifactId)}`,
-        parentOrigin: origin,
-      }),
-    )
+    res.sendFile(join(ctx.appDir, 'sandbox.html'), (error) => {
+      if (error) next(error)
+    })
   })
 
-  // `runner.js` and anything else the stage ships beside it.
+  // The registry modules the import map points at, and whatever ships beside them.
   router.use(
     express.static(join(ctx.appDir, 'sandbox'), {
       index: false,

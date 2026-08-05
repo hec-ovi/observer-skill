@@ -111,7 +111,8 @@ class WebHost implements Host {
     }
     const timeoutMs = request.timeoutMs ?? DEFAULT_VERIFY_TIMEOUT_MS
     const { requestId, result } = this.#verifications.start(artifactId, timeoutMs)
-    const url = `${this.#origin()}/sandbox/${encodeURIComponent(sessionId)}/${encodeURIComponent(artifactId)}`
+    // The module, not a document: the page owns the frame it runs the module in.
+    const url = `${this.#origin()}/api/artifact/${encodeURIComponent(sessionId)}/${encodeURIComponent(artifactId)}`
     this.#store.signal(sessionId, { type: 'verify', requestId, url, timeoutMs })
     return result
   }

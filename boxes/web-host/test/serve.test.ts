@@ -67,24 +67,27 @@ test('an artifact whose path climbs out of the session is refused', async () => 
   }
 })
 
-test('the sandbox document runs the bundle under its own policy', async () => {
-  const answer = await fetch(`${running.base}/sandbox/s1/a1`)
+test('the verify frame is served under its own policy', async () => {
+  const answer = await fetch(`${running.base}/sandbox/frame`)
   assert.equal(answer.status, 200)
 
   const policy = answer.headers.get('content-security-policy') ?? ''
   assert.match(policy, /default-src 'none'/)
   assert.match(policy, /connect-src 'none'/)
   assert.match(policy, /sandbox allow-scripts/)
-  assert.ok(policy.includes(`script-src ${running.base}/sandbox/ ${running.base}/api/artifact/`))
+  assert.ok(
+    policy.includes(
+      `script-src ${running.base}/sandbox/ ${running.base}/assets/ ${running.base}/api/artifact/`,
+    ),
+  )
   assert.equal(answer.headers.get('x-content-type-options'), 'nosniff')
 
-  const html = await answer.text()
-  assert.match(html, /<script type="module" src="\/sandbox\/runner\.js\?/)
-  assert.match(html, /bundle=%2Fapi%2Fartifact%2Fs1%2Fa1/)
+  // The document is the app build's own, so the stage's loader runs the module.
+  assert.match(await answer.text(), /<script type="module"/)
 })
 
-test('the runner is served with the CORS header a module fetch needs', async () => {
-  const answer = await fetch(`${running.base}/sandbox/runner.js`)
+test('the registry modules are served with the CORS header a module fetch needs', async () => {
+  const answer = await fetch(`${running.base}/sandbox/vendor/echarts.js`)
   assert.equal(answer.status, 200)
   assert.equal(answer.headers.get('access-control-allow-origin'), '*')
 })

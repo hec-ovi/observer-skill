@@ -19,7 +19,7 @@ test('verify signals the page and resolves with what it posts back', async () =>
 
   const signalled = await client.waitFor('verify')
   const asked = signalled.data as { requestId: string; url: string; timeoutMs: number }
-  assert.equal(asked.url, `${running.base}/sandbox/s1/a1`)
+  assert.equal(asked.url, `${running.base}/api/artifact/s1/a1`)
   assert.equal(asked.timeoutMs, 2_000)
 
   const answer = await postJson(`${running.base}/live/s1/event`, {
