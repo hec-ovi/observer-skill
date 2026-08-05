@@ -71,6 +71,13 @@ rather than through the URL. It has one address only: the build's own `/sandbox.
 `Access-Control-Allow-Origin: *`, because a module script is always a CORS fetch and a
 sandboxed document has an opaque origin.
 
+The frame carries one inline script that nothing else can replace: the import map resolving
+`echarts`, `d3` and `katex` to the built registry. A policy with no allowance for it blocks
+the map silently, every artifact fails to resolve its library, and the whole toolkit reports
+a missing registry. So `script-src` is not written by hand: the hashes are computed from the
+inline scripts of the document actually being served, and re-read when the build changes.
+The policy cannot drift away from the page it protects, because it is derived from it.
+
 ## The live channel
 
 Downstream, as SSE, each with an id so the page can order what it receives:
