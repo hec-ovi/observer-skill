@@ -100,7 +100,15 @@ class SessionStore {
 
     const handle = new SessionHandle(this.#home, record, this.#seq++)
     this.#handles.set(id, handle)
-    await handle.flush()
+    try {
+      await handle.flush()
+    } catch (error) {
+      // A session that never reached the disk is not a session: a failed create leaves
+      // nothing behind for `get` or `list` to hand out.
+      this.#handles.delete(id)
+      await handle.close()
+      throw error
+    }
     return handle.record
   }
 

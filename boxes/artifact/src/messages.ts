@@ -22,8 +22,33 @@ function byteColumnToCharacter(lineText: string, byteColumn: number): number {
   return lineText.length
 }
 
+/**
+ * esbuild notes come in two shapes. One stands alone as an instruction. The other points at
+ * a second place in the source ("The name … was originally exported here:") and carries the
+ * location that sentence is missing; that one describes the problem, so it joins the message
+ * with its line, and the fix is left to the caller's instruction.
+ */
+function pointersIn(message: Message): string[] {
+  const pointers: string[] = []
+  for (const note of message.notes) {
+    const text = note.text.trim()
+    if (note.location && text.length > 0) pointers.push(`${text} line ${note.location.line}.`)
+  }
+  return pointers
+}
+
+function describe(message: Message): string {
+  const pointers = pointersIn(message)
+  if (pointers.length === 0) return message.text
+  const head = message.text.trim()
+  return [/[.!?:]$/.test(head) ? head : `${head}.`, ...pointers].join(' ')
+}
+
 function fixFrom(message: Message): string | undefined {
-  const parts = message.notes.map((note) => note.text).filter((text) => text.length > 0)
+  const parts = message.notes
+    .filter((note) => !note.location)
+    .map((note) => note.text.trim())
+    .filter((text) => text.length > 0)
   const suggestion = message.location?.suggestion
   if (suggestion) parts.push(`Write \`${suggestion}\` at that position.`)
   return parts.length > 0 ? parts.join(' ') : undefined
@@ -35,14 +60,15 @@ export function toBuildError(
   source: SourceText,
 ): BuildError {
   const fix = fixFrom(message)
+  const text = describe(message)
   const location = message.location
-  if (!location) return { stage, message: message.text, ...(fix ? { fix } : {}) }
+  if (!location) return { stage, message: text, ...(fix ? { fix } : {}) }
 
   const column = byteColumnToCharacter(location.lineText, location.column) + 1
   const position = { line: location.line, column }
   return {
     stage,
-    message: message.text,
+    message: text,
     line: position.line,
     column: position.column,
     snippet: source.snippet(position),

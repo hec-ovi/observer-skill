@@ -3,23 +3,21 @@
     "url": "https://www.youtube.com/youtubei/v1/player?prettyPrint=false&alt=json",
     "body": {
       "playabilityStatus": {
-        "status": "ERROR",
-        "reason": "This video is unavailable",
+        "status": "LOGIN_REQUIRED",
+        "reason": "Sign in to confirm you’re not a bot",
         "errorScreen": {
           "playerErrorMessageRenderer": {
             "reason": {
               "runs": [
                 {
-                  "text": "This video is unavailable"
+                  "text": "Sign in to confirm you’re not a bot"
                 }
               ]
             },
-            "thumbnail": {
-              "thumbnails": [
+            "subreason": {
+              "runs": [
                 {
-                  "url": "//s.ytimg.com/yts/img/meh7-vflGevej7.png",
-                  "width": 140,
-                  "height": 100
+                  "text": "This helps protect our community."
                 }
               ]
             },
@@ -28,12 +26,7 @@
             }
           }
         },
-        "pictureInPicture": {
-          "pictureInPictureRenderer": {
-            "offByDefault": false
-          }
-        },
-        "contextParams": "Q0FBU0FnZ0E="
+        "contextParams": "Q0FFU0FnZ0M="
       }
     }
   },

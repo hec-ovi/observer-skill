@@ -101,10 +101,13 @@ class WebSpeechHold implements Hold {
     const recognition = this.#recognition
 
     if (this.#failure) {
-      recognition?.abort()
+      this.#detach()
       throw this.#failure
     }
-    if (!recognition || this.#ended) return this.#final.trim()
+    if (!recognition || this.#ended) {
+      this.#detach()
+      return this.#final.trim()
+    }
 
     const text = await new Promise<string>((resolve) => {
       this.#resolve = resolve
@@ -116,15 +119,17 @@ class WebSpeechHold implements Hold {
       }
     })
 
+    // The final wait can run out on a session that is still listening, and that session would
+    // otherwise keep firing partials into a hold whose utterance is already delivered.
+    this.#detach()
     if (this.#failure) throw this.#failure
     return text
   }
 
   cancel(): void {
     this.#held = false
-    this.#clearTimer()
-    this.#recognition?.abort()
-    this.#recognition = null
+    this.#detach()
+    this.#settle()
   }
 
   #open(): void {
@@ -192,6 +197,17 @@ class WebSpeechHold implements Hold {
     const resolve = this.#resolve
     this.#resolve = null
     resolve?.(this.#final.trim())
+  }
+
+  /** The session is over for this hold. Handlers go first, so the abort cannot come back. */
+  #detach(): void {
+    const recognition = this.#recognition
+    this.#recognition = null
+    if (!recognition) return
+    recognition.onresult = null
+    recognition.onerror = null
+    recognition.onend = null
+    recognition.abort()
   }
 
   #clearTimer(): void {

@@ -1,8 +1,10 @@
 import { fail } from '#errors'
-import type { Concept, Session, SessionStore } from '#session'
+import type { Artifact, Concept, Session, SessionStore } from '#session'
 import { assertInBounds, readConcept, readNote, readRange } from './drafts.ts'
 import { conceptIdFor } from './ids.ts'
+import { planLink } from './links.ts'
 import { planWrite } from './merge.ts'
+import { SessionQueue } from './queue.ts'
 import type { ConceptDraftInput, NoteDraftInput, TimeRange, TimeRangeInput } from './schema.ts'
 import { Timeline } from './timeline.ts'
 import type { Coverage } from './timeline.ts'
@@ -23,12 +25,25 @@ function requireConcept(session: Session, conceptId: string): Concept {
   return concept
 }
 
+function requireArtifact(session: Session, artifactId: string): Artifact {
+  const artifact = session.artifacts.find((candidate) => candidate.id === artifactId)
+  if (artifact === undefined) {
+    fail(
+      'UNKNOWN_ARTIFACT',
+      `Session ${session.id} has no artifact ${artifactId}.`,
+      'Build the visual before binding it to a concept.',
+    )
+  }
+  return artifact
+}
+
 /**
  * What the agent worked out about one video: the concepts, the notes attached to them, the
  * visuals bound to them, and the lookup by second that runs inside a pause.
  */
 export class Knowledge {
   readonly #store: SessionStore
+  readonly #writes = new SessionQueue()
   readonly #timelines = new Map<string, Timeline>()
 
   constructor(store: SessionStore) {
@@ -45,9 +60,11 @@ export class Knowledge {
       assertInBounds(`Concept "${draft.label}"`, draft, session.source.duration)
       return draft
     })
-    const plan = planWrite(session.concepts, drafts)
-    const written = await this.#store.appendConcepts(sessionId, plan)
-    return plan.map((entry) => requireConcept(written, entry.id))
+    return this.#writes.run(sessionId, async () => {
+      const plan = planWrite(this.#store.get(sessionId).concepts, drafts)
+      const written = await this.#store.appendConcepts(sessionId, plan)
+      return plan.map((entry) => requireConcept(written, entry.id))
+    })
   }
 
   /** Notes are appended and never edited: a later one wins by being later, both stay. */

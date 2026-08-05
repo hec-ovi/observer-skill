@@ -23,16 +23,31 @@ describe('at', () => {
     assert.deepEqual(knowledge.at(session.id, 160), covering)
   })
 
-  it('covers the second where one range ends and the next begins', async (t) => {
+  it('covers the second where one range ends and the next begins, earlier one first', async (t) => {
     const { knowledge, session } = await openKnowledge(t)
     await knowledge.writeConcepts(session.id, [
-      { label: 'intro', kind: 'definition', startsAt: 0, endsAt: 60 },
-      { label: 'setup', kind: 'definition', startsAt: 60, endsAt: 120 },
+      { label: 'intro', kind: 'definition', startsAt: 60, endsAt: 120 },
+      { label: 'warm up', kind: 'definition', startsAt: 0, endsAt: 60 },
     ])
 
     assert.deepEqual(
       knowledge.at(session.id, 60).concepts.map((concept) => concept.label),
-      ['intro', 'setup'],
+      ['warm up', 'intro'],
+    )
+  })
+
+  it('breaks a tie between two identical ranges on the lower id', async (t) => {
+    const { knowledge, session } = await openKnowledge(t)
+    const [zeta, alma] = await knowledge.writeConcepts(session.id, [
+      { label: 'zeta', kind: 'definition', startsAt: 1000, endsAt: 1100 },
+      { label: 'alma', kind: 'definition', startsAt: 1000, endsAt: 1100 },
+    ])
+    assert.ok(zeta && alma)
+    assert.ok(alma.id < zeta.id)
+
+    assert.deepEqual(
+      knowledge.at(session.id, 1050).concepts.map((concept) => concept.id),
+      [alma.id, zeta.id],
     )
   })
 

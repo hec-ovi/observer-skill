@@ -97,11 +97,24 @@ describe('the fake player', () => {
     await settle()
     player.play()
     const reported = log.positions.length
+    const moved = [...log.states]
 
     player.destroy()
 
     expect(el.childNodes).toHaveLength(0)
     vi.advanceTimersByTime(POSITION_TICK_MS * 10)
     expect(log.positions).toHaveLength(reported)
+
+    // A late command from a caller does not bring it back either.
+    player.play()
+    player.pause()
+    player.seek(10)
+    player.advance(5)
+    player.fail('NOT_EMBEDDABLE')
+    vi.advanceTimersByTime(POSITION_TICK_MS * 10)
+
+    expect(log.positions).toHaveLength(reported)
+    expect(log.states).toEqual(moved)
+    expect(log.errors).toEqual([])
   })
 })

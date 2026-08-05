@@ -48,13 +48,13 @@ export class RecordWriter {
     }
   }
 
+  /** The timer holds the event loop open: it carries a write already owed to a caller. */
   #schedule(): void {
     if (this.#timer !== null || this.#current !== null) return
     this.#timer = setTimeout(() => {
       this.#timer = null
       void this.#run()
     }, DEBOUNCE_MS)
-    this.#timer.unref()
   }
 
   #run(): Promise<void> {

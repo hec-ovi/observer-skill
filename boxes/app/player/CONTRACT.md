@@ -21,7 +21,10 @@ cannot do until the video has started.
 
 ## Outputs
 
-- `onReady({ duration, title })` once the video can be controlled.
+- `onReady({ duration, title })` once the video can be controlled, and again when the
+  player's own title or duration correct what was reported then. A source that knew neither
+  is told `{ duration: 0, title: '' }` first and the real pair once playback starts, so a
+  caller reads the latest call, not the first. `duration()` carries the same value.
 - `onPosition({ time, state })` on play, on pause, on seek, on end, and on a steady tick
   while playing. The tick is fast enough that a pause maps to the right sentence and slow
   enough that it is not a network event storm: `POSITION_TICK_MS` is exported, so the
@@ -49,7 +52,7 @@ cannot do until the video has started.
   a remount reuses or cleanly replaces the instance, including under React's double
   invocation in development.
 - `destroy` removes the iframe, the listeners, and the tick. Nothing survives a route
-  change.
+  change, and a command that arrives after it does nothing.
 - The page never autoplays. Playback starts from a user gesture, which also unlocks audio
   for the voice box.
 - The provider name and every provider-specific parameter live inside this box. Callers

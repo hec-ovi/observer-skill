@@ -67,6 +67,34 @@ test('rebuilding the same id replaces the bundle at the same path', async () => 
   if (!first.result.ok || !second.result.ok) return
   assert.equal(second.result.bundlePath, first.result.bundlePath)
   assert.equal(second.result.bytes, first.result.bytes)
+
+  // On disk, not just in the result: an append would leave two bundles the stage cannot parse.
+  const written = await stat(second.result.bundlePath)
+  assert.equal(written.size, second.result.bytes)
+})
+
+test('a sessionId or id that is not one path segment is refused, and nothing is written', async () => {
+  const root = await mkdtemp(join(tmpdir(), 'observer-artifact-input-'))
+  const nested = join(root, 'inner', 'home')
+  const source = await fixture('good-chart')
+
+  try {
+    for (const bad of [
+      { sessionId: '../..', id: 'escape' },
+      { sessionId: 'session-1', id: 'a/b' },
+    ]) {
+      const errors = errorsOf(await build({ ...bad, source, home: nested }))
+      const error = errors[0]
+      assert.ok(error)
+      assert.equal(error.stage, 'check')
+      assert.match(error.message, /letters, digits, dot, dash or underscore/)
+      assert.ok(error.fix)
+    }
+
+    assert.deepEqual(await readdir(root), [])
+  } finally {
+    await rm(root, { recursive: true, force: true })
+  }
 })
 
 test('an import outside the registry fails the check and writes nothing', async () => {
@@ -100,6 +128,27 @@ test('reaching the network fails the check', async () => {
   assert.ok(error)
   assert.match(error.message, /fetch is not allowed/)
   assertPointsAt(source, error, 'fetch(')
+})
+
+test('a source with CRLF line endings reports the same position as with LF', async () => {
+  const lf = await fixture('network-fetch')
+  const crlf = lf.replace(/\n/g, '\r\n')
+  const result = await build({ sessionId: 'session-1', id: 'crlf', source: crlf, home })
+
+  const error = errorsOf(result)[0]
+  assert.ok(error)
+  assertPointsAt(crlf, error, 'fetch(')
+  assert.ok(error.snippet?.includes('fetch('))
+})
+
+test('a repeated key on one line points at the offending occurrence', async () => {
+  const { source, result } = await buildFixture('repeated-radius')
+  const errors = errorsOf(result)
+  assert.equal(errors.length, 1)
+
+  const error = errors[0]
+  assert.ok(error)
+  assertPointsAt(source, error, 'borderRadius: 8')
 })
 
 test('a non-zero border-radius fails, in CSS text and in chart options', async () => {
@@ -142,6 +191,15 @@ test('a syntax error reports the line it is on', async () => {
   assert.equal(error.line, 11)
   assert.equal(source.split('\n')[10], '  echarts.init(el).setOption(option)')
   assert.ok(error.fix)
+})
+
+test('a name declared twice names the other place and still says what to do', async () => {
+  const { result } = await buildFixture('duplicate-export')
+  const error = errorsOf(result)[0]
+  assert.ok(error)
+  assert.equal(error.line, 6)
+  assert.match(error.message, /originally exported here: line 1\./)
+  assert.match(error.fix ?? '', /^Fix the syntax at that position/)
 })
 
 test('a bundle over the size limit is refused and nothing is written', async () => {

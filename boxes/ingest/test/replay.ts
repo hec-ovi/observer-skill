@@ -1,6 +1,8 @@
 /**
  * Replays recorded lookups. Every fixture under `fixtures/` was captured from the live
  * endpoints on 2026-08-05; the innertube captures keep only the branches this box reads.
+ * The one exception is `innertube-refused.json`, a challenge YouTube serves on its own
+ * schedule: it carries YouTube's wording in the shape the player endpoint answers with.
  * Nothing here reaches the network.
  */
 
@@ -24,6 +26,8 @@ export interface Plan {
   oembed: string | number
   /** File name under `fixtures/`. Omitted means the richer lookup cannot be reached. */
   innertube?: string
+  /** Called with every request the box makes, before the recording answers it. */
+  watch?: (url: string, init?: FetchInit) => void
 }
 
 function load<T>(name: string): T {
@@ -31,6 +35,7 @@ function load<T>(name: string): T {
 }
 
 type FetchInput = Parameters<typeof fetch>[0]
+type FetchInit = Parameters<typeof fetch>[1]
 
 function urlOf(input: FetchInput): string {
   if (typeof input === 'string') return input
@@ -48,8 +53,9 @@ export function replay(plan: Plan): () => void {
       : load<OEmbedFixture>(plan.oembed)
   const calls = plan.innertube === undefined ? null : load<InnertubeCall[]>(plan.innertube)
 
-  globalThis.fetch = async (input: FetchInput): Promise<Response> => {
+  globalThis.fetch = async (input: FetchInput, init?: FetchInit): Promise<Response> => {
     const url = urlOf(input)
+    plan.watch?.(url, init)
 
     if (url.includes('/oembed')) {
       return new Response(embed.body, { status: embed.status })

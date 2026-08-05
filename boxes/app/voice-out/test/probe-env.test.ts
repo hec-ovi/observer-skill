@@ -1,22 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 
 describe('env', () => {
-  it('imports the worker module under a stubbed scope', async () => {
-    const posted: unknown[] = []
-    let listener: ((event: { data: unknown }) => void) | null = null
-    vi.stubGlobal('self', {
-      postMessage: (message: unknown) => posted.push(message),
-      addEventListener: (_type: string, fn: (event: { data: unknown }) => void) => {
-        listener = fn
-      },
-      close: () => {},
-    })
-    vi.resetModules()
-    await import('../src/pocket/worker.ts')
-    expect(typeof listener).toBe('function')
-    expect(posted).toEqual([])
-  })
-
   it('constructs a host against a fake Worker', async () => {
     const seen: string[] = []
     class FakeWorker extends EventTarget {

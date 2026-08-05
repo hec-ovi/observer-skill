@@ -6,6 +6,7 @@ import { playerError } from '../errors.ts'
 import { PositionPoll } from '../position-poll.ts'
 import { loadYouTubeApi } from './api.ts'
 import { toPlayerError, toPlayerState } from './mapping.ts'
+import { ReadyMetadata } from './metadata.ts'
 import type { Reading } from '../position-poll.ts'
 import type {
   Player,
@@ -29,17 +30,17 @@ class YouTubePlayer implements Player {
   #el: HTMLElement
   #options: PlayerOptions
   #poll: PositionPoll
+  #metadata: ReadyMetadata
   #yt: YT.Player | null = null
   #state: PlayerState = 'unstarted'
   #time = 0
-  #duration: number
   #watchdog: ReturnType<typeof setTimeout> | null = null
   #gone = false
 
   constructor(el: HTMLElement, options: PlayerOptions) {
     this.#el = el
     this.#options = options
-    this.#duration = options.source.duration ?? 0
+    this.#metadata = new ReadyMetadata(options.source, (info) => options.onReady?.(info))
     this.#poll = new PositionPoll(
       () => this.#reading(),
       (time) => this.#report(time),
@@ -90,7 +91,7 @@ class YouTubePlayer implements Player {
   }
 
   duration(): number {
-    return this.#duration
+    return this.#metadata.duration
   }
 
   destroy(): void {
@@ -130,16 +131,12 @@ class YouTubePlayer implements Player {
 
   #ready(target: YT.Player): void {
     this.#yt = target
-    // Both getters are empty for a round trip after load, so what the source already knows
-    // stands in for them.
-    const seconds = target.getDuration?.()
-    if (typeof seconds === 'number' && seconds > 0) this.#duration = seconds
-    const data = target.getVideoData?.()
-    const title = data?.title || this.#options.source.title || ''
-    this.#options.onReady?.({ duration: this.#duration, title })
+    this.#metadata.read(target)
   }
 
   #moved(raw: number): void {
+    // The video has moved, so the metadata the player withheld at load may be there now.
+    this.#metadata.read(this.#yt)
     const next = toPlayerState(raw)
     if (next !== 'unstarted' && next !== 'cued') this.#unwatch()
     if (next !== this.#state) {

@@ -10,6 +10,8 @@ export interface Position {
   column: number
 }
 
+const LINE_BREAK = /\r\n|\r|\n/g
+
 export class SourceText {
   readonly text: string
   private readonly lines: string[]
@@ -18,13 +20,18 @@ export class SourceText {
 
   constructor(text: string) {
     this.text = text
-    this.lines = text.split(/\r\n|\r|\n/)
+    this.lines = []
     this.starts = []
-    let offset = 0
-    for (const line of this.lines) {
-      this.starts.push(offset)
-      offset += line.length + 1
+    // Cut on the real separator each time: a CRLF is two characters, and counting it as one
+    // would slide every later offset away from the text the caret is drawn against.
+    let start = 0
+    for (const match of text.matchAll(LINE_BREAK)) {
+      this.lines.push(text.slice(start, match.index))
+      this.starts.push(start)
+      start = match.index + match[0].length
     }
+    this.lines.push(text.slice(start))
+    this.starts.push(start)
   }
 
   lineText(line: number): string {
@@ -46,11 +53,18 @@ export class SourceText {
     return { line, column: offset - (this.starts[line - 1] ?? 0) + 1 }
   }
 
-  /** First occurrence of `needle` at or after the start of `from`'s line, if there is one. */
+  /**
+   * First occurrence of `needle` at or after `from`. The needle sits inside the node that
+   * was found, so searching from the node itself keeps the caret off an earlier, compliant
+   * occurrence on the same line; the line start is the fallback for when the mapped position
+   * lands past the needle.
+   */
   find(needle: string, from: Position): Position | null {
     if (needle.length === 0) return null
-    const index = this.text.indexOf(needle, this.offsetAt({ line: from.line, column: 1 }))
-    return index === -1 ? null : this.positionAt(index)
+    const ahead = this.text.indexOf(needle, this.offsetAt(from))
+    if (ahead !== -1) return this.positionAt(ahead)
+    const onLine = this.text.indexOf(needle, this.offsetAt({ line: from.line, column: 1 }))
+    return onLine === -1 ? null : this.positionAt(onLine)
   }
 
   /** The offending line with a caret under the column, indented the way the line is. */

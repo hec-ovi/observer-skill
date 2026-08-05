@@ -67,3 +67,51 @@ test('asking again for the same artifact leaves only one verification pending', 
   assert.equal((await second).ok, false)
   client.vanish()
 })
+
+test('two sessions holding the same artifact id verify without cancelling each other', async () => {
+  // Artifact ids are chosen per session, so `revenue-chart` in two sessions is two artifacts.
+  const store = new FakeStore([makeSession({ id: 'sA' }), makeSession({ id: 'sB' })])
+  const pair = await startHost({ store })
+  try {
+    const pageA = await openSse(`${pair.base}/live/sA`)
+    const pageB = await openSse(`${pair.base}/live/sB`)
+
+    const runA = pair.host.verify({ sessionId: 'sA', artifactId: 'revenue-chart', timeoutMs: 5_000 })
+    const runB = pair.host.verify({ sessionId: 'sB', artifactId: 'revenue-chart', timeoutMs: 5_000 })
+
+    const askedA = (await pageA.waitFor('verify')).data as { requestId: string }
+    const askedB = (await pageB.waitFor('verify')).data as { requestId: string }
+
+    const answer = await postJson(`${pair.base}/live/sA/event`, {
+      type: 'verify-result',
+      requestId: askedA.requestId,
+      ok: true,
+      errors: [],
+      size: { width: 320, height: 180 },
+      snapshot: null,
+    })
+    assert.equal(answer.status, 202)
+
+    assert.deepEqual(await runA, {
+      ok: true,
+      errors: [],
+      size: { width: 320, height: 180 },
+      snapshot: null,
+    })
+
+    await postJson(`${pair.base}/live/sB/event`, {
+      type: 'verify-result',
+      requestId: askedB.requestId,
+      ok: false,
+      errors: ['it drew nothing'],
+      size: { width: 0, height: 0 },
+      snapshot: null,
+    })
+    assert.deepEqual((await runB).errors, ['it drew nothing'])
+
+    pageA.vanish()
+    pageB.vanish()
+  } finally {
+    await pair.stop()
+  }
+})

@@ -54,17 +54,21 @@ class Fake implements FakePlayer {
     })
   }
 
+  // A destroyed player answers no command, the way a torn-down provider frame does not.
   play(): void {
+    if (this.#gone) return
     this.#move('playing')
     this.#timer ??= setInterval(() => this.advance(POSITION_TICK_MS / 1000), POSITION_TICK_MS)
   }
 
   pause(): void {
+    if (this.#gone) return
     this.#stop()
     this.#move('paused')
   }
 
   seek(seconds: number): void {
+    if (this.#gone) return
     this.#time = Math.min(Math.max(seconds, 0), this.#duration)
     this.#report()
   }
@@ -82,6 +86,7 @@ class Fake implements FakePlayer {
   }
 
   advance(seconds: number): void {
+    if (this.#gone) return
     this.#time = Math.min(this.#time + seconds, this.#duration)
     if (this.#time < this.#duration) {
       this.#report()
@@ -92,6 +97,7 @@ class Fake implements FakePlayer {
   }
 
   fail(code: PlayerErrorCode): void {
+    if (this.#gone) return
     this.#options.onError?.(playerError(code))
   }
 

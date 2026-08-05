@@ -45,6 +45,23 @@ test('a taken port moves up one, and the host reports the one it got', async () 
   }
 })
 
+test('closing while the bind is in flight leaves nothing listening', async () => {
+  const host = await createHost({
+    store: new FakeStore(),
+    appDir: await makeAppDir(),
+    home: await makeHome(),
+    port: 0,
+  })
+
+  const starting = host.start()
+  await host.close()
+  const { url } = await starting
+
+  assert.equal(host.url, null)
+  assert.equal(host.port, null)
+  await assert.rejects(() => fetch(`${url}/healthz`))
+})
+
 test('close returns with a stream still attached', async () => {
   const running = await startHost()
   const client = await openSse(`${running.base}/live/s1`)

@@ -142,14 +142,24 @@ class HoldListener implements Listener {
     })
     this.#hold = hold
 
+    let capture: MicCapture
     try {
-      this.#capture = await openMicrophone()
+      capture = await openMicrophone()
     } catch (error) {
       hold.cancel()
       this.#hold = null
       this.#emitDiagnostic(null)
       this.#fail(error)
+      return
     }
+
+    // Disposed while the device was opening: `dispose` cancelled the hold but had no capture
+    // to give back yet, and `stop` will not run on a dead listener. Give it back here.
+    if (this.#disposed) {
+      capture.close().catch(() => undefined)
+      return
+    }
+    this.#capture = capture
   }
 
   #fail(error: unknown): void {

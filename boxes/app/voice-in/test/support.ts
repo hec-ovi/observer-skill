@@ -39,3 +39,11 @@ export function hear(seconds: number, amplitude: number): void {
   const samples = new Float32Array(Math.round(seconds * RATE)).fill(amplitude)
   FakeAudioWorkletNode.last().port.emit(samples)
 }
+
+/**
+ * Run a release as far as it goes on its own: the capture torn down, the gate applied, and
+ * the request handed to whatever engine is next, which is where the test takes over.
+ */
+export function flush(): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, 0))
+}

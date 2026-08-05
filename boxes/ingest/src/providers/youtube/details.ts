@@ -6,6 +6,7 @@
  */
 
 import type { Innertube } from 'youtubei.js'
+import { fetchWithin, withDeadline } from './deadline.ts'
 import { readPlayability, type Verdict } from './playability.ts'
 import { parsePublished } from './published.ts'
 
@@ -31,7 +32,7 @@ function innertube(): Promise<Innertube> {
   client ??= (async () => {
     const { Innertube } = await import('youtubei.js')
     return Innertube.create({
-      fetch: (input, init) => globalThis.fetch(input, init),
+      fetch: fetchWithin,
       lang: 'en',
       generate_session_locally: true,
       retrieve_innertube_config: false,
@@ -45,20 +46,12 @@ function innertube(): Promise<Innertube> {
   return client
 }
 
-function withTimeout<T>(work: Promise<T>): Promise<T> {
-  const signal = AbortSignal.timeout(TIMEOUT_MS)
-  const expiry = new Promise<never>((_, reject) => {
-    signal.addEventListener('abort', () => {
-      reject(new Error(`Lookup did not answer within ${TIMEOUT_MS} ms.`))
-    })
-  })
-  return Promise.race([work, expiry])
-}
-
 export async function lookupDetails(videoId: string): Promise<Details | null> {
   try {
-    const yt = await innertube()
-    const info = await withTimeout(yt.getInfo(videoId, { client: CLIENT }))
+    const info = await withDeadline(TIMEOUT_MS, async () => {
+      const yt = await innertube()
+      return yt.getInfo(videoId, { client: CLIENT })
+    })
 
     const languages = (info.captions?.caption_tracks ?? []).map((track) => track.language_code)
 

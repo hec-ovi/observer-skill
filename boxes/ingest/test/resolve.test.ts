@@ -116,11 +116,29 @@ test('the richer lookup being unreachable degrades the extra fields', async (t) 
 })
 
 test('the richer lookup refusing us degrades rather than condemning the video', async (t) => {
-  t.after(replay({ oembed: 'oembed-normal.json', innertube: 'innertube-error.json' }))
+  t.after(replay({ oembed: 'oembed-normal.json', innertube: 'innertube-refused.json' }))
 
   const source = await resolve({ url: NORMAL })
 
   assert.equal(source.embeddable, true)
   assert.equal(source.degraded, true)
   assert.equal(source.duration, null)
+  assert.equal(source.hasCaptions, null)
+})
+
+test('the player request carries the deadline, so a stalled lookup is torn down', async (t) => {
+  const signals = new Map<string, AbortSignal | null | undefined>()
+  t.after(
+    replay({
+      oembed: 'oembed-normal.json',
+      innertube: 'innertube-normal.json',
+      watch: (url, init) => signals.set(new URL(url).pathname, init?.signal),
+    }),
+  )
+
+  await resolve({ url: NORMAL })
+
+  const player = signals.get('/youtubei/v1/player')
+  assert.ok(player instanceof AbortSignal, 'the player request should carry an abort signal')
+  assert.equal(player.aborted, false)
 })

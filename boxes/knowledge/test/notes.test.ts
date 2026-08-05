@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
+import type { NoteDraftInput } from '#knowledge'
 import { openKnowledge } from '../fixtures.ts'
 
 describe('addNote', () => {
@@ -28,6 +29,28 @@ describe('addNote', () => {
       ],
     )
     assert.equal(updated.notes[0]?.source, 'https://arxiv.org/abs/1706.03762')
+  })
+
+  it('refuses a note with no text and a note with an unknown kind', async (t) => {
+    const { knowledge, session } = await openKnowledge(t)
+    const [concept] = await knowledge.writeConcepts(session.id, [
+      { label: 'attention', kind: 'system', startsAt: 300, endsAt: 600 },
+    ])
+    assert.ok(concept)
+
+    await assert.rejects(
+      () => knowledge.addNote(session.id, concept.id, { kind: 'background', text: '   ' }),
+      { code: 'INVALID_CONCEPT' },
+    )
+    await assert.rejects(
+      () =>
+        knowledge.addNote(session.id, concept.id, {
+          kind: 'rumour' as NoteDraftInput['kind'],
+          text: 'heard it somewhere',
+        }),
+      { code: 'INVALID_CONCEPT' },
+    )
+    assert.deepEqual(knowledge.byLabel(session.id, 'attention')?.notes, [])
   })
 
   it('refuses a concept that was never written', async (t) => {

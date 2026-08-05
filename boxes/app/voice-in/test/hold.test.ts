@@ -3,7 +3,7 @@
  * silence away from the engine.
  */
 
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import {
   FakeAudioContext,
   FakeMediaStream,
@@ -131,5 +131,31 @@ describe('the listener', () => {
 
     expect(heard).toEqual([])
     expect(navigator.mediaDevices.getUserMedia).toHaveBeenCalledTimes(1)
+  })
+
+  it('gives the microphone back when disposed while it is still opening', async () => {
+    // The permission prompt, the device open and the first worklet fetch all live in this
+    // window, so an unmount mid-press lands here rather than after the microphone is live.
+    let grant = (): void => {}
+    const prompt = new Promise<void>((resolve) => {
+      grant = resolve
+    })
+    vi.mocked(navigator.mediaDevices.getUserMedia).mockImplementation(async () => {
+      await prompt
+      return new FakeMediaStream() as unknown as MediaStream
+    })
+
+    const { listener, heard, states } = recordedListener({ provider: 'auto' })
+    const started = listener.start()
+    listener.dispose()
+    grant()
+    await started
+    await listener.stop()
+
+    expect(FakeMediaStream.live()).toHaveLength(0)
+    expect(FakeAudioContext.live()).toHaveLength(0)
+    expect(FakeSpeechRecognition.last().started).toBe(false)
+    expect(heard).toEqual([])
+    expect(states).toEqual(['listening'])
   })
 })

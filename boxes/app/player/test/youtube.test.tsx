@@ -34,11 +34,32 @@ function mount() {
 }
 
 describe('the YouTube player', () => {
-  it('reports its duration and title once it can be controlled', async () => {
+  it('stands in for the metadata it cannot have yet, then reports the real one', async () => {
+    const { log, player } = mount()
+    await settle()
+    const yt = FakeYTPlayer.last()
+
+    // Both YouTube getters are empty until the video has started, so this is the source.
+    expect(log.ready).toEqual([{ duration: 0, title: 'A talk' }])
+    expect(player.duration()).toBe(0)
+
+    yt.playVideo()
+
+    expect(log.ready.at(-1)).toEqual({ duration: 300, title: 'Fake video' })
+    expect(player.duration()).toBe(300)
+  })
+
+  it('reports the metadata once when nothing about it changed', async () => {
     const { log } = mount()
     await settle()
+    const yt = FakeYTPlayer.last()
+    yt.duration = 0
+    yt.title = ''
 
-    expect(log.ready).toEqual([{ duration: 300, title: 'A talk' }])
+    yt.playVideo()
+    yt.pauseVideo()
+
+    expect(log.ready).toEqual([{ duration: 0, title: 'A talk' }])
   })
 
   it('does not autoplay', async () => {
@@ -75,6 +96,25 @@ describe('the YouTube player', () => {
     // The tick belongs to playback; a paused video is not polled.
     vi.advanceTimersByTime(POSITION_TICK_MS * 8)
     expect(log.positions).toHaveLength(4)
+  })
+
+  it('reports buffering, and gives a slow connection the time it needs', async () => {
+    vi.useFakeTimers()
+    const { log, player } = mount()
+    await settle()
+    const yt = FakeYTPlayer.last()
+    // The command lands; the connection makes the player wait before any frame plays.
+    vi.spyOn(yt, 'playVideo').mockImplementation(() => {})
+
+    player.play()
+    yt.setState(YT_STATE.BUFFERING)
+    expect(log.states).toEqual(['buffering'])
+
+    vi.advanceTimersByTime(10_000)
+    expect(log.errors).toEqual([])
+
+    yt.setState(YT_STATE.PLAYING)
+    expect(log.states).toEqual(['buffering', 'playing'])
   })
 
   it('reports the end of the video', async () => {

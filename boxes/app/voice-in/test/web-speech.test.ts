@@ -8,6 +8,7 @@ import { FakeSpeechRecognition } from '../../testing/fakes.ts'
 import { hear, recordedListener } from './support.ts'
 
 const PAST_THE_RESTART_DELAY = 200
+const PAST_THE_FINAL_WAIT = 3500
 
 describe('the web-speech provider', () => {
   it('reopens a session that ended by itself, at most twice', async () => {
@@ -27,6 +28,30 @@ describe('the web-speech provider', () => {
     await listener.stop()
 
     expect(heard).toEqual(['still holding'])
+  })
+
+  it('shuts a session down that never reported its end, so no late result lands', async () => {
+    vi.useFakeTimers()
+    const { listener, heard, partials } = recordedListener({ provider: 'web-speech' })
+
+    await listener.start()
+    hear(1, 0.5)
+    const recognition = FakeSpeechRecognition.last()
+    recognition.say('what is a matrix')
+    // A stop() the engine never answers is the case the final wait exists for.
+    recognition.stop = (): void => {}
+
+    const stopped = listener.stop()
+    await vi.advanceTimersByTimeAsync(PAST_THE_FINAL_WAIT)
+    await stopped
+
+    expect(heard).toEqual(['what is a matrix'])
+    expect(listener.state).toBe('idle')
+    expect(recognition.started).toBe(false)
+
+    const delivered = partials.length
+    recognition.say('stale tail')
+    expect(partials).toHaveLength(delivered)
   })
 
   it('delivers an empty utterance when the engine fails, with the reason', async () => {
